@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lịch Công Tác</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h2>Lịch Công Tác Tuần</h2>
+    <table id="lichTable">
+        <thead>
+            <tr><th>Ngày</th><th>Thứ</th><th>Thời gian</th><th>Nội dung</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Thay link này bằng URL bạn vừa copy ở Bước 2
+        const url = https://script.google.com/macros/s/AKfycbykeidMNUjjumto0v3g6ezQcInnlu7fGL6k0HK3mVHjfEYAdpnU5d5dDHxpI9AOpXs/exec";
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector("#lichTable tbody");
+                data.forEach(item => {
+                    let row = `<tr>
+                        <td>${item.ngay}</td>
+                        <td>${item.thu}</td>
+                        <td>${item.thoiGian}</td>
+                        <td>${item.noiDung}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    </script>
+</body>
+</html>
