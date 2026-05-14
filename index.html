@@ -336,13 +336,64 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .hidden { display: none !important; }
+  @media (max-width: 480px) {
+    .btn-label-full { display: none; }
+    .btn-label-short { display: inline !important; }
+  }
 
   @media (max-width: 768px) {
-    .header { padding: 0 16px; }
-    .main { padding: 16px 12px; }
-    .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+    /* HEADER mobile */
+    .header { padding: 0 12px; height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+    .header-logo { font-size: 15px; }
+    .header-sub { display: none; }
+    .header-right { gap: 6px; flex-wrap: wrap; }
+    .btn { padding: 6px 10px; font-size: 12px; }
+    .user-badge { padding: 5px 10px; font-size: 12px; }
+
+    /* MAIN */
+    .main { padding: 12px 10px; }
+
+    /* WEEK NAV */
+    .week-nav { padding: 12px 14px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .week-title { font-size: 15px; }
+    .week-nav > div:last-child { width: 100%; justify-content: space-between; }
+    .view-tabs { flex: 1; }
+    .view-tab { padding: 5px 12px; font-size: 12px; }
+
+    /* TABLE: ẩn bớt cột, dùng card style */
+    .table-wrap { border-radius: 10px; overflow-x: auto; }
+    table { min-width: 480px; }
+    thead th { padding: 10px 10px; font-size: 12px; }
+    tbody td { padding: 10px 10px; font-size: 12px; }
     thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+    .td-time { font-size: 11px; padding: 2px 6px; }
+
+    /* CALENDAR: 1 cột */
+    .calendar-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .cal-day-header { padding: 8px; }
+    .cal-date { font-size: 16px; }
+    .cal-event { font-size: 11px; padding: 4px 6px; }
+
+    /* MODAL full screen */
+    .modal { width: 95vw; padding: 20px 16px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
+    .modal[style*="360px"] { width: 92vw; }
     .form-row { grid-template-columns: 1fr; }
+    .form-input { font-size: 14px; padding: 10px; }
+
+    /* PIN modal */
+    .pin-input { width: 44px; height: 48px; font-size: 20px; }
+    .pin-inputs { gap: 8px; }
+
+    /* USERS modal */
+    .users-list { max-height: 200px; }
+  }
+
+  @media (max-width: 400px) {
+    .calendar-grid { grid-template-columns: 1fr; }
+    .header-logo { font-size: 13px; }
+    table { min-width: 360px; }
+    thead th:nth-child(6), tbody td:nth-child(6) { display: none; }
+    thead th:nth-child(7), tbody td:nth-child(7) { display: none; }
   }
 </style>
 </head>
@@ -361,7 +412,7 @@
       <div class="user-dot"></div>
       <span id="userName">--</span>
     </div>
-    <button id="btnAdmin" class="btn btn-outline hidden" onclick="openUsersModal()">👥 Quản lý người dùng</button>
+    <button id="btnAdmin" class="btn btn-outline hidden" onclick="openUsersModal()"><span class="btn-label-full">👥 Quản lý người dùng</span><span class="btn-label-short hidden">👥</span></button>
     <button id="btnAddLich" class="btn btn-accent hidden" onclick="openAddModal()">+ Thêm lịch</button>
     <button id="btnLogin" class="btn btn-outline" onclick="openPinModal()">🔐 Đăng nhập</button>
     <button id="btnLogout" class="btn btn-outline hidden" onclick="logout()">Đăng xuất</button>
@@ -575,11 +626,27 @@ function changeWeek(dir) {
 }
 
 // ── FETCH DATA ──
+function cleanRow(r) {
+  // Chuẩn hóa ngày: lấy phần YYYY-MM-DD, bù timezone +7
+  if (r.ngay && r.ngay.includes('T')) {
+    const d = new Date(r.ngay);
+    d.setHours(d.getHours() + 7);
+    r.ngay = d.toISOString().split('T')[0];
+  }
+  // Chuẩn hóa thoigian: nếu là datetime thì bỏ
+  if (r.thoigian && r.thoigian.includes('T')) {
+    r.thoigian = '';
+  }
+  // id về string
+  r.id = String(r.id);
+  return r;
+}
+
 async function loadData() {
   try {
     const r = await fetch(`${API}?action=getLich`);
     const d = await r.json();
-    allData = Array.isArray(d) ? d : [];
+    allData = Array.isArray(d) ? d.map(cleanRow) : [];
   } catch(e) {
     allData = [];
   }
