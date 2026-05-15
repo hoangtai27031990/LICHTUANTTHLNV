@@ -293,23 +293,24 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 // ════════════════════════════════════════════════════════
 const API = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
 const THU = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
-const CACHE_TTL  = 60_000;   // Cache dữ liệu 60 giây
-const MAX_RETRY  = 2;         // Số lần thử lại khi lỗi mạng
-const RATE_LIMIT = 3_000;     // Tối thiểu 3 giây giữa các lần ghi (thêm/sửa/xóa)
-const PIN_LOCKOUT_LIMIT = 5;  // Khóa sau 5 lần nhập sai
-const PIN_LOCKOUT_MS    = 120_000; // Khóa 2 phút
+const CACHE_TTL        = 60_000;  // Cache dữ liệu 60 giây
+const MAX_RETRY        = 2;       // Số lần thử lại khi lỗi mạng
+const RATE_LIMIT       = 3_000;   // Tối thiểu 3 giây giữa các lần ghi
+const PIN_LOCKOUT_LIMIT = 5;      // Khóa sau 5 lần nhập sai
+const PIN_LOCKOUT_MS   = 120_000; // Khóa 2 phút
 
 // ════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════
-let cu = null, isAdm = false;
+// [SỬA 1] Thêm cu_pin để lưu PIN sau khi đăng nhập thành công
+let cu = null, isAdm = false, cu_pin = null;
 let allD = [], wOff = 0, edId = null, cv = 'table';
 let isLoading = false, cacheTime = 0;
-let lastWriteTime = 0;          // Rate-limit ghi
-let pinFailCount = 0;           // Đếm lần nhập PIN sai
-let pinLockedUntil = 0;         // Timestamp hết khóa PIN
-let pinTimer = null;            // Debounce PIN submit
-let toastTimer = null;          // Quản lý toast timeout
+let lastWriteTime = 0;
+let pinFailCount = 0;
+let pinLockedUntil = 0;
+let pinTimer = null;
+let toastTimer = null;
 
 // ════════════════════════════════════════════════════════
 //  SECURITY HELPERS
@@ -358,14 +359,14 @@ async function apiFetch(params, retries = MAX_RETRY) {
   for (let i = 0; i <= retries; i++) {
     try {
       const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), 12_000); // 12s timeout
+      const tid = setTimeout(() => ctrl.abort(), 12_000);
       const res = await fetch(url, { signal: ctrl.signal });
       clearTimeout(tid);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (e) {
       if (i === retries) throw e;
-      await new Promise(r => setTimeout(r, 1000 * (i + 1))); // backoff 1s, 2s
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
     }
   }
 }
@@ -414,7 +415,6 @@ function cleanRow(r) {
   }
   if (r.thoigian?.includes('T')) r.thoigian = '';
   r.id = String(r.id ?? '');
-  // Giới hạn độ dài để tránh dữ liệu bất thường từ sheet
   ['thu','thoigian','noidung','diadiem','chutri','thanhphan'].forEach(k => {
     r[k] = san(r[k] ?? '', 300);
   });
@@ -422,15 +422,14 @@ function cleanRow(r) {
 }
 
 async function load(force = false) {
-  // Dùng cache nếu còn hạn và không cần force
   if (!force && allD.length && (Date.now() - cacheTime) < CACHE_TTL) {
     render(); return;
   }
-  if (isLoading) return; // Chặn duplicate request
+  if (isLoading) return;
   isLoading = true;
   showLoading();
   try {
-    const d = await apiFetch({ action: 'getLich', t: Date.now() }); // t= phá cache CDN
+    const d = await apiFetch({ action: 'getLich', t: Date.now() });
     allD = Array.isArray(d) ? d.map(cleanRow) : [];
     cacheTime = Date.now();
   } catch(e) {
@@ -481,8 +480,6 @@ function renderT() {
     (a.ngay||'').localeCompare(b.ngay||'') || (a.thoigian||'').localeCompare(b.thoigian||'')
   );
 
-  // Dùng esc() cho mọi giá trị — chống XSS
-  // Dùng data-id thay vì inline onclick — chống injection
   b.innerHTML = data.map(r => `
     <tr>
       <td class="td-date">${esc(dsp(r.ngay))}</td>
@@ -498,7 +495,6 @@ function renderT() {
       </td>` : '<td></td>'}
     </tr>`).join('');
 
-  // Event delegation — 1 listener thay vì N inline handler
   b.onclick = e => {
     const ed = e.target.closest('.ibtn.edit');
     const dl = e.target.closest('.ibtn.del');
@@ -550,17 +546,16 @@ function openPin() {
 function closePin() { document.getElementById('pinOv').classList.remove('open'); }
 
 function pnxt(el, nxt) {
-  // Chỉ chấp nhận chữ số
   el.value = el.value.replace(/\D/g, '');
   if (el.value.length >= 1 && nxt) document.getElementById(nxt).focus();
   if (!nxt && el.value.length >= 1) {
     clearTimeout(pinTimer);
-    pinTimer = setTimeout(verPin, 150); // Debounce 150ms
+    pinTimer = setTimeout(verPin, 150);
   }
 }
 
-function pinKey(e, prevId) {
-  // Backspace: quay lại ô trước nếu ô hiện tại rỗng
+// [SỬA 2] Thêm tham số curId (khắc phục lỗi tham số bị bỏ qua)
+function pinKey(e, prevId, curId) {
   if (e.key === 'Backspace' && e.target.value === '' && prevId) {
     document.getElementById(prevId).focus();
   }
@@ -570,7 +565,6 @@ async function verPin() {
   const btn = document.getElementById('pinBtn');
   if (btn.disabled) return;
 
-  // Kiểm tra khóa PIN
   if (Date.now() < pinLockedUntil) {
     const sec = Math.ceil((pinLockedUntil - Date.now()) / 1000);
     document.getElementById('perr').textContent = `Bị khóa, thử lại sau ${sec}s`;
@@ -587,9 +581,12 @@ async function verPin() {
   try {
     const d = await apiFetch({ action: 'verifyPin', pin: encodeURIComponent(pin) });
     if (d.success) {
-      pinFailCount = 0; // Reset counter khi đăng nhập thành công
-      cu = san(d.ten, 50); isAdm = !!d.isAdmin;
-      closePin(); updUI();
+      pinFailCount = 0;
+      cu = san(d.ten, 50);
+      isAdm = !!d.isAdmin;
+      cu_pin = pin; // [SỬA 3] Lưu PIN để gửi kèm request ghi
+      closePin();
+      updUI();
       toast(`Xin chào, ${esc(d.ten)}! 👋`, 'ok');
       render();
     } else {
@@ -602,7 +599,6 @@ async function verPin() {
         msg.textContent = `❌ Nhập sai quá nhiều lần. Bị khóa 2 phút.`;
         msg.style.display = 'block';
         btn.disabled = true; btn.textContent = 'Bị khóa';
-        // Tự mở khóa sau 2 phút
         setTimeout(() => {
           btn.disabled = false; btn.textContent = 'Xác nhận';
           msg.style.display = 'none';
@@ -623,8 +619,11 @@ async function verPin() {
 }
 
 function logout() {
-  cu = null; isAdm = false;
-  updUI(); render();
+  cu = null;
+  isAdm = false;
+  cu_pin = null; // [SỬA 4] Xóa PIN khi đăng xuất
+  updUI();
+  render();
   toast('Đã đăng xuất');
 }
 
@@ -651,7 +650,7 @@ function resetForm() {
 }
 
 function openAdd() {
-  if (!cu) return; // Guard: chỉ cho người đã đăng nhập
+  if (!cu) return;
   edId = null;
   document.getElementById('mtitle').textContent = '➕ Thêm lịch mới';
   resetForm();
@@ -659,19 +658,18 @@ function openAdd() {
 }
 
 function openEdit(id) {
-  if (!cu) return; // Guard
-  // Validate id trước khi lookup — tránh prototype pollution
+  if (!cu) return;
   if (typeof id !== 'string' || id.length > 20) return;
   const r = allD.find(x => x.id === id);
   if (!r) return;
   edId = id;
   document.getElementById('mtitle').textContent = '✏️ Chỉnh sửa lịch';
-  document.getElementById('fNgay').value = r.ngay    || '';
-  document.getElementById('fThu').value  = r.thu     || '';
-  document.getElementById('fTg').value   = r.thoigian|| '';
-  document.getElementById('fNd').value   = r.noidung || '';
-  document.getElementById('fDd').value   = r.diadiem || '';
-  document.getElementById('fCt').value   = r.chutri  || '';
+  document.getElementById('fNgay').value = r.ngay     || '';
+  document.getElementById('fThu').value  = r.thu      || '';
+  document.getElementById('fTg').value   = r.thoigian || '';
+  document.getElementById('fNd').value   = r.noidung  || '';
+  document.getElementById('fDd').value   = r.diadiem  || '';
+  document.getElementById('fCt').value   = r.chutri   || '';
   document.getElementById('fTp').value   = r.thanhphan || '';
   const btn = document.getElementById('saveBtn');
   btn.disabled = false; btn.textContent = '💾 Lưu lịch';
@@ -687,14 +685,11 @@ function autoThu() {
 function closeLich() { document.getElementById('lichOv').classList.remove('open'); }
 
 async function saveLich() {
-  if (!cu) return; // Guard
+  if (!cu || !cu_pin) return;
   const btn = document.getElementById('saveBtn');
-  if (btn.disabled) return; // Chống double-submit
-
-  // Rate limit ghi
+  if (btn.disabled) return;
   if (isRateLimited()) return;
 
-  // Validate
   const ngay = document.getElementById('fNgay').value;
   if (!isValidDate(ngay)) { toast('Ngày không hợp lệ', 'err'); return; }
   const nd = san(document.getElementById('fNd').value, 200);
@@ -703,8 +698,10 @@ async function saveLich() {
   btn.disabled = true; btn.textContent = 'Đang lưu...';
   lastWriteTime = Date.now();
   try {
+    // [SỬA 5] Gửi kèm pin để backend xác thực quyền
     const d = await apiFetch({
       action:    edId ? 'updateRow' : 'addRow',
+      pin:       cu_pin,
       id:        edId || '',
       ngay,
       thu:       san(document.getElementById('fThu').value, 20),
@@ -718,7 +715,7 @@ async function saveLich() {
     if (d.success) {
       closeLich();
       toast(edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', 'ok');
-      await load(true); // Force reload — đồng bộ dữ liệu
+      await load(true);
     } else {
       toast('Lỗi: ' + esc(d.error || 'không xác định'), 'err');
       btn.disabled = false; btn.textContent = '💾 Lưu lịch';
@@ -730,15 +727,17 @@ async function saveLich() {
 }
 
 async function delL(id) {
-  if (!cu) return; // Guard
+  if (!cu || !cu_pin) return;
   if (typeof id !== 'string' || id.length > 20) return;
   if (isRateLimited()) return;
   if (!confirm('Xác nhận xóa lịch này?')) return;
 
   lastWriteTime = Date.now();
   try {
+    // [SỬA 6] Gửi kèm pin để backend xác thực quyền
     const d = await apiFetch({
       action: 'deleteRow',
+      pin:    cu_pin,
       id,
       nguoiThucHien: san(cu, 50),
     });
@@ -753,26 +752,27 @@ async function delL(id) {
 //  USERS
 // ════════════════════════════════════════════════════════
 async function openUsers() {
-  if (!isAdm) return; // Guard: chỉ admin
+  if (!isAdm || !cu_pin) return;
   try {
-    const users = await apiFetch({ action: 'getUsers' });
+    // [SỬA 7] Gửi kèm pin — backend chỉ cho admin
+    const users = await apiFetch({ action: 'getUsers', pin: cu_pin });
     const list = document.getElementById('usrList');
     list.innerHTML = (Array.isArray(users) ? users : []).map(u => `
       <div class="usr-row">
         <div>
           <div class="usr-name">${esc(u.ten)}${u.ten==='Admin'?'<span class="admin-badge">ADMIN</span>':''}</div>
-          <div class="usr-pin">PIN: ${'•'.repeat(Math.min(String(u.pin||'').length, 4))}</div>
+          <div class="usr-pin">PIN: ${esc(u.pin)}</div>
         </div>
         ${u.ten !== 'Admin'
-          ? `<button class="del-usr" data-pin="${esc(u.pin)}"
+          ? `<button class="del-usr" data-ten="${esc(u.ten)}"
                style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;">
                🗑 Xóa</button>`
           : ''}
       </div>`).join('');
-    // Event delegation
+    // [SỬA 8] Xóa user bằng tên thay vì PIN (PIN giờ là "••••" từ backend)
     list.onclick = e => {
       const b = e.target.closest('.del-usr');
-      if (b) delUsr(b.dataset.pin);
+      if (b) delUsr(b.dataset.ten);
     };
   } catch(e) { toast('Lỗi tải danh sách', 'err'); }
   document.getElementById('usrOv').classList.add('open');
@@ -780,32 +780,38 @@ async function openUsers() {
 function closeUsers() { document.getElementById('usrOv').classList.remove('open'); }
 
 async function addUsr() {
-  if (!isAdm) return; // Guard
+  if (!isAdm || !cu_pin) return;
   const btn = document.getElementById('addUsrBtn');
   const ten = san(document.getElementById('nUN').value, 50);
   const pin = document.getElementById('nUP').value.trim();
-  if (!ten)           { toast('Vui lòng nhập tên', 'err'); return; }
+  if (!ten)             { toast('Vui lòng nhập tên', 'err'); return; }
   if (!isValidPin(pin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
 
   btn.disabled = true; btn.textContent = 'Đang thêm...';
   try {
-    const d = await apiFetch({ action: 'addUser', ten, pin });
+    // [SỬA 9] Gửi kèm pin admin để backend xác thực
+    const d = await apiFetch({ action: 'addUser', pin: cu_pin, ten, newpin: pin });
     if (d.success) {
       document.getElementById('nUN').value = '';
       document.getElementById('nUP').value = '';
       toast(`Đã thêm ${esc(ten)} ✓`, 'ok');
-      openUsers(); // Refresh danh sách
-    } else toast('Lỗi thêm người dùng', 'err');
+      openUsers();
+    } else if (d.error === 'PIN already exists') {
+      toast('PIN này đã được dùng, chọn PIN khác', 'err'); // [SỬA 10] Xử lý lỗi PIN trùng
+    } else {
+      toast('Lỗi thêm người dùng', 'err');
+    }
   } catch(e) { toast('Lỗi kết nối', 'err'); }
   finally { btn.disabled = false; btn.textContent = '➕ Thêm'; }
 }
 
-async function delUsr(pin) {
-  if (!isAdm) return; // Guard
-  if (!isValidPin(String(pin))) return;
-  if (!confirm('Xác nhận xóa người dùng này?')) return;
+async function delUsr(ten) {
+  if (!isAdm || !cu_pin) return;
+  if (!ten || ten === 'Admin') return;
+  if (!confirm(`Xác nhận xóa người dùng "${ten}"?`)) return;
   try {
-    const d = await apiFetch({ action: 'deleteUser', pin });
+    // [SỬA 11] Gửi kèm pin admin + tên user cần xóa
+    const d = await apiFetch({ action: 'deleteUser', pin: cu_pin, ten });
     if (d.success) { toast('Đã xóa người dùng ✓', 'ok'); openUsers(); }
     else toast('Lỗi xóa người dùng', 'err');
   } catch(e) { toast('Lỗi kết nối', 'err'); }
@@ -820,7 +826,7 @@ function bgClose(e, closeFn) {
 
 function toast(msg, type = '') {
   const t = document.getElementById('toast');
-  t.textContent = String(msg).slice(0, 80); // Giới hạn độ dài
+  t.textContent = String(msg).slice(0, 80);
   t.className = `toast ${type} show`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
@@ -830,12 +836,12 @@ function toast(msg, type = '') {
 //  AUTO REFRESH — Tự động tải lại mỗi 5 phút
 // ════════════════════════════════════════════════════════
 setInterval(() => {
-  // Chỉ refresh khi tab đang active và không đang thao tác
-  if (!document.hidden && !isLoading) load(true);
-}, 300_000); // 5 phút
+  // [SỬA 12] Không refresh khi form đang mở tránh conflict dữ liệu
+  const formOpen = document.getElementById('lichOv').classList.contains('open');
+  if (!document.hidden && !isLoading && !formOpen) load(true);
+}, 300_000);
 
 document.addEventListener('visibilitychange', () => {
-  // Khi người dùng quay lại tab sau >1 phút, tải mới
   if (!document.hidden && (Date.now() - cacheTime) > 60_000) load();
 });
 
