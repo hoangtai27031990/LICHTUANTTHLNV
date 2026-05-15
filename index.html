@@ -8,146 +8,161 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --p: #1a3a5c; --p-light: #2a5080; --p-pale: #e8f0fb;
-  --acc: #e63946; --suc: #2d9c6b; --bg: #eef2f7;
-  --card: #ffffff; --txt: #1a1a2e; --muted: #5a6478;
-  --bdr: #d4dbe8; --bdr2: #c0cad9;
+  --p:#1a3a5c; --p-light:#2a5080; --p-pale:#e8f0fb;
+  --acc:#e63946; --suc:#2d9c6b; --bg:#eef2f7;
+  --card:#fff; --txt:#1a1a2e; --muted:#5a6478;
+  --bdr:#d4dbe8; --bdr2:#c0cad9;
 }
-body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--txt); font-size: 14px; min-height: 100vh; }
+body { font-family:'Be Vietnam Pro',sans-serif; background:var(--bg); color:var(--txt); font-size:14px; min-height:100vh; }
 
-.hdr { background: var(--p); color: #fff; padding: 14px 16px 12px; position: sticky; top: 0; z-index: 50; }
-.hdr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.logo-wrap { display: flex; align-items: center; gap: 9px; }
-.logo-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.logo-text { font-size: 15px; font-weight: 600; line-height: 1.2; }
-.logo-sub { font-size: 11px; font-weight: 400; opacity: 0.65; margin-top: 1px; }
-.hdr-actions { display: flex; align-items: center; gap: 6px; }
-.hbtn { border: none; background: rgba(255,255,255,0.15); color: #fff; border-radius: 8px; padding: 7px 11px; font-size: 12.5px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: 'Be Vietnam Pro', sans-serif; transition: background 0.15s; }
-.hbtn:hover { background: rgba(255,255,255,0.22); }
-.ubadge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 5px 11px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
-.udot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+/* ── HEADER ── */
+.hdr { background:var(--p); color:#fff; padding:14px 16px 12px; position:sticky; top:0; z-index:50; }
+.hdr-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.logo-wrap { display:flex; align-items:center; gap:9px; }
+.logo-icon { width:36px; height:36px; background:rgba(255,255,255,.15); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.logo-text { font-size:15px; font-weight:600; line-height:1.2; }
+.logo-sub { font-size:11px; font-weight:400; opacity:.65; margin-top:1px; }
+.hdr-actions { display:flex; align-items:center; gap:6px; }
+.hbtn { border:none; background:rgba(255,255,255,.15); color:#fff; border-radius:8px; padding:7px 11px; font-size:12.5px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:5px; font-family:'Be Vietnam Pro',sans-serif; transition:background .15s; }
+.hbtn:hover { background:rgba(255,255,255,.22); }
+.ubadge { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:5px 11px; font-size:12px; display:flex; align-items:center; gap:6px; }
+.udot { width:7px; height:7px; border-radius:50%; background:#4ade80; flex-shrink:0; }
 
-.week-bar { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.week-info .wt { font-size: 14px; font-weight: 600; color: #fff; }
-.week-info .wr { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
-.week-ctrl { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.vtabs { display: flex; background: rgba(0,0,0,0.2); border-radius: 7px; padding: 2px; gap: 2px; }
-.vtab { border: none; background: none; color: rgba(255,255,255,0.6); border-radius: 5px; padding: 5px 10px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'Be Vietnam Pro', sans-serif; transition: all 0.15s; }
-.vtab.on { background: rgba(255,255,255,0.92); color: var(--p); }
-.navbtn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: background 0.15s; }
-.navbtn:hover { background: rgba(255,255,255,0.2); }
+/* ── WEEK BAR ── */
+.week-bar { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.week-info .wt { font-size:14px; font-weight:600; color:#fff; }
+.week-info .wr { font-size:11px; color:rgba(255,255,255,.7); margin-top:2px; }
+.week-ctrl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.vtabs { display:flex; background:rgba(0,0,0,.2); border-radius:7px; padding:2px; gap:2px; }
+.vtab { border:none; background:none; color:rgba(255,255,255,.6); border-radius:5px; padding:5px 10px; font-size:12px; font-weight:500; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; transition:all .15s; }
+.vtab.on { background:rgba(255,255,255,.92); color:var(--p); }
+.navbtn { width:30px; height:30px; border-radius:7px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.1); color:rgba(255,255,255,.85); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; transition:background .15s; }
+.navbtn:hover { background:rgba(255,255,255,.2); }
 
-.main { padding: 12px; }
-.scroll-hint { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); margin-bottom: 7px; padding: 0 3px; }
-.scroll-hint-dot { width: 16px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--p) 0%, transparent 100%); }
+/* ── MAIN ── */
+.main { padding:12px; }
+.scroll-hint { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); margin-bottom:7px; padding:0 3px; }
+.scroll-hint-dot { width:16px; height:3px; border-radius:2px; background:linear-gradient(90deg,var(--p) 0%,transparent 100%); }
 
-.tcard { background: var(--card); border-radius: 12px; border: 1px solid var(--bdr); overflow: hidden; }
-.tscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--bdr) transparent; }
-.tscroll::-webkit-scrollbar { height: 4px; }
-.tscroll::-webkit-scrollbar-track { background: transparent; }
-.tscroll::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 2px; }
-table { border-collapse: collapse; min-width: 620px; width: 100%; }
-thead tr { background: var(--p); }
-thead th { padding: 11px 14px; text-align: left; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); white-space: nowrap; letter-spacing: 0.4px; }
-tbody tr { border-bottom: 1px solid var(--bdr); transition: background 0.1s; }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:nth-child(even) { background: #f6f8fc; }
-tbody tr:hover { background: #edf3fc; }
-tbody td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
-.td-date { font-weight: 600; color: var(--p); white-space: nowrap; }
-.td-day { font-size: 11px; color: var(--muted); white-space: nowrap; }
-.pill { background: var(--p-pale); color: var(--p); border-radius: 6px; padding: 3px 9px; font-size: 11.5px; font-weight: 500; display: inline-block; white-space: nowrap; }
-.pill.all { background: #fef3c7; color: #92400e; }
-.td-content { font-weight: 500; white-space: normal; min-width: 160px; max-width: 200px; line-height: 1.4; }
-.td-muted { color: var(--muted); }
-.td-acts { display: flex; gap: 5px; }
-.ibtn { border: none; border-radius: 6px; padding: 6px 9px; cursor: pointer; font-size: 13px; display: flex; align-items: center; transition: all 0.15s; }
-.ibtn.edit { background: var(--p-pale); color: var(--p); }
-.ibtn.edit:hover { background: #d4e4f8; }
-.ibtn.del { background: #feecec; color: var(--acc); }
-.ibtn.del:hover { background: #fcd5d7; }
-.empty-row td { text-align: center; padding: 44px 20px; color: var(--muted); font-size: 13px; }
-.loading-row td { text-align: center; padding: 44px 20px; color: var(--muted); font-size: 13px; }
-.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--bdr); border-top-color: var(--p); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ── TABLE ── */
+.tcard { background:var(--card); border-radius:12px; border:1px solid var(--bdr); overflow:hidden; }
+.tscroll { overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--bdr) transparent; }
+.tscroll::-webkit-scrollbar { height:4px; }
+.tscroll::-webkit-scrollbar-track { background:transparent; }
+.tscroll::-webkit-scrollbar-thumb { background:var(--bdr2); border-radius:2px; }
+table { border-collapse:collapse; min-width:620px; width:100%; }
+thead tr { background:var(--p); }
+thead th { padding:11px 14px; text-align:left; font-size:11px; font-weight:600; color:rgba(255,255,255,.85); white-space:nowrap; letter-spacing:.4px; }
+tbody tr { border-bottom:1px solid var(--bdr); transition:background .1s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:nth-child(even) { background:#f6f8fc; }
+tbody tr:hover { background:#edf3fc; }
+tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
+.td-date { font-weight:600; color:var(--p); white-space:nowrap; }
+.td-day { font-size:11px; color:var(--muted); white-space:nowrap; }
+.pill { background:var(--p-pale); color:var(--p); border-radius:6px; padding:3px 9px; font-size:11.5px; font-weight:500; display:inline-block; white-space:nowrap; }
+.pill.all { background:#fef3c7; color:#92400e; }
+.td-content { font-weight:500; white-space:normal; min-width:160px; max-width:200px; line-height:1.4; }
+.td-muted { color:var(--muted); }
+.td-acts { display:flex; gap:5px; }
+.ibtn { border:none; border-radius:6px; padding:6px 9px; cursor:pointer; font-size:13px; display:flex; align-items:center; transition:all .15s; }
+.ibtn.edit { background:var(--p-pale); color:var(--p); }
+.ibtn.edit:hover { background:#d4e4f8; }
+.ibtn.del { background:#feecec; color:var(--acc); }
+.ibtn.del:hover { background:#fcd5d7; }
+.empty-row td,.loading-row td { text-align:center; padding:44px 20px; color:var(--muted); font-size:13px; }
+.spinner { display:inline-block; width:18px; height:18px; border:2px solid var(--bdr); border-top-color:var(--p); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+@keyframes spin { to { transform:rotate(360deg); } }
 
-.cal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.cal-day { background: var(--card); border-radius: 10px; border: 1px solid var(--bdr); overflow: hidden; }
-.cal-hdr { background: var(--p); color: #fff; padding: 9px 10px; text-align: center; }
-.cal-hdr.today { background: var(--acc); }
-.cal-thu { font-size: 10px; opacity: 0.72; margin-bottom: 2px; }
-.cal-dt { font-size: 18px; font-weight: 600; line-height: 1; }
-.cal-body { padding: 7px; display: flex; flex-direction: column; gap: 5px; min-height: 56px; }
-.cevent { background: var(--p-pale); border-left: 2.5px solid var(--p); border-radius: 0 5px 5px 0; padding: 5px 7px; }
-.cevent-time { font-size: 10px; color: var(--muted); margin-bottom: 1px; }
-.cevent-title { font-size: 11.5px; font-weight: 500; color: var(--txt); line-height: 1.3; }
-.cal-empty { font-size: 11px; color: #c0c8d8; text-align: center; padding: 14px 6px; }
+/* ── CALENDAR ── */
+.cal-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cal-day { background:var(--card); border-radius:10px; border:1px solid var(--bdr); overflow:hidden; }
+.cal-hdr { background:var(--p); color:#fff; padding:9px 10px; text-align:center; }
+.cal-hdr.today { background:var(--acc); }
+.cal-thu { font-size:10px; opacity:.72; margin-bottom:2px; }
+.cal-dt { font-size:18px; font-weight:600; line-height:1; }
+.cal-body { padding:7px; display:flex; flex-direction:column; gap:5px; min-height:56px; }
+.cevent { background:var(--p-pale); border-left:2.5px solid var(--p); border-radius:0 5px 5px 0; padding:5px 7px; }
+.cevent-time { font-size:10px; color:var(--muted); margin-bottom:1px; }
+.cevent-title { font-size:11.5px; font-weight:500; color:var(--txt); line-height:1.3; }
+.cal-empty { font-size:11px; color:#c0c8d8; text-align:center; padding:14px 6px; }
 
-.fab { position: fixed; bottom: 20px; right: 16px; z-index: 60; background: var(--p); color: #fff; border: none; border-radius: 50px; padding: 13px 20px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; font-family: 'Be Vietnam Pro', sans-serif; box-shadow: 0 4px 16px rgba(26,58,92,0.35); transition: transform 0.15s, box-shadow 0.15s; }
-.fab:active { transform: scale(0.96); }
-.fab:disabled { opacity: 0.6; cursor: not-allowed; }
+/* ── FAB ── */
+.fab { position:fixed; bottom:20px; right:16px; z-index:60; background:var(--p); color:#fff; border:none; border-radius:50px; padding:13px 20px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:7px; font-family:'Be Vietnam Pro',sans-serif; box-shadow:0 4px 16px rgba(26,58,92,.35); transition:transform .15s,box-shadow .15s; }
+.fab:active { transform:scale(.96); }
+.fab:disabled { opacity:.6; cursor:not-allowed; }
 
-.ov { position: fixed; inset: 0; background: rgba(10,20,40,0.5); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
-.ov.open { display: flex; }
-.sheet { background: var(--card); border-radius: 18px 18px 0 0; width: 100%; max-width: 540px; max-height: 92vh; overflow-y: auto; padding: 0 16px 36px; animation: slideUp 0.25s cubic-bezier(0.25,0.46,0.45,0.94); }
-@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.sheet-handle { width: 38px; height: 4px; background: var(--bdr); border-radius: 2px; margin: 12px auto 16px; }
-.sheet-title { font-size: 16px; font-weight: 600; color: var(--txt); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-.xcls { border: none; background: #f0f2f6; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; color: var(--muted); }
+/* ── BOTTOM SHEETS ── */
+.ov { position:fixed; inset:0; background:rgba(10,20,40,.5); z-index:200; display:none; align-items:flex-end; justify-content:center; }
+.ov.open { display:flex; }
+.sheet { background:var(--card); border-radius:18px 18px 0 0; width:100%; max-width:540px; max-height:92vh; overflow-y:auto; padding:0 16px 36px; animation:slideUp .25s cubic-bezier(.25,.46,.45,.94); }
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+.sheet-handle { width:38px; height:4px; background:var(--bdr); border-radius:2px; margin:12px auto 16px; }
+.sheet-title { font-size:16px; font-weight:600; color:var(--txt); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+.xcls { border:none; background:#f0f2f6; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer; color:var(--muted); }
 
-.fg { margin-bottom: 11px; }
-.fl { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-.fi { width: 100%; padding: 10px 12px; border: 1.5px solid var(--bdr); border-radius: 9px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 14px; color: var(--txt); background: #f8fafd; outline: none; transition: border-color 0.2s, background 0.2s; }
-.fi:focus { border-color: var(--p); background: #fff; }
-.fi[readonly] { background: #f0f2f6; color: var(--muted); }
-.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mf { display: flex; gap: 8px; margin-top: 16px; }
-.mbtn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-family: 'Be Vietnam Pro', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-.mbtn.cancel { background: #f0f2f6; color: var(--muted); }
-.mbtn.cancel:hover { background: #e4e7ed; }
-.mbtn.save { background: var(--p); color: #fff; }
-.mbtn.save:hover { background: var(--p-light); }
-.mbtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+/* ── FORM ── */
+.fg { margin-bottom:11px; }
+.fl { display:block; font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+.fi { width:100%; padding:10px 12px; border:1.5px solid var(--bdr); border-radius:9px; font-family:'Be Vietnam Pro',sans-serif; font-size:14px; color:var(--txt); background:#f8fafd; outline:none; transition:border-color .2s,background .2s; }
+.fi:focus { border-color:var(--p); background:#fff; }
+.fi[readonly] { background:#f0f2f6; color:var(--muted); }
+.fr { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mf { display:flex; gap:8px; margin-top:16px; }
+.mbtn { flex:1; padding:12px; border-radius:10px; border:none; font-family:'Be Vietnam Pro',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all .15s; }
+.mbtn.cancel { background:#f0f2f6; color:var(--muted); }
+.mbtn.cancel:hover { background:#e4e7ed; }
+.mbtn.save { background:var(--p); color:#fff; }
+.mbtn.save:hover { background:var(--p-light); }
+.mbtn:disabled { opacity:.6; cursor:not-allowed; }
 
-.pin-row { display: flex; gap: 8px; justify-content: center; margin: 14px 0 6px; }
-.pin-i { width: 52px; height: 56px; border: 1.5px solid var(--bdr); border-radius: 10px; text-align: center; font-size: 22px; font-weight: 600; outline: none; font-family: 'Be Vietnam Pro', sans-serif; color: var(--txt); background: #f8fafd; transition: border-color 0.2s; }
-.pin-i:focus { border-color: var(--p); background: #fff; }
-.pin-err { color: var(--acc); font-size: 12px; text-align: center; min-height: 18px; margin-bottom: 6px; }
+/* ── PIN ── */
+.pin-row { display:flex; gap:8px; justify-content:center; margin:14px 0 6px; }
+.pin-i { width:52px; height:56px; border:1.5px solid var(--bdr); border-radius:10px; text-align:center; font-size:22px; font-weight:600; outline:none; font-family:'Be Vietnam Pro',sans-serif; color:var(--txt); background:#f8fafd; transition:border-color .2s; }
+.pin-i:focus { border-color:var(--p); background:#fff; }
+.pin-err { color:var(--acc); font-size:12px; text-align:center; min-height:18px; margin-bottom:6px; }
 
-.usr-list { max-height: 220px; overflow-y: auto; margin-bottom: 4px; }
-.usr-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--bdr); }
-.usr-row:last-child { border-bottom: none; }
-.usr-name { font-weight: 500; font-size: 14px; }
-.usr-pin { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.admin-badge { background: #fef3c7; color: #92400e; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 5px; margin-left: 6px; }
-.sdiv { border-top: 1px solid var(--bdr); padding-top: 14px; margin-top: 4px; }
-.slabel { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+/* ── USERS ── */
+.usr-list { max-height:220px; overflow-y:auto; margin-bottom:4px; }
+.usr-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--bdr); }
+.usr-row:last-child { border-bottom:none; }
+.usr-name { font-weight:500; font-size:14px; }
+.usr-pin { font-size:11px; color:var(--muted); margin-top:2px; }
+.admin-badge { background:#fef3c7; color:#92400e; font-size:10px; font-weight:600; padding:2px 7px; border-radius:5px; margin-left:6px; }
+.sdiv { border-top:1px solid var(--bdr); padding-top:14px; margin-top:4px; }
+.slabel { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
 
-.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--p); color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap; pointer-events: none; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.ok { background: var(--suc); }
-.toast.err { background: var(--acc); }
+/* ── TOAST ── */
+.toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--p); color:#fff; padding:10px 20px; border-radius:50px; font-size:13px; font-weight:500; opacity:0; transition:all .3s; z-index:999; white-space:nowrap; pointer-events:none; max-width:90vw; overflow:hidden; text-overflow:ellipsis; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.ok { background:var(--suc); }
+.toast.err { background:var(--acc); }
 
-.hidden { display: none !important; }
+/* ── RATE LIMIT INDICATOR ── */
+.rl-warn { background:#fef3c7; border:1px solid #fbbf24; border-radius:8px; padding:8px 12px; font-size:12px; color:#92400e; margin-bottom:8px; display:none; }
+.rl-warn.show { display:block; }
 
-@media (min-width: 769px) {
-  .hdr { padding: 16px 32px; }
-  .hdr-top { margin-bottom: 14px; }
-  .week-bar { padding: 12px 16px; }
-  .week-info .wt { font-size: 15px; }
-  .main { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
-  .cal-grid { grid-template-columns: repeat(7, 1fr); gap: 10px; }
-  .sheet { max-width: 500px; }
-  table { min-width: 760px; }
+.hidden { display:none !important; }
+
+@media (min-width:769px) {
+  .hdr { padding:16px 32px; }
+  .hdr-top { margin-bottom:14px; }
+  .week-bar { padding:12px 16px; }
+  .week-info .wt { font-size:15px; }
+  .main { max-width:1200px; margin:0 auto; padding:20px 24px; }
+  .cal-grid { grid-template-columns:repeat(7,1fr); gap:10px; }
+  .sheet { max-width:500px; }
+  table { min-width:760px; }
 }
-@media (max-width: 400px) {
-  .logo-sub { display: none; }
-  .hbtn span { display: none; }
+@media (max-width:400px) {
+  .logo-sub { display:none; }
+  .hbtn span { display:none; }
 }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-top">
     <div class="logo-wrap">
@@ -174,14 +189,17 @@ tbody td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
         <button class="vtab on" onclick="setView('table')">📋 Bảng</button>
         <button class="vtab" onclick="setView('cal')">📅 Lịch</button>
       </div>
-      <button class="navbtn" onclick="chW(-1)">◀</button>
-      <button class="navbtn" onclick="chW(0)">●</button>
-      <button class="navbtn" onclick="chW(1)">▶</button>
+      <button class="navbtn" onclick="chW(-1)" title="Tuần trước">◀</button>
+      <button class="navbtn" onclick="chW(0)" title="Tuần hiện tại">●</button>
+      <button class="navbtn" onclick="chW(1)" title="Tuần sau">▶</button>
     </div>
   </div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
+  <div class="rl-warn" id="rlWarn">⚠️ Bạn thao tác quá nhanh, vui lòng chờ một chút...</div>
+
   <div id="tvw">
     <div class="scroll-hint"><div class="scroll-hint-dot"></div>Vuốt ngang để xem đầy đủ thông tin</div>
     <div class="tcard"><div class="tscroll">
@@ -191,28 +209,32 @@ tbody td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
           <th>Địa điểm</th><th>Chủ trì</th><th>Thành phần</th>
           <th id="actCol" class="hidden">Thao tác</th>
         </tr></thead>
-        <tbody id="tbody"><tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải dữ liệu...</td></tr></tbody>
+        <tbody id="tbody">
+          <tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải dữ liệu...</td></tr>
+        </tbody>
       </table>
     </div></div>
   </div>
+
   <div id="cvw" class="hidden"><div class="cal-grid" id="cgrid"></div></div>
 </div>
 
 <button id="fab" class="fab hidden" onclick="openAdd()">＋ Thêm lịch</button>
 
-<!-- PIN -->
+<!-- PIN SHEET -->
 <div class="ov" id="pinOv" onclick="bgClose(event,closePin)">
   <div class="sheet" style="max-width:400px;">
     <div class="sheet-handle"></div>
     <div class="sheet-title">🔐 Nhập mã PIN <button class="xcls" onclick="closePin()">✕</button></div>
     <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:4px;">Nhập PIN 4 chữ số để đăng nhập chỉnh sửa</p>
     <div class="pin-row">
-      <input class="pin-i" maxlength="1" type="password" id="p1" inputmode="numeric" oninput="pnxt(this,'p2')">
-      <input class="pin-i" maxlength="1" type="password" id="p2" inputmode="numeric" oninput="pnxt(this,'p3')">
-      <input class="pin-i" maxlength="1" type="password" id="p3" inputmode="numeric" oninput="pnxt(this,'p4')">
-      <input class="pin-i" maxlength="1" type="password" id="p4" inputmode="numeric" oninput="pnxt(this,null)">
+      <input class="pin-i" maxlength="1" type="password" id="p1" inputmode="numeric" oninput="pnxt(this,'p2')" onkeydown="pinKey(event,null,'p1')">
+      <input class="pin-i" maxlength="1" type="password" id="p2" inputmode="numeric" oninput="pnxt(this,'p3')" onkeydown="pinKey(event,'p1','p2')">
+      <input class="pin-i" maxlength="1" type="password" id="p3" inputmode="numeric" oninput="pnxt(this,'p4')" onkeydown="pinKey(event,'p2','p3')">
+      <input class="pin-i" maxlength="1" type="password" id="p4" inputmode="numeric" oninput="pnxt(this,null)"  onkeydown="pinKey(event,'p3','p4')">
     </div>
     <div class="pin-err" id="perr"></div>
+    <div id="lockMsg" style="color:var(--acc);font-size:12px;text-align:center;margin-bottom:8px;display:none;"></div>
     <div class="mf">
       <button class="mbtn cancel" onclick="closePin()">Hủy</button>
       <button class="mbtn save" id="pinBtn" onclick="verPin()">Xác nhận</button>
@@ -220,7 +242,7 @@ tbody td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
   </div>
 </div>
 
-<!-- ADD/EDIT -->
+<!-- ADD/EDIT SHEET -->
 <div class="ov" id="lichOv" onclick="bgClose(event,closeLich)">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -243,7 +265,7 @@ tbody td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
   </div>
 </div>
 
-<!-- USERS -->
+<!-- USERS SHEET -->
 <div class="ov" id="usrOv" onclick="bgClose(event,closeUsers)">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -266,75 +288,149 @@ tbody td { padding: 10px 14px; font-size: 13px; vertical-align: middle; }
 <div class="toast" id="toast"></div>
 
 <script>
+// ════════════════════════════════════════════════════════
+//  CẤU HÌNH
+// ════════════════════════════════════════════════════════
 const API = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
 const THU = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+const CACHE_TTL  = 60_000;   // Cache dữ liệu 60 giây
+const MAX_RETRY  = 2;         // Số lần thử lại khi lỗi mạng
+const RATE_LIMIT = 3_000;     // Tối thiểu 3 giây giữa các lần ghi (thêm/sửa/xóa)
+const PIN_LOCKOUT_LIMIT = 5;  // Khóa sau 5 lần nhập sai
+const PIN_LOCKOUT_MS    = 120_000; // Khóa 2 phút
 
-// ── STATE ──
-let cu = null, isAdm = false, allD = [], wOff = 0, edId = null, cv = 'table';
-let isLoading = false;        // chống race condition
-let cacheTime = 0;            // timestamp lần load cuối
-const CACHE_TTL = 60000;      // cache 60 giây — không gọi API liên tục khi đổi tuần
-let pinTimer = null;          // debounce PIN
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+let cu = null, isAdm = false;
+let allD = [], wOff = 0, edId = null, cv = 'table';
+let isLoading = false, cacheTime = 0;
+let lastWriteTime = 0;          // Rate-limit ghi
+let pinFailCount = 0;           // Đếm lần nhập PIN sai
+let pinLockedUntil = 0;         // Timestamp hết khóa PIN
+let pinTimer = null;            // Debounce PIN submit
+let toastTimer = null;          // Quản lý toast timeout
 
-// ── SECURITY: escape HTML chống XSS ──
+// ════════════════════════════════════════════════════════
+//  SECURITY HELPERS
+// ════════════════════════════════════════════════════════
+
+/** Escape HTML — chống XSS khi render innerHTML */
 function esc(s) {
-  if (s === null || s === undefined) return '';
+  if (s == null) return '';
   return String(s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
 }
 
-// ── SECURITY: sanitize input ──
+/** Sanitize input: trim + giới hạn độ dài */
 function san(s, max = 300) {
-  return String(s || '').trim().slice(0, max);
+  return String(s ?? '').trim().slice(0, max);
 }
 
-// ── WEEK ──
+/** Validate ngày YYYY-MM-DD */
+function isValidDate(s) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s));
+}
+
+/** Validate PIN: đúng 4 chữ số */
+function isValidPin(s) {
+  return /^\d{4}$/.test(s);
+}
+
+/** Rate-limit ghi: trả true nếu đang bị chặn */
+function isRateLimited() {
+  const now = Date.now();
+  if (now - lastWriteTime < RATE_LIMIT) {
+    document.getElementById('rlWarn').classList.add('show');
+    setTimeout(() => document.getElementById('rlWarn').classList.remove('show'), 2500);
+    return true;
+  }
+  return false;
+}
+
+// ════════════════════════════════════════════════════════
+//  NETWORK — fetch với retry + timeout
+// ════════════════════════════════════════════════════════
+async function apiFetch(params, retries = MAX_RETRY) {
+  const url = `${API}?${new URLSearchParams(params)}`;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 12_000); // 12s timeout
+      const res = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      if (i === retries) throw e;
+      await new Promise(r => setTimeout(r, 1000 * (i + 1))); // backoff 1s, 2s
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  WEEK HELPERS
+// ════════════════════════════════════════════════════════
 function wkDays(off = 0) {
   const n = new Date(), d = n.getDay();
   const mon = new Date(n);
   mon.setDate(n.getDate() - (d === 0 ? 6 : d - 1) + off * 7);
-  return Array.from({length:7},(_,i) => { const x=new Date(mon); x.setDate(mon.getDate()+i); return x; });
+  return Array.from({length:7}, (_, i) => {
+    const x = new Date(mon); x.setDate(mon.getDate() + i); return x;
+  });
 }
+
 function fmt(d) { return d.toISOString().split('T')[0]; }
+
 function dsp(s) {
   if (!s) return '';
   const d = new Date(s + 'T00:00:00');
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 }
-function wkn(d) { const j=new Date(d.getFullYear(),0,1); return Math.ceil(((d-j)/86400000+j.getDay()+1)/7); }
-function updHdr() {
-  const days=wkDays(wOff), s=days[0], e=days[6];
-  document.getElementById('wt').textContent=`Tuần ${wkn(s)} — Năm ${s.getFullYear()}`;
-  document.getElementById('wr').textContent=`Từ ${dsp(fmt(s))} đến ${dsp(fmt(e))}/${e.getFullYear()}`;
-}
-function chW(d) { wOff = d===0 ? 0 : wOff+d; updHdr(); render(); }
 
-// ── DATA ──
+function wkn(d) {
+  const j = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d - j) / 86400000 + j.getDay() + 1) / 7);
+}
+
+function updHdr() {
+  const days = wkDays(wOff), s = days[0], e = days[6];
+  document.getElementById('wt').textContent = `Tuần ${wkn(s)} — Năm ${s.getFullYear()}`;
+  document.getElementById('wr').textContent  = `Từ ${dsp(fmt(s))} đến ${dsp(fmt(e))}/${e.getFullYear()}`;
+}
+
+function chW(d) { wOff = d === 0 ? 0 : wOff + d; updHdr(); render(); }
+
+// ════════════════════════════════════════════════════════
+//  DATA
+// ════════════════════════════════════════════════════════
 function cleanRow(r) {
-  if (r.ngay && r.ngay.includes('T')) {
+  if (r.ngay?.includes('T')) {
     const d = new Date(r.ngay);
-    d.setHours(d.getHours()+7);
+    d.setHours(d.getHours() + 7);
     r.ngay = d.toISOString().split('T')[0];
   }
-  if (r.thoigian && r.thoigian.includes('T')) r.thoigian = '';
-  r.id = String(r.id);
+  if (r.thoigian?.includes('T')) r.thoigian = '';
+  r.id = String(r.id ?? '');
+  // Giới hạn độ dài để tránh dữ liệu bất thường từ sheet
+  ['thu','thoigian','noidung','diadiem','chutri','thanhphan'].forEach(k => {
+    r[k] = san(r[k] ?? '', 300);
+  });
   return r;
 }
 
 async function load(force = false) {
-  // CACHE: nếu data còn mới và không force reload thì dùng lại
+  // Dùng cache nếu còn hạn và không cần force
   if (!force && allD.length && (Date.now() - cacheTime) < CACHE_TTL) {
     render(); return;
   }
-  if (isLoading) return; // chống duplicate request
+  if (isLoading) return; // Chặn duplicate request
   isLoading = true;
-  document.getElementById('tbody').innerHTML =
-    '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
+  showLoading();
   try {
-    const r = await fetch(`${API}?action=getLich&t=${Date.now()}`); // cache-bust
-    const d = await r.json();
+    const d = await apiFetch({ action: 'getLich', t: Date.now() }); // t= phá cache CDN
     allD = Array.isArray(d) ? d.map(cleanRow) : [];
     cacheTime = Date.now();
   } catch(e) {
@@ -345,19 +441,28 @@ async function load(force = false) {
   render();
 }
 
-function wkData() {
-  const dates = wkDays(wOff).map(d => fmt(d));
-  return allD.filter(r => dates.includes(r.ngay));
+function showLoading() {
+  document.getElementById('tbody').innerHTML =
+    '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
 }
 
-// ── RENDER ──
-function render() { cv==='table' ? renderT() : renderC(); }
+function wkData() {
+  const dates = new Set(wkDays(wOff).map(d => fmt(d)));
+  return allD.filter(r => dates.has(r.ngay));
+}
+
+// ════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════
+function render() { cv === 'table' ? renderT() : renderC(); }
 
 function setView(v) {
   cv = v;
-  document.querySelectorAll('.vtab').forEach((t,i)=>t.classList.toggle('on',(i===0&&v==='table')||(i===1&&v==='cal')));
-  document.getElementById('tvw').classList.toggle('hidden', v!=='table');
-  document.getElementById('cvw').classList.toggle('hidden', v!=='cal');
+  document.querySelectorAll('.vtab').forEach((t,i) =>
+    t.classList.toggle('on', (i===0&&v==='table')||(i===1&&v==='cal'))
+  );
+  document.getElementById('tvw').classList.toggle('hidden', v !== 'table');
+  document.getElementById('cvw').classList.toggle('hidden', v !== 'cal');
   render();
 }
 
@@ -365,13 +470,19 @@ function renderT() {
   const b = document.getElementById('tbody');
   const data = wkData();
   document.getElementById('actCol').classList.toggle('hidden', !cu);
+
   if (!data.length) {
     b.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Không có lịch nào trong tuần này</td></tr>`;
+    b.onclick = null;
     return;
   }
-  data.sort((a,b)=>(a.ngay||'').localeCompare(b.ngay||'')||(a.thoigian||'').localeCompare(b.thoigian||''));
 
-  // FIX XSS: dùng esc() cho mọi giá trị động
+  data.sort((a,b) =>
+    (a.ngay||'').localeCompare(b.ngay||'') || (a.thoigian||'').localeCompare(b.thoigian||'')
+  );
+
+  // Dùng esc() cho mọi giá trị — chống XSS
+  // Dùng data-id thay vì inline onclick — chống injection
   b.innerHTML = data.map(r => `
     <tr>
       <td class="td-date">${esc(dsp(r.ngay))}</td>
@@ -382,12 +493,12 @@ function renderT() {
       <td class="td-muted">${esc(r.chutri)}</td>
       <td class="td-muted">${esc(r.thanhphan)}</td>
       ${cu ? `<td class="td-acts">
-        <button class="ibtn edit" data-id="${esc(r.id)}">✏️</button>
-        <button class="ibtn del" data-id="${esc(r.id)}">🗑</button>
+        <button class="ibtn edit" data-id="${esc(r.id)}" title="Chỉnh sửa">✏️</button>
+        <button class="ibtn del"  data-id="${esc(r.id)}" title="Xóa">🗑</button>
       </td>` : '<td></td>'}
     </tr>`).join('');
 
-  // FIX memory leak: event delegation thay vì inline onclick
+  // Event delegation — 1 listener thay vì N inline handler
   b.onclick = e => {
     const ed = e.target.closest('.ibtn.edit');
     const dl = e.target.closest('.ibtn.del');
@@ -401,213 +512,336 @@ function renderC() {
   const today = fmt(new Date());
   g.innerHTML = wkDays(wOff).map(day => {
     const ds = fmt(day);
-    const dd = allD.filter(r=>r.ngay===ds).sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
+    const dd = allD.filter(r => r.ngay === ds)
+      .sort((a,b) => (a.thoigian||'').localeCompare(b.thoigian||''));
     return `<div class="cal-day">
       <div class="cal-hdr${ds===today?' today':''}">
         <div class="cal-thu">${esc(THU[day.getDay()])}</div>
         <div class="cal-dt">${day.getDate()}/${day.getMonth()+1}</div>
       </div>
       <div class="cal-body">
-        ${dd.length ? dd.map(r=>`
-          <div class="cevent">
-            <div class="cevent-time">${esc(r.thoigian)}</div>
-            <div class="cevent-title">${esc(r.noidung)}</div>
-          </div>`).join('') : '<div class="cal-empty">Không có lịch</div>'}
+        ${dd.length
+          ? dd.map(r=>`<div class="cevent">
+              <div class="cevent-time">${esc(r.thoigian)}</div>
+              <div class="cevent-title">${esc(r.noidung)}</div>
+            </div>`).join('')
+          : '<div class="cal-empty">Không có lịch</div>'}
       </div>
     </div>`;
   }).join('');
 }
 
-// ── PIN ──
+// ════════════════════════════════════════════════════════
+//  PIN / LOGIN
+// ════════════════════════════════════════════════════════
 function openPin() {
-  ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('perr').textContent='';
+  if (Date.now() < pinLockedUntil) {
+    const sec = Math.ceil((pinLockedUntil - Date.now()) / 1000);
+    toast(`PIN bị khóa, thử lại sau ${sec}s`, 'err'); return;
+  }
+  ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('perr').textContent = '';
+  document.getElementById('lockMsg').style.display = 'none';
   const btn = document.getElementById('pinBtn');
   btn.disabled = false; btn.textContent = 'Xác nhận';
   document.getElementById('pinOv').classList.add('open');
-  setTimeout(()=>document.getElementById('p1').focus(), 150);
+  setTimeout(() => document.getElementById('p1').focus(), 150);
 }
 function closePin() { document.getElementById('pinOv').classList.remove('open'); }
 
-// FIX debounce: tránh gọi verPin() 2 lần khi nhập ký tự cuối nhanh
 function pnxt(el, nxt) {
+  // Chỉ chấp nhận chữ số
+  el.value = el.value.replace(/\D/g, '');
   if (el.value.length >= 1 && nxt) document.getElementById(nxt).focus();
   if (!nxt && el.value.length >= 1) {
     clearTimeout(pinTimer);
-    pinTimer = setTimeout(verPin, 150);
+    pinTimer = setTimeout(verPin, 150); // Debounce 150ms
+  }
+}
+
+function pinKey(e, prevId) {
+  // Backspace: quay lại ô trước nếu ô hiện tại rỗng
+  if (e.key === 'Backspace' && e.target.value === '' && prevId) {
+    document.getElementById(prevId).focus();
   }
 }
 
 async function verPin() {
   const btn = document.getElementById('pinBtn');
   if (btn.disabled) return;
-  const pin = ['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('');
-  if (pin.length < 4) { document.getElementById('perr').textContent='Vui lòng nhập đủ 4 chữ số'; return; }
 
-  // FIX: disable nút tránh double-submit
+  // Kiểm tra khóa PIN
+  if (Date.now() < pinLockedUntil) {
+    const sec = Math.ceil((pinLockedUntil - Date.now()) / 1000);
+    document.getElementById('perr').textContent = `Bị khóa, thử lại sau ${sec}s`;
+    return;
+  }
+
+  const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
+  if (!isValidPin(pin)) {
+    document.getElementById('perr').textContent = 'Vui lòng nhập đủ 4 chữ số';
+    return;
+  }
+
   btn.disabled = true; btn.textContent = '...';
   try {
-    const r = await fetch(`${API}?action=verifyPin&pin=${encodeURIComponent(pin)}`);
-    const d = await r.json();
+    const d = await apiFetch({ action: 'verifyPin', pin: encodeURIComponent(pin) });
     if (d.success) {
-      cu = d.ten; isAdm = d.isAdmin;
+      pinFailCount = 0; // Reset counter khi đăng nhập thành công
+      cu = san(d.ten, 50); isAdm = !!d.isAdmin;
       closePin(); updUI();
       toast(`Xin chào, ${esc(d.ten)}! 👋`, 'ok');
       render();
     } else {
-      document.getElementById('perr').textContent='❌ Mã PIN không đúng, thử lại';
-      ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
-      document.getElementById('p1').focus();
-      btn.disabled = false; btn.textContent = 'Xác nhận';
+      pinFailCount++;
+      if (pinFailCount >= PIN_LOCKOUT_LIMIT) {
+        pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
+        pinFailCount = 0;
+        document.getElementById('perr').textContent = '';
+        const msg = document.getElementById('lockMsg');
+        msg.textContent = `❌ Nhập sai quá nhiều lần. Bị khóa 2 phút.`;
+        msg.style.display = 'block';
+        btn.disabled = true; btn.textContent = 'Bị khóa';
+        // Tự mở khóa sau 2 phút
+        setTimeout(() => {
+          btn.disabled = false; btn.textContent = 'Xác nhận';
+          msg.style.display = 'none';
+        }, PIN_LOCKOUT_MS);
+      } else {
+        const remain = PIN_LOCKOUT_LIMIT - pinFailCount;
+        document.getElementById('perr').textContent =
+          `❌ PIN không đúng. Còn ${remain} lần thử.`;
+        ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('p1').focus();
+        btn.disabled = false; btn.textContent = 'Xác nhận';
+      }
     }
   } catch(e) {
-    document.getElementById('perr').textContent='Lỗi kết nối, thử lại sau';
+    document.getElementById('perr').textContent = 'Lỗi kết nối, thử lại sau';
     btn.disabled = false; btn.textContent = 'Xác nhận';
   }
 }
 
-function logout() { cu=null; isAdm=false; updUI(); render(); toast('Đã đăng xuất'); }
-
-function updUI() {
-  const on=!!cu;
-  document.getElementById('ubadge').classList.toggle('hidden',!on);
-  document.getElementById('uname').textContent=cu||'';
-  document.getElementById('btnAdm').classList.toggle('hidden',!isAdm);
-  document.getElementById('btnLogin').classList.toggle('hidden',on);
-  document.getElementById('btnOut').classList.toggle('hidden',!on);
-  document.getElementById('fab').classList.toggle('hidden',!on);
-  document.getElementById('actCol').classList.toggle('hidden',!on);
+function logout() {
+  cu = null; isAdm = false;
+  updUI(); render();
+  toast('Đã đăng xuất');
 }
 
-// ── ADD/EDIT ──
+function updUI() {
+  const on = !!cu;
+  document.getElementById('ubadge').classList.toggle('hidden', !on);
+  document.getElementById('uname').textContent = cu || '';
+  document.getElementById('btnAdm').classList.toggle('hidden', !isAdm);
+  document.getElementById('btnLogin').classList.toggle('hidden', on);
+  document.getElementById('btnOut').classList.toggle('hidden', !on);
+  document.getElementById('fab').classList.toggle('hidden', !on);
+  document.getElementById('actCol').classList.toggle('hidden', !on);
+}
+
+// ════════════════════════════════════════════════════════
+//  ADD / EDIT LỊCH
+// ════════════════════════════════════════════════════════
+function resetForm() {
+  ['fNgay','fThu','fTg','fNd','fDd','fCt','fTp'].forEach(id =>
+    document.getElementById(id).value = ''
+  );
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = false; btn.textContent = '💾 Lưu lịch';
+}
+
 function openAdd() {
-  edId=null;
-  document.getElementById('mtitle').textContent='➕ Thêm lịch mới';
-  ['fNgay','fThu','fTg','fNd','fDd','fCt','fTp'].forEach(id=>document.getElementById(id).value='');
-  const btn=document.getElementById('saveBtn'); btn.disabled=false; btn.textContent='💾 Lưu lịch';
+  if (!cu) return; // Guard: chỉ cho người đã đăng nhập
+  edId = null;
+  document.getElementById('mtitle').textContent = '➕ Thêm lịch mới';
+  resetForm();
   document.getElementById('lichOv').classList.add('open');
 }
 
 function openEdit(id) {
-  const r=allD.find(x=>String(x.id)===String(id));
+  if (!cu) return; // Guard
+  // Validate id trước khi lookup — tránh prototype pollution
+  if (typeof id !== 'string' || id.length > 20) return;
+  const r = allD.find(x => x.id === id);
   if (!r) return;
-  edId=id;
-  document.getElementById('mtitle').textContent='✏️ Chỉnh sửa lịch';
-  document.getElementById('fNgay').value=r.ngay||'';
-  document.getElementById('fThu').value=r.thu||'';
-  document.getElementById('fTg').value=r.thoigian||'';
-  document.getElementById('fNd').value=r.noidung||'';
-  document.getElementById('fDd').value=r.diadiem||'';
-  document.getElementById('fCt').value=r.chutri||'';
-  document.getElementById('fTp').value=r.thanhphan||'';
-  const btn=document.getElementById('saveBtn'); btn.disabled=false; btn.textContent='💾 Lưu lịch';
+  edId = id;
+  document.getElementById('mtitle').textContent = '✏️ Chỉnh sửa lịch';
+  document.getElementById('fNgay').value = r.ngay    || '';
+  document.getElementById('fThu').value  = r.thu     || '';
+  document.getElementById('fTg').value   = r.thoigian|| '';
+  document.getElementById('fNd').value   = r.noidung || '';
+  document.getElementById('fDd').value   = r.diadiem || '';
+  document.getElementById('fCt').value   = r.chutri  || '';
+  document.getElementById('fTp').value   = r.thanhphan || '';
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = false; btn.textContent = '💾 Lưu lịch';
   document.getElementById('lichOv').classList.add('open');
 }
 
 function autoThu() {
-  const v=document.getElementById('fNgay').value;
-  if (v) document.getElementById('fThu').value=THU[new Date(v+'T00:00:00').getDay()];
+  const v = document.getElementById('fNgay').value;
+  if (v && isValidDate(v))
+    document.getElementById('fThu').value = THU[new Date(v + 'T00:00:00').getDay()];
 }
+
 function closeLich() { document.getElementById('lichOv').classList.remove('open'); }
 
-async function apiG(params) {
-  const r = await fetch(`${API}?${new URLSearchParams(params)}`);
-  return r.json();
-}
-
 async function saveLich() {
-  const btn=document.getElementById('saveBtn');
-  if (btn.disabled) return; // FIX: chống double submit
-  const ngay=document.getElementById('fNgay').value;
-  const nd=san(document.getElementById('fNd').value);
-  if (!ngay||!nd) { toast('Vui lòng nhập Ngày và Nội dung','err'); return; }
-  btn.disabled=true; btn.textContent='Đang lưu...';
+  if (!cu) return; // Guard
+  const btn = document.getElementById('saveBtn');
+  if (btn.disabled) return; // Chống double-submit
+
+  // Rate limit ghi
+  if (isRateLimited()) return;
+
+  // Validate
+  const ngay = document.getElementById('fNgay').value;
+  if (!isValidDate(ngay)) { toast('Ngày không hợp lệ', 'err'); return; }
+  const nd = san(document.getElementById('fNd').value, 200);
+  if (!nd) { toast('Vui lòng nhập Nội dung', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = 'Đang lưu...';
+  lastWriteTime = Date.now();
   try {
-    const d=await apiG({
-      action: edId?'updateRow':'addRow', id: edId||'',
-      ngay, thu: san(document.getElementById('fThu').value),
-      thoigian: san(document.getElementById('fTg').value),
-      noidung: nd, diadiem: san(document.getElementById('fDd').value),
-      chutri: san(document.getElementById('fCt').value),
-      thanhphan: san(document.getElementById('fTp').value),
+    const d = await apiFetch({
+      action:    edId ? 'updateRow' : 'addRow',
+      id:        edId || '',
+      ngay,
+      thu:       san(document.getElementById('fThu').value, 20),
+      thoigian:  san(document.getElementById('fTg').value, 50),
+      noidung:   nd,
+      diadiem:   san(document.getElementById('fDd').value, 100),
+      chutri:    san(document.getElementById('fCt').value, 100),
+      thanhphan: san(document.getElementById('fTp').value, 200),
+      nguoiThucHien: san(cu, 50),
     });
     if (d.success) {
       closeLich();
-      toast(edId?'Đã cập nhật lịch ✓':'Đã thêm lịch mới ✓','ok');
-      await load(true); // force reload sau khi lưu
+      toast(edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', 'ok');
+      await load(true); // Force reload — đồng bộ dữ liệu
     } else {
-      toast('Lỗi: '+(d.error||'không xác định'),'err');
-      btn.disabled=false; btn.textContent='💾 Lưu lịch';
+      toast('Lỗi: ' + esc(d.error || 'không xác định'), 'err');
+      btn.disabled = false; btn.textContent = '💾 Lưu lịch';
     }
   } catch(e) {
-    toast('Lỗi kết nối','err');
-    btn.disabled=false; btn.textContent='💾 Lưu lịch';
+    toast('Lỗi kết nối, thử lại sau', 'err');
+    btn.disabled = false; btn.textContent = '💾 Lưu lịch';
   }
 }
 
 async function delL(id) {
+  if (!cu) return; // Guard
+  if (typeof id !== 'string' || id.length > 20) return;
+  if (isRateLimited()) return;
   if (!confirm('Xác nhận xóa lịch này?')) return;
+
+  lastWriteTime = Date.now();
   try {
-    const d=await apiG({action:'deleteRow',id});
-    if (d.success) { toast('Đã xóa lịch ✓','ok'); await load(true); }
-    else toast('Lỗi xóa dữ liệu','err');
-  } catch(e) { toast('Lỗi kết nối','err'); }
+    const d = await apiFetch({
+      action: 'deleteRow',
+      id,
+      nguoiThucHien: san(cu, 50),
+    });
+    if (d.success) { toast('Đã xóa lịch ✓', 'ok'); await load(true); }
+    else toast('Lỗi xóa dữ liệu: ' + esc(d.error || ''), 'err');
+  } catch(e) {
+    toast('Lỗi kết nối, thử lại sau', 'err');
+  }
 }
 
-// ── USERS ──
+// ════════════════════════════════════════════════════════
+//  USERS
+// ════════════════════════════════════════════════════════
 async function openUsers() {
+  if (!isAdm) return; // Guard: chỉ admin
   try {
-    const users=await apiG({action:'getUsers'});
-    const list=document.getElementById('usrList');
-    list.innerHTML=(Array.isArray(users)?users:[]).map(u=>`
+    const users = await apiFetch({ action: 'getUsers' });
+    const list = document.getElementById('usrList');
+    list.innerHTML = (Array.isArray(users) ? users : []).map(u => `
       <div class="usr-row">
         <div>
           <div class="usr-name">${esc(u.ten)}${u.ten==='Admin'?'<span class="admin-badge">ADMIN</span>':''}</div>
-          <div class="usr-pin">PIN: ${'•'.repeat(Math.min(String(u.pin).length,4))}</div>
+          <div class="usr-pin">PIN: ${'•'.repeat(Math.min(String(u.pin||'').length, 4))}</div>
         </div>
-        ${u.ten!=='Admin'?`<button class="del-usr" data-pin="${esc(u.pin)}" style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;">🗑 Xóa</button>`:''}
+        ${u.ten !== 'Admin'
+          ? `<button class="del-usr" data-pin="${esc(u.pin)}"
+               style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;">
+               🗑 Xóa</button>`
+          : ''}
       </div>`).join('');
-    // FIX: event delegation cho nút xóa user
-    list.onclick=e=>{ const b=e.target.closest('.del-usr'); if(b) delUsr(b.dataset.pin); };
-  } catch(e) { toast('Lỗi tải danh sách','err'); }
+    // Event delegation
+    list.onclick = e => {
+      const b = e.target.closest('.del-usr');
+      if (b) delUsr(b.dataset.pin);
+    };
+  } catch(e) { toast('Lỗi tải danh sách', 'err'); }
   document.getElementById('usrOv').classList.add('open');
 }
 function closeUsers() { document.getElementById('usrOv').classList.remove('open'); }
 
 async function addUsr() {
-  const btn=document.getElementById('addUsrBtn');
-  const ten=san(document.getElementById('nUN').value);
-  const pin=document.getElementById('nUP').value.trim();
-  if (!ten||!pin||!/^\d{4}$/.test(pin)) { toast('Nhập tên và PIN 4 chữ số hợp lệ','err'); return; }
-  btn.disabled=true; btn.textContent='Đang thêm...';
-  const d=await apiG({action:'addUser',ten,pin});
-  btn.disabled=false; btn.textContent='➕ Thêm';
-  if (d.success) {
-    document.getElementById('nUN').value='';
-    document.getElementById('nUP').value='';
-    toast(`Đã thêm ${esc(ten)} ✓`,'ok');
-    openUsers();
-  } else toast('Lỗi thêm người dùng','err');
+  if (!isAdm) return; // Guard
+  const btn = document.getElementById('addUsrBtn');
+  const ten = san(document.getElementById('nUN').value, 50);
+  const pin = document.getElementById('nUP').value.trim();
+  if (!ten)           { toast('Vui lòng nhập tên', 'err'); return; }
+  if (!isValidPin(pin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = 'Đang thêm...';
+  try {
+    const d = await apiFetch({ action: 'addUser', ten, pin });
+    if (d.success) {
+      document.getElementById('nUN').value = '';
+      document.getElementById('nUP').value = '';
+      toast(`Đã thêm ${esc(ten)} ✓`, 'ok');
+      openUsers(); // Refresh danh sách
+    } else toast('Lỗi thêm người dùng', 'err');
+  } catch(e) { toast('Lỗi kết nối', 'err'); }
+  finally { btn.disabled = false; btn.textContent = '➕ Thêm'; }
 }
 
 async function delUsr(pin) {
+  if (!isAdm) return; // Guard
+  if (!isValidPin(String(pin))) return;
   if (!confirm('Xác nhận xóa người dùng này?')) return;
-  const d=await apiG({action:'deleteUser',pin});
-  if (d.success) { toast('Đã xóa người dùng ✓','ok'); openUsers(); }
+  try {
+    const d = await apiFetch({ action: 'deleteUser', pin });
+    if (d.success) { toast('Đã xóa người dùng ✓', 'ok'); openUsers(); }
+    else toast('Lỗi xóa người dùng', 'err');
+  } catch(e) { toast('Lỗi kết nối', 'err'); }
 }
 
-// ── HELPERS ──
-function bgClose(e, closeFn) { if (e.target===e.currentTarget) closeFn(); }
+// ════════════════════════════════════════════════════════
+//  UI HELPERS
+// ════════════════════════════════════════════════════════
+function bgClose(e, closeFn) {
+  if (e.target === e.currentTarget) closeFn();
+}
 
-let toastTimer=null;
-function toast(msg, type='') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className=`toast ${type} show`;
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = String(msg).slice(0, 80); // Giới hạn độ dài
+  t.className = `toast ${type} show`;
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ── INIT ──
+// ════════════════════════════════════════════════════════
+//  AUTO REFRESH — Tự động tải lại mỗi 5 phút
+// ════════════════════════════════════════════════════════
+setInterval(() => {
+  // Chỉ refresh khi tab đang active và không đang thao tác
+  if (!document.hidden && !isLoading) load(true);
+}, 300_000); // 5 phút
+
+document.addEventListener('visibilitychange', () => {
+  // Khi người dùng quay lại tab sau >1 phút, tải mới
+  if (!document.hidden && (Date.now() - cacheTime) > 60_000) load();
+});
+
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
 updHdr();
 load();
 </script>
