@@ -119,6 +119,8 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .mbtn.cancel:hover { background:#e4e7ed; }
 .mbtn.save { background:var(--p); color:#fff; }
 .mbtn.save:hover { background:var(--p-light); }
+.mbtn.danger { background:var(--acc); color:#fff; }
+.mbtn.danger:hover { background:#c0303b; }
 .mbtn:disabled { opacity:.6; cursor:not-allowed; }
 
 /* ── PIN ── */
@@ -152,8 +154,36 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .unlock-btn:hover { background:#d1ede0; }
 .no-locked { text-align:center; padding:24px 0; color:var(--muted); font-size:13px; }
 
+/* ── DELETE CONFIRM SHEET ── */
+.del-avatar {
+  width:60px; height:60px; border-radius:50%;
+  background:#feecec; display:flex; align-items:center;
+  justify-content:center; font-size:28px; margin:8px auto 16px;
+}
+.del-title {
+  font-size:17px; font-weight:600; color:var(--txt);
+  text-align:center; margin-bottom:14px;
+}
+.del-preview {
+  background:#f6f8fc; border:1px solid var(--bdr);
+  border-radius:10px; padding:13px 15px; margin-bottom:12px;
+  font-size:13px; line-height:1.7;
+}
+.del-preview-row { display:flex; gap:8px; }
+.del-preview-row + .del-preview-row { margin-top:2px; }
+.del-preview-label { color:var(--muted); min-width:76px; flex-shrink:0; }
+.del-preview-val { color:var(--txt); }
+.del-preview-val.bold { font-weight:600; }
+.del-warn {
+  display:flex; align-items:flex-start; gap:9px;
+  background:#feecec; border:1px solid #fca5a5;
+  border-radius:9px; padding:11px 13px; margin-bottom:6px;
+}
+.del-warn-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+.del-warn-text { font-size:12.5px; color:#7f1d1d; line-height:1.6; }
+
 /* ══════════════════════════════════════════════════════
-   TOAST SYSTEM MỚI — hỗ trợ nhiều loại, có icon, action
+   TOAST SYSTEM
    ══════════════════════════════════════════════════════ */
 #toast-stack {
   position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
@@ -168,13 +198,9 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
   transition:opacity .25s, transform .25s;
 }
-.toast-item.leaving {
-  animation:toastOut .25s ease-in both;
-}
+.toast-item.leaving { animation:toastOut .25s ease-in both; }
 @keyframes toastIn  { from{opacity:0;transform:translateY(16px) scale(.96)} to{opacity:1;transform:none} }
 @keyframes toastOut { to{opacity:0;transform:translateY(8px) scale(.96)} }
-
-/* dải màu trái */
 .toast-item::before {
   content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:12px 0 0 12px;
 }
@@ -182,8 +208,6 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .toast-item.err::before   { background:var(--acc); }
 .toast-item.warn::before  { background:var(--warn); }
 .toast-item.info::before  { background:var(--p); }
-
-/* icon badge */
 .t-icon {
   flex-shrink:0; width:32px; height:32px; border-radius:8px;
   display:flex; align-items:center; justify-content:center; font-size:15px;
@@ -192,12 +216,9 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .toast-item.err  .t-icon { background:#feecec; }
 .toast-item.warn .t-icon { background:#fef3c7; }
 .toast-item.info .t-icon { background:var(--p-pale); }
-
 .t-body { flex:1; min-width:0; }
 .t-title { font-size:13px; font-weight:600; color:var(--txt); line-height:1.3; }
 .t-msg   { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
-
-/* action button bên trong toast */
 .t-action {
   margin-top:8px; border:none; border-radius:6px; padding:6px 12px;
   font-size:12px; font-weight:600; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif;
@@ -207,7 +228,6 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .toast-item.warn .t-action:hover { background:#fde68a; }
 .toast-item.err  .t-action { background:#feecec; color:var(--acc); }
 .toast-item.err  .t-action:hover { background:#fcd5d7; }
-
 .t-close {
   flex-shrink:0; width:20px; height:20px; border:none; background:none;
   color:var(--muted); cursor:pointer; font-size:14px; border-radius:4px;
@@ -215,8 +235,6 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   transition:background .15s;
 }
 .t-close:hover { background:#f0f2f6; }
-
-/* progress bar tự đóng */
 .t-progress {
   position:absolute; bottom:0; left:0; height:2px;
   background:currentColor; opacity:.2; border-radius:0 0 0 12px;
@@ -228,7 +246,7 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .toast-item.info  .t-progress { color:var(--p); }
 @keyframes tprog { from{width:100%} to{width:0%} }
 
-/* ── CONFLICT DIALOG (modal nhỏ) ── */
+/* ── CONFLICT DIALOG ── */
 .cdlg-ov {
   position:fixed; inset:0; background:rgba(10,20,40,.5); z-index:500;
   display:none; align-items:center; justify-content:center; padding:16px;
@@ -402,6 +420,43 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   </div>
 </div>
 
+<!-- DELETE CONFIRM SHEET -->
+<div class="ov" id="delOv" onclick="bgClose(event,closeDel)">
+  <div class="sheet" style="max-width:420px;">
+    <div class="sheet-handle"></div>
+    <div style="padding:4px 0 6px;">
+      <div class="del-avatar">🗑</div>
+      <div class="del-title">Xóa lịch công tác?</div>
+      <div class="del-preview" id="delPreview">
+        <div class="del-preview-row">
+          <span class="del-preview-label">Ngày:</span>
+          <span class="del-preview-val bold" id="dpNgay">—</span>
+        </div>
+        <div class="del-preview-row">
+          <span class="del-preview-label">Thời gian:</span>
+          <span class="del-preview-val" id="dpTg">—</span>
+        </div>
+        <div class="del-preview-row">
+          <span class="del-preview-label">Nội dung:</span>
+          <span class="del-preview-val bold" id="dpNd">—</span>
+        </div>
+        <div class="del-preview-row" id="dpDdRow">
+          <span class="del-preview-label">Địa điểm:</span>
+          <span class="del-preview-val" id="dpDd">—</span>
+        </div>
+      </div>
+      <div class="del-warn">
+        <span class="del-warn-icon">⚠️</span>
+        <span class="del-warn-text">Dữ liệu sẽ bị xóa vĩnh viễn và <strong>không thể phục hồi</strong>. Vui lòng xác nhận trước khi tiếp tục.</span>
+      </div>
+    </div>
+    <div class="mf" style="margin-top:10px;">
+      <button class="mbtn cancel" onclick="closeDel()">Hủy bỏ</button>
+      <button class="mbtn danger" id="delConfirmBtn" onclick="confirmDel()">🗑 Xóa vĩnh viễn</button>
+    </div>
+  </div>
+</div>
+
 <!-- USERS SHEET -->
 <div class="ov" id="usrOv" onclick="bgClose(event,closeUsers)">
   <div class="sheet">
@@ -443,7 +498,7 @@ const API        = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pj
 const THU        = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
 const CACHE_TTL  = 60_000;
 const MAX_RETRY  = 2;
-const RATE_LIMIT = 800; // giảm từ 3000 → 800ms
+const RATE_LIMIT = 800;
 
 // ════════════════════════════════════════════════════════
 //  STATE
@@ -453,7 +508,8 @@ let allD = [], wOff = 0, edId = null, cv = 'table';
 let isLoading = false, cacheTime = 0;
 let lastWriteTime = 0;
 let pinTimer = null;
-let _editOpenedAt = 0; // timestamp khi user mở form edit → gửi lên để check conflict
+let _editOpenedAt = 0;
+let _pendingDelId = null;
 
 // ════════════════════════════════════════════════════════
 //  DOM CACHE
@@ -473,6 +529,8 @@ const D = {
   p1:null, p2:null, p3:null, p4:null,
   rlWarn:null,
   conflictOv:null, conflictMeta:null, conflictReloadBtn:null,
+  delOv:null, delConfirmBtn:null,
+  dpNgay:null, dpTg:null, dpNd:null, dpDd:null, dpDdRow:null,
 };
 function initDOM() { Object.keys(D).forEach(k => { D[k] = $(k); }); }
 
@@ -561,7 +619,7 @@ function cleanRow(r) {
   }
   if (r.thoigian?.includes('T')) r.thoigian = '';
   r.id        = String(r.id ?? '');
-  r.updatedAt = Number(r.updatedAt) || 0;   // version token
+  r.updatedAt = Number(r.updatedAt) || 0;
   ['thu','thoigian','noidung','diadiem','chutri','thanhphan',
    'nguoiTao','thoiGianTao','nguoiSua','thoiGianSua'].forEach(k => {
     r[k] = san(r[k] ?? '', 300);
@@ -654,7 +712,7 @@ function renderT() {
     const ed = e.target.closest('.ibtn.edit');
     const dl = e.target.closest('.ibtn.del');
     if (ed) openEdit(ed.dataset.id);
-    if (dl) delL(dl.dataset.id);
+    if (dl) openDel(dl.dataset.id);
   };
 }
 
@@ -683,9 +741,7 @@ function renderC() {
 }
 
 // ════════════════════════════════════════════════════════
-//  TOAST SYSTEM MỚI
-//  toast({ type, title, msg, action, actionLabel, duration })
-//  type: 'ok' | 'err' | 'warn' | 'info'
+//  TOAST SYSTEM
 // ════════════════════════════════════════════════════════
 const TOAST_ICONS = { ok:'✅', err:'❌', warn:'⚠️', info:'ℹ️' };
 let _toastId = 0;
@@ -693,14 +749,11 @@ let _toastId = 0;
 function toast({ type = 'info', title = '', msg = '', action = null, actionLabel = 'Thực hiện', duration = 4000 }) {
   const stack = $('toast-stack');
   const id    = ++_toastId;
-
   const item  = document.createElement('div');
   item.className = `toast-item ${type}`;
   item.dataset.id = id;
-
   const actionHtml = action
     ? `<button class="t-action" onclick="_toastAction(${id})">${esc(actionLabel)}</button>` : '';
-
   item.innerHTML = `
     <div class="t-icon">${TOAST_ICONS[type] || 'ℹ️'}</div>
     <div class="t-body">
@@ -710,11 +763,8 @@ function toast({ type = 'info', title = '', msg = '', action = null, actionLabel
     </div>
     <button class="t-close" onclick="_toastClose(${id})">✕</button>
     <div class="t-progress" style="animation-duration:${duration}ms"></div>`;
-
   if (action) item._toastCb = action;
   stack.appendChild(item);
-
-  // Tự đóng
   setTimeout(() => _toastClose(id), duration);
   return id;
 }
@@ -748,7 +798,6 @@ function showConflictDialog(conflictedBy, conflictTime) {
 
 function closeConflict() {
   D.conflictOv.classList.remove('open');
-  // Reset save button
   D.saveBtn.disabled = false;
   D.saveBtn.textContent = '💾 Lưu lịch';
 }
@@ -758,7 +807,7 @@ async function conflictReload() {
   D.conflictReloadBtn.textContent = 'Đang tải...';
   await load(true);
   D.conflictOv.classList.remove('open');
-  closeLich(); // đóng form edit
+  closeLich();
   D.conflictReloadBtn.disabled = false;
   D.conflictReloadBtn.textContent = '🔄 Tải lại & xem';
   toast({ type:'info', title:'Đã tải lại dữ liệu', msg:'Vui lòng mở lại lịch để chỉnh sửa.' });
@@ -867,7 +916,7 @@ function openEdit(id) {
   const r = allD.find(x => x.id === id);
   if (!r) return;
   edId = id;
-  _editOpenedAt = r.updatedAt || 0;  // ← lưu version token lúc mở form
+  _editOpenedAt = r.updatedAt || 0;
   D.mtitle.textContent = '✏️ Chỉnh sửa lịch';
   D.fNgay.value = r.ngay      || '';
   D.fThu.value  = r.thu       || '';
@@ -906,7 +955,7 @@ async function saveLich() {
     diadiem:         san(D.fDd.value, 100),
     chutri:          san(D.fCt.value, 100),
     thanhphan:       san(D.fTp.value, 200),
-    clientUpdatedAt: edId ? _editOpenedAt : undefined,  // ← gửi version token
+    clientUpdatedAt: edId ? _editOpenedAt : undefined,
   };
 
   D.saveBtn.disabled = true; D.saveBtn.textContent = 'Đang lưu...';
@@ -914,10 +963,8 @@ async function saveLich() {
   try {
     const d = await apiFetch(payload);
 
-    // ── CONFLICT: ai đó đã sửa trước ──
     if (d.error === 'conflict') {
       showConflictDialog(d.conflictedBy, d.conflictTime);
-      // saveBtn reset nằm trong closeConflict / conflictReload
       return;
     }
 
@@ -958,22 +1005,58 @@ async function saveLich() {
   }
 }
 
-async function delL(id) {
+// ════════════════════════════════════════════════════════
+//  DELETE CONFIRM SHEET
+// ════════════════════════════════════════════════════════
+function openDel(id) {
   if (!cu || !cu_pin) return;
   if (typeof id !== 'string' || id.length > 20) return;
+  const r = allD.find(x => x.id === id);
+  if (!r) return;
+  _pendingDelId = id;
+
+  // Điền thông tin preview
+  D.dpNgay.textContent = (dsp(r.ngay) || '—') + (r.thu ? ' — ' + r.thu : '');
+  D.dpTg.textContent   = r.thoigian  || '—';
+  D.dpNd.textContent   = r.noidung   || '—';
+  D.dpDd.textContent   = r.diadiem   || '—';
+  // Ẩn dòng địa điểm nếu trống
+  D.dpDdRow.style.display = r.diadiem ? 'flex' : 'none';
+
+  D.delConfirmBtn.disabled = false;
+  D.delConfirmBtn.textContent = '🗑 Xóa vĩnh viễn';
+  D.delOv.classList.add('open');
+}
+
+function closeDel() {
+  D.delOv.classList.remove('open');
+  _pendingDelId = null;
+}
+
+async function confirmDel() {
+  const id = _pendingDelId;
+  if (!id || !cu || !cu_pin) return;
   if (isRateLimited()) return;
-  if (!confirm('Xác nhận xóa lịch này?')) return;
+  D.delConfirmBtn.disabled = true;
+  D.delConfirmBtn.textContent = 'Đang xóa...';
   lastWriteTime = Date.now();
   try {
     const d = await apiFetch({ action: 'deleteRow', pin: cu_pin, id });
     if (d.success) {
+      closeDel();
       toast({ type:'ok', title:'Đã xóa lịch ✓' });
       allD = allD.filter(r => r.id !== id);
       invalidateWkCache(); render();
     } else {
       toast({ type:'err', title:'Lỗi xóa dữ liệu', msg: esc(d.error || '') });
+      D.delConfirmBtn.disabled = false;
+      D.delConfirmBtn.textContent = '🗑 Xóa vĩnh viễn';
     }
-  } catch(e) { toast({ type:'err', title:'Lỗi kết nối', msg:'Vui lòng thử lại.' }); }
+  } catch(e) {
+    toast({ type:'err', title:'Lỗi kết nối', msg:'Vui lòng thử lại.' });
+    D.delConfirmBtn.disabled = false;
+    D.delConfirmBtn.textContent = '🗑 Xóa vĩnh viễn';
+  }
 }
 
 // ════════════════════════════════════════════════════════
