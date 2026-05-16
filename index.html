@@ -360,6 +360,36 @@ function nowLocal() {
 }
 
 // ════════════════════════════════════════════════════════
+//  DOM CACHE — query một lần, dùng mãi
+// ════════════════════════════════════════════════════════
+// Các element được dùng lặp lại nhiều lần trong render/updUI
+// được cache ở đây thay vì getElementById mỗi lần gọi.
+const $ = id => document.getElementById(id);
+const D = {
+  tbody:    null, cgrid:    null, actCol:   null,
+  tvw:      null, cvw:      null,
+  wt:       null, wr:       null,
+  ubadge:   null, uname:    null,
+  btnAdm:   null, btnLogin: null, btnOut:   null,
+  fab:      null,
+  toast:    null, rlWarn:   null,
+  lichOv:   null, pinOv:    null, usrOv:    null,
+  pinBtn:   null, perr:     null, pinInputArea: null, lockedBox: null, lockedMsg: null,
+  saveBtn:  null, mtitle:   null,
+  fNgay:    null, fThu:     null, fTg:      null, fNd:      null,
+  fDd:      null, fCt:      null, fTp:      null,
+  usrList:  null, lockedList: null, lockCount: null,
+  tabUsers: null, tabLocked: null,
+  panelUsers: null, panelLocked: null,
+  nUN:      null, nUP:      null, addUsrBtn: null,
+  p1: null, p2: null, p3: null, p4: null,
+};
+// Khởi tạo sau khi DOM sẵn sàng
+function initDOM() {
+  Object.keys(D).forEach(k => { D[k] = $(k); });
+}
+
+// ════════════════════════════════════════════════════════
 //  SECURITY HELPERS
 // ════════════════════════════════════════════════════════
 function esc(s) {
@@ -373,8 +403,8 @@ function isValidPin(s)  { return /^\d{4}$/.test(s); }
 
 function isRateLimited() {
   if (Date.now() - lastWriteTime < RATE_LIMIT) {
-    document.getElementById('rlWarn').classList.add('show');
-    setTimeout(() => document.getElementById('rlWarn').classList.remove('show'), 2500);
+    D.rlWarn.classList.add('show');
+    setTimeout(() => D.rlWarn.classList.remove('show'), 2500);
     return true;
   }
   return false;
@@ -423,10 +453,10 @@ function wkn(d) {
 }
 function updHdr() {
   const days = wkDays(wOff), s = days[0], e = days[6];
-  document.getElementById('wt').textContent = `Tuần ${wkn(s)} — Năm ${s.getFullYear()}`;
-  document.getElementById('wr').textContent  = `Từ ${dsp(fmt(s))} đến ${dsp(fmt(e))}/${e.getFullYear()}`;
+  D.wt.textContent = `Tuần ${wkn(s)} — Năm ${s.getFullYear()}`;
+  D.wr.textContent  = `Từ ${dsp(fmt(s))} đến ${dsp(fmt(e))}/${e.getFullYear()}`;
 }
-function chW(d) { wOff = d === 0 ? 0 : wOff + d; updHdr(); render(); }
+function chW(d) { wOff = d === 0 ? 0 : wOff + d; invalidateWkCache(); updHdr(); render(); }
 
 // ════════════════════════════════════════════════════════
 //  DATA
@@ -453,19 +483,31 @@ async function load(force = false) {
     const d = await apiFetch({ action: 'getLich', t: Date.now() });
     allD = Array.isArray(d) ? d.map(cleanRow) : [];
     cacheTime = Date.now();
+    invalidateWkCache();
   } catch(e) { toast('Không thể tải dữ liệu, thử lại sau', 'err'); }
   finally { isLoading = false; }
   render();
 }
 
 function showLoading() {
-  document.getElementById('tbody').innerHTML =
+  D.tbody.innerHTML =
     '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
 }
 
+// ════════════════════════════════════════════════════════
+//  wkData CACHE — chỉ filter lại khi allD hoặc wOff thay đổi
+// ════════════════════════════════════════════════════════
+let _wkCache = null, _wkOff = null, _wkLen = -1;
+
+function invalidateWkCache() { _wkCache = null; }
+
 function wkData() {
+  if (_wkCache && _wkOff === wOff && _wkLen === allD.length) return _wkCache;
   const dates = new Set(wkDays(wOff).map(d => fmt(d)));
-  return allD.filter(r => dates.has(r.ngay));
+  _wkCache = allD.filter(r => dates.has(r.ngay));
+  _wkOff   = wOff;
+  _wkLen   = allD.length;
+  return _wkCache;
 }
 
 // ════════════════════════════════════════════════════════
@@ -505,15 +547,15 @@ function setView(v) {
   document.querySelectorAll('.vtab').forEach((t,i) =>
     t.classList.toggle('on', (i===0&&v==='table')||(i===1&&v==='cal'))
   );
-  document.getElementById('tvw').classList.toggle('hidden', v !== 'table');
-  document.getElementById('cvw').classList.toggle('hidden', v !== 'cal');
+  D.tvw.classList.toggle('hidden', v !== 'table');
+  D.cvw.classList.toggle('hidden', v !== 'cal');
   render();
 }
 
 function renderT() {
-  const b    = document.getElementById('tbody');
+  const b    = D.tbody;
   const data = wkData();
-  document.getElementById('actCol').classList.toggle('hidden', !cu);
+  D.actCol.classList.toggle('hidden', !cu);
 
   if (!data.length) {
     b.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Không có lịch nào trong tuần này</td></tr>`;
@@ -551,7 +593,7 @@ function renderT() {
 }
 
 function renderC() {
-  const g     = document.getElementById('cgrid');
+  const g     = D.cgrid;
   const today = fmt(new Date());
   g.innerHTML = wkDays(wOff).map(day => {
     const ds = fmt(day);
@@ -588,50 +630,46 @@ function renderC() {
 // ════════════════════════════════════════════════════════
 function openPin() {
   resetPinUI();
-  document.getElementById('pinOv').classList.add('open');
-  setTimeout(() => document.getElementById('p1').focus(), 150);
+  D.pinOv.classList.add('open');
+  setTimeout(() => D.p1.focus(), 150);
 }
-function closePin() { document.getElementById('pinOv').classList.remove('open'); }
+function closePin() { D.pinOv.classList.remove('open'); }
 
 function resetPinUI() {
-  ['p1','p2','p3','p4'].forEach(id => { const el = document.getElementById(id); el.value=''; el.disabled=false; });
-  document.getElementById('perr').textContent = '';
-  document.getElementById('pinInputArea').classList.remove('hidden');
-  document.getElementById('lockedBox').classList.add('hidden');
-  const btn = document.getElementById('pinBtn');
-  btn.disabled = false; btn.textContent = 'Xác nhận';
+  [D.p1, D.p2, D.p3, D.p4].forEach(el => { el.value=''; el.disabled=false; });
+  D.perr.textContent = '';
+  D.pinInputArea.classList.remove('hidden');
+  D.lockedBox.classList.add('hidden');
+  D.pinBtn.disabled = false; D.pinBtn.textContent = 'Xác nhận';
 }
 
 function showLockedUI(msg) {
-  ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).disabled = true);
-  document.getElementById('perr').textContent = '';
-  document.getElementById('pinInputArea').classList.add('hidden');
-  document.getElementById('lockedMsg').innerHTML =
-    esc(msg) || 'Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.';
-  document.getElementById('lockedBox').classList.remove('hidden');
-  const btn = document.getElementById('pinBtn');
-  btn.disabled = true; btn.textContent = 'Bị khóa';
+  [D.p1, D.p2, D.p3, D.p4].forEach(el => el.disabled = true);
+  D.perr.textContent = '';
+  D.pinInputArea.classList.add('hidden');
+  D.lockedMsg.innerHTML = esc(msg) || 'Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.';
+  D.lockedBox.classList.remove('hidden');
+  D.pinBtn.disabled = true; D.pinBtn.textContent = 'Bị khóa';
 }
 
 function pnxt(el, nxt) {
   el.value = el.value.replace(/\D/g, '');
-  if (el.value.length >= 1 && nxt) document.getElementById(nxt).focus();
+  if (el.value.length >= 1 && nxt) D[nxt].focus();
   if (!nxt && el.value.length >= 1) { clearTimeout(pinTimer); pinTimer = setTimeout(verPin, 150); }
 }
 
 function pinKey(e, prevId, curId) {
   if (e.key === 'Backspace' && e.target.value === '' && prevId)
-    document.getElementById(prevId).focus();
+    D[prevId].focus();
 }
 
 async function verPin() {
-  const btn = document.getElementById('pinBtn');
-  if (btn.disabled) return;
+  if (D.pinBtn.disabled) return;
 
-  const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
-  if (!isValidPin(pin)) { document.getElementById('perr').textContent = 'Vui lòng nhập đủ 4 chữ số'; return; }
+  const pin = [D.p1, D.p2, D.p3, D.p4].map(el => el.value).join('');
+  if (!isValidPin(pin)) { D.perr.textContent = 'Vui lòng nhập đủ 4 chữ số'; return; }
 
-  btn.disabled = true; btn.textContent = '...';
+  D.pinBtn.disabled = true; D.pinBtn.textContent = '...';
   try {
     const d = await apiFetch({ action: 'verifyPin', pin });
     if (d.success) {
@@ -643,14 +681,14 @@ async function verPin() {
       showLockedUI(d.message);
     } else {
       const remain = d.remaining ?? '?';
-      document.getElementById('perr').textContent = `❌ PIN không đúng. Còn ${remain} lần thử.`;
-      ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('p1').focus();
-      btn.disabled = false; btn.textContent = 'Xác nhận';
+      D.perr.textContent = `❌ PIN không đúng. Còn ${remain} lần thử.`;
+      [D.p1, D.p2, D.p3, D.p4].forEach(el => el.value = '');
+      D.p1.focus();
+      D.pinBtn.disabled = false; D.pinBtn.textContent = 'Xác nhận';
     }
   } catch(e) {
-    document.getElementById('perr').textContent = 'Lỗi kết nối, thử lại sau';
-    btn.disabled = false; btn.textContent = 'Xác nhận';
+    D.perr.textContent = 'Lỗi kết nối, thử lại sau';
+    D.pinBtn.disabled = false; D.pinBtn.textContent = 'Xác nhận';
   }
 }
 
@@ -661,30 +699,29 @@ function logout() {
 
 function updUI() {
   const on = !!cu;
-  document.getElementById('ubadge').classList.toggle('hidden', !on);
-  document.getElementById('uname').textContent = cu || '';
-  document.getElementById('btnAdm').classList.toggle('hidden', !isAdm);
-  document.getElementById('btnLogin').classList.toggle('hidden', on);
-  document.getElementById('btnOut').classList.toggle('hidden', !on);
-  document.getElementById('fab').classList.toggle('hidden', !on);
-  document.getElementById('actCol').classList.toggle('hidden', !on);
+  D.ubadge.classList.toggle('hidden', !on);
+  D.uname.textContent = cu || '';
+  D.btnAdm.classList.toggle('hidden', !isAdm);
+  D.btnLogin.classList.toggle('hidden', on);
+  D.btnOut.classList.toggle('hidden', !on);
+  D.fab.classList.toggle('hidden', !on);
+  D.actCol.classList.toggle('hidden', !on);
 }
 
 // ════════════════════════════════════════════════════════
 //  ADD / EDIT LỊCH
 // ════════════════════════════════════════════════════════
 function resetForm() {
-  ['fNgay','fThu','fTg','fNd','fDd','fCt','fTp'].forEach(id => document.getElementById(id).value = '');
-  const btn = document.getElementById('saveBtn');
-  btn.disabled = false; btn.textContent = '💾 Lưu lịch';
+  [D.fNgay, D.fThu, D.fTg, D.fNd, D.fDd, D.fCt, D.fTp].forEach(el => el.value = '');
+  D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
 }
 
 function openAdd() {
   if (!cu) return;
   edId = null;
-  document.getElementById('mtitle').textContent = '➕ Thêm lịch mới';
+  D.mtitle.textContent = '➕ Thêm lịch mới';
   resetForm();
-  document.getElementById('lichOv').classList.add('open');
+  D.lichOv.classList.add('open');
 }
 
 function openEdit(id) {
@@ -693,53 +730,50 @@ function openEdit(id) {
   const r = allD.find(x => x.id === id);
   if (!r) return;
   edId = id;
-  document.getElementById('mtitle').textContent  = '✏️ Chỉnh sửa lịch';
-  document.getElementById('fNgay').value = r.ngay     || '';
-  document.getElementById('fThu').value  = r.thu      || '';
-  document.getElementById('fTg').value   = r.thoigian || '';
-  document.getElementById('fNd').value   = r.noidung  || '';
-  document.getElementById('fDd').value   = r.diadiem  || '';
-  document.getElementById('fCt').value   = r.chutri   || '';
-  document.getElementById('fTp').value   = r.thanhphan|| '';
-  const btn = document.getElementById('saveBtn');
-  btn.disabled = false; btn.textContent = '💾 Lưu lịch';
-  document.getElementById('lichOv').classList.add('open');
+  D.mtitle.textContent = '✏️ Chỉnh sửa lịch';
+  D.fNgay.value = r.ngay      || '';
+  D.fThu.value  = r.thu       || '';
+  D.fTg.value   = r.thoigian  || '';
+  D.fNd.value   = r.noidung   || '';
+  D.fDd.value   = r.diadiem   || '';
+  D.fCt.value   = r.chutri    || '';
+  D.fTp.value   = r.thanhphan || '';
+  D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
+  D.lichOv.classList.add('open');
 }
 
 function autoThu() {
-  const v = document.getElementById('fNgay').value;
+  const v = D.fNgay.value;
   if (v && isValidDate(v))
-    document.getElementById('fThu').value = THU[new Date(v + 'T00:00:00').getDay()];
+    D.fThu.value = THU[new Date(v + 'T00:00:00').getDay()];
 }
 
-function closeLich() { document.getElementById('lichOv').classList.remove('open'); }
+function closeLich() { D.lichOv.classList.remove('open'); }
 
 async function saveLich() {
   if (!cu || !cu_pin) return;
-  const btn = document.getElementById('saveBtn');
-  if (btn.disabled) return;
+  if (D.saveBtn.disabled) return;
   if (isRateLimited()) return;
 
-  const ngay     = document.getElementById('fNgay').value;
+  const ngay = D.fNgay.value;
   if (!isValidDate(ngay)) { toast('Ngày không hợp lệ', 'err'); return; }
-  const nd = san(document.getElementById('fNd').value, 200);
+  const nd = san(D.fNd.value, 200);
   if (!nd) { toast('Vui lòng nhập Nội dung', 'err'); return; }
 
-  // Snapshot form values trước khi disable
   const payload = {
     action:    edId ? 'updateRow' : 'addRow',
     pin:       cu_pin,
     id:        edId || '',
     ngay,
-    thu:       san(document.getElementById('fThu').value, 20),
-    thoigian:  san(document.getElementById('fTg').value, 50),
+    thu:       san(D.fThu.value, 20),
+    thoigian:  san(D.fTg.value, 50),
     noidung:   nd,
-    diadiem:   san(document.getElementById('fDd').value, 100),
-    chutri:    san(document.getElementById('fCt').value, 100),
-    thanhphan: san(document.getElementById('fTp').value, 200),
+    diadiem:   san(D.fDd.value, 100),
+    chutri:    san(D.fCt.value, 100),
+    thanhphan: san(D.fTp.value, 200),
   };
 
-  btn.disabled = true; btn.textContent = 'Đang lưu...';
+  D.saveBtn.disabled = true; D.saveBtn.textContent = 'Đang lưu...';
   lastWriteTime = Date.now();
   try {
     const d = await apiFetch(payload);
@@ -748,23 +782,21 @@ async function saveLich() {
       toast(edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', 'ok');
 
       if (edId) {
-        // --- UPDATE: sửa trực tiếp trong allD, không fetch lại ---
         const idx = allD.findIndex(r => r.id === edId);
         if (idx !== -1) {
           allD[idx] = cleanRow(Object.assign(allD[idx], {
-            ngay:      payload.ngay,
-            thu:       payload.thu,
-            thoigian:  payload.thoigian,
-            noidung:   payload.noidung,
-            diadiem:   payload.diadiem,
-            chutri:    payload.chutri,
-            thanhphan: payload.thanhphan,
+            ngay:        payload.ngay,
+            thu:         payload.thu,
+            thoigian:    payload.thoigian,
+            noidung:     payload.noidung,
+            diadiem:     payload.diadiem,
+            chutri:      payload.chutri,
+            thanhphan:   payload.thanhphan,
             nguoiSua:    d.nguoiSua    || cu,
             thoiGianSua: d.thoiGianSua || nowLocal(),
           }));
         }
       } else {
-        // --- ADD: push thẳng vào allD, không fetch lại ---
         allD.push(cleanRow({
           id:          d.id,
           ngay:        payload.ngay,
@@ -780,14 +812,15 @@ async function saveLich() {
           thoiGianSua: '',
         }));
       }
-      render(); // render từ cache cục bộ — không round-trip
+      invalidateWkCache();
+      render();
     } else {
       toast('Lỗi: ' + esc(d.error || 'không xác định'), 'err');
-      btn.disabled = false; btn.textContent = '💾 Lưu lịch';
+      D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
     }
   } catch(e) {
     toast('Lỗi kết nối, thử lại sau', 'err');
-    btn.disabled = false; btn.textContent = '💾 Lưu lịch';
+    D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
   }
 }
 
@@ -801,8 +834,8 @@ async function delL(id) {
     const d = await apiFetch({ action: 'deleteRow', pin: cu_pin, id });
     if (d.success) {
       toast('Đã xóa lịch ✓', 'ok');
-      // Xóa trực tiếp trong allD — không fetch lại từ server
       allD = allD.filter(r => r.id !== id);
+      invalidateWkCache();
       render();
     }
     else toast('Lỗi xóa dữ liệu: ' + esc(d.error || ''), 'err');
@@ -813,10 +846,10 @@ async function delL(id) {
 //  USERS PANEL
 // ════════════════════════════════════════════════════════
 function switchUsrTab(tab) {
-  document.getElementById('tabUsers').classList.toggle('on',  tab === 'users');
-  document.getElementById('tabLocked').classList.toggle('on', tab === 'locked');
-  document.getElementById('panelUsers').classList.toggle('hidden',  tab !== 'users');
-  document.getElementById('panelLocked').classList.toggle('hidden', tab !== 'locked');
+  D.tabUsers.classList.toggle('on',  tab === 'users');
+  D.tabLocked.classList.toggle('on', tab === 'locked');
+  D.panelUsers.classList.toggle('hidden',  tab !== 'users');
+  D.panelLocked.classList.toggle('hidden', tab !== 'locked');
   if (tab === 'locked') refreshLocked();
 }
 
@@ -825,15 +858,14 @@ async function openUsers() {
   switchUsrTab('users');
   await loadUsersList();
   await refreshLocked(true);
-  document.getElementById('usrOv').classList.add('open');
+  D.usrOv.classList.add('open');
 }
-function closeUsers() { document.getElementById('usrOv').classList.remove('open'); }
+function closeUsers() { D.usrOv.classList.remove('open'); }
 
 async function loadUsersList() {
   try {
     const users = await apiFetch({ action: 'getUsers', pin: cu_pin });
-    const list  = document.getElementById('usrList');
-    list.innerHTML = (Array.isArray(users) ? users : []).map(u => `
+    D.usrList.innerHTML = (Array.isArray(users) ? users : []).map(u => `
       <div class="usr-row">
         <div>
           <div class="usr-name">${esc(u.ten)}${u.ten==='Admin'?'<span class="admin-badge">ADMIN</span>':''}</div>
@@ -845,7 +877,7 @@ async function loadUsersList() {
                🗑 Xóa</button>`
           : ''}
       </div>`).join('');
-    list.onclick = e => { const b = e.target.closest('.del-usr'); if (b) delUsr(b.dataset.ten); };
+    D.usrList.onclick = e => { const b = e.target.closest('.del-usr'); if (b) delUsr(b.dataset.ten); };
   } catch(e) { toast('Lỗi tải danh sách', 'err'); }
 }
 
@@ -853,13 +885,12 @@ async function refreshLocked(silent = false) {
   try {
     const locked = await apiFetch({ action: 'getLockouts', pin: cu_pin });
     const count  = Array.isArray(locked) ? locked.length : 0;
-    document.getElementById('lockCount').textContent = count > 0 ? ` (${count})` : '';
+    D.lockCount.textContent = count > 0 ? ` (${count})` : '';
     if (!silent) {
-      const list = document.getElementById('lockedList');
       if (!count) {
-        list.innerHTML = '<div class="no-locked">✅ Không có tài khoản nào bị khóa</div>';
+        D.lockedList.innerHTML = '<div class="no-locked">✅ Không có tài khoản nào bị khóa</div>';
       } else {
-        list.innerHTML = locked.map(u => `
+        D.lockedList.innerHTML = locked.map(u => `
           <div class="lock-row">
             <div>
               <div class="lock-row-name">${esc(u.ten)}</div>
@@ -867,7 +898,7 @@ async function refreshLocked(silent = false) {
             </div>
             <button class="unlock-btn" data-pin="${esc(u.targetPin)}">🔓 Mở khóa</button>
           </div>`).join('');
-        list.onclick = e => { const b = e.target.closest('.unlock-btn'); if (b) doUnlock(b.dataset.pin, b); };
+        D.lockedList.onclick = e => { const b = e.target.closest('.unlock-btn'); if (b) doUnlock(b.dataset.pin, b); };
       }
     }
   } catch(e) { if (!silent) toast('Lỗi tải danh sách khóa', 'err'); }
@@ -886,24 +917,22 @@ async function doUnlock(targetPin, btnEl) {
 
 async function addUsr() {
   if (!isAdm || !cu_pin) return;
-  const btn    = document.getElementById('addUsrBtn');
-  const ten    = san(document.getElementById('nUN').value, 50);
-  const newpin = document.getElementById('nUP').value.trim();
-  if (!ten)               { toast('Vui lòng nhập tên', 'err'); return; }
+  const ten    = san(D.nUN.value, 50);
+  const newpin = D.nUP.value.trim();
+  if (!ten)                { toast('Vui lòng nhập tên', 'err'); return; }
   if (!isValidPin(newpin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
-  btn.disabled = true; btn.textContent = 'Đang thêm...';
+  D.addUsrBtn.disabled = true; D.addUsrBtn.textContent = 'Đang thêm...';
   try {
     const d = await apiFetch({ action: 'addUser', pin: cu_pin, ten, newpin });
     if (d.success) {
-      document.getElementById('nUN').value = '';
-      document.getElementById('nUP').value = '';
+      D.nUN.value = ''; D.nUP.value = '';
       toast(`Đã thêm ${esc(ten)} ✓`, 'ok');
       await loadUsersList();
     } else if (d.error === 'PIN already exists') {
       toast('PIN này đã được dùng, chọn PIN khác', 'err');
     } else { toast('Lỗi thêm người dùng', 'err'); }
   } catch(e) { toast('Lỗi kết nối', 'err'); }
-  finally { btn.disabled = false; btn.textContent = '➕ Thêm'; }
+  finally { D.addUsrBtn.disabled = false; D.addUsrBtn.textContent = '➕ Thêm'; }
 }
 
 async function delUsr(ten) {
@@ -922,18 +951,17 @@ async function delUsr(ten) {
 function bgClose(e, closeFn) { if (e.target === e.currentTarget) closeFn(); }
 
 function toast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = String(msg).slice(0, 80);
-  t.className   = `toast ${type} show`;
+  D.toast.textContent = String(msg).slice(0, 80);
+  D.toast.className   = `toast ${type} show`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  toastTimer = setTimeout(() => D.toast.classList.remove('show'), 3000);
 }
 
 // ════════════════════════════════════════════════════════
 //  AUTO REFRESH
 // ════════════════════════════════════════════════════════
 setInterval(() => {
-  const formOpen = document.getElementById('lichOv').classList.contains('open');
+  const formOpen = D.lichOv.classList.contains('open');
   if (!document.hidden && !isLoading && !formOpen) load(true);
 }, 300_000);
 
@@ -944,6 +972,7 @@ document.addEventListener('visibilitychange', () => {
 // ════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════
+initDOM();  // cache tất cả DOM references trước mọi thứ khác
 updHdr();
 load();
 </script>
