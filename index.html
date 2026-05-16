@@ -9,7 +9,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --p:#1a3a5c; --p-light:#2a5080; --p-pale:#e8f0fb;
-  --acc:#e63946; --suc:#2d9c6b; --bg:#eef2f7;
+  --acc:#e63946; --suc:#2d9c6b; --warn:#f59e0b; --bg:#eef2f7;
   --card:#fff; --txt:#1a1a2e; --muted:#5a6478;
   --bdr:#d4dbe8; --bdr2:#c0cad9;
 }
@@ -64,17 +64,11 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .pill.all { background:#fef3c7; color:#92400e; }
 .td-content { white-space:normal; min-width:180px; max-width:240px; line-height:1.4; }
 .td-noidung { font-weight:500; }
-
-/* ── AUDIT TRAIL — dòng nhỏ dưới nội dung ── */
 .audit { margin-top:5px; display:flex; flex-direction:column; gap:2px; }
-.audit-line {
-  display:inline-flex; align-items:center; gap:4px;
-  font-size:10.5px; color:var(--muted); line-height:1.3;
-}
+.audit-line { display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--muted); line-height:1.3; }
 .audit-line .a-icon { font-size:10px; flex-shrink:0; }
 .audit-line .a-name { color:var(--p); font-weight:600; }
 .audit-line .a-time { color:#8a96aa; }
-
 .td-muted { color:var(--muted); }
 .td-acts { display:flex; gap:5px; }
 .ibtn { border:none; border-radius:6px; padding:6px 9px; cursor:pointer; font-size:13px; display:flex; align-items:center; transition:all .15s; }
@@ -158,11 +152,103 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .unlock-btn:hover { background:#d1ede0; }
 .no-locked { text-align:center; padding:24px 0; color:var(--muted); font-size:13px; }
 
-/* ── TOAST ── */
-.toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--p); color:#fff; padding:10px 20px; border-radius:50px; font-size:13px; font-weight:500; opacity:0; transition:all .3s; z-index:999; white-space:nowrap; pointer-events:none; max-width:90vw; overflow:hidden; text-overflow:ellipsis; }
-.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-.toast.ok  { background:var(--suc); }
-.toast.err { background:var(--acc); }
+/* ══════════════════════════════════════════════════════
+   TOAST SYSTEM MỚI — hỗ trợ nhiều loại, có icon, action
+   ══════════════════════════════════════════════════════ */
+#toast-stack {
+  position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+  z-index:999; display:flex; flex-direction:column; align-items:center;
+  gap:8px; pointer-events:none; width:min(92vw,420px);
+}
+.toast-item {
+  width:100%; display:flex; align-items:flex-start; gap:10px;
+  background:#fff; border-radius:12px; padding:12px 14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.06);
+  pointer-events:all; position:relative; overflow:hidden;
+  animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  transition:opacity .25s, transform .25s;
+}
+.toast-item.leaving {
+  animation:toastOut .25s ease-in both;
+}
+@keyframes toastIn  { from{opacity:0;transform:translateY(16px) scale(.96)} to{opacity:1;transform:none} }
+@keyframes toastOut { to{opacity:0;transform:translateY(8px) scale(.96)} }
+
+/* dải màu trái */
+.toast-item::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:12px 0 0 12px;
+}
+.toast-item.ok::before    { background:var(--suc); }
+.toast-item.err::before   { background:var(--acc); }
+.toast-item.warn::before  { background:var(--warn); }
+.toast-item.info::before  { background:var(--p); }
+
+/* icon badge */
+.t-icon {
+  flex-shrink:0; width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; font-size:15px;
+}
+.toast-item.ok   .t-icon { background:#e8f5ee; }
+.toast-item.err  .t-icon { background:#feecec; }
+.toast-item.warn .t-icon { background:#fef3c7; }
+.toast-item.info .t-icon { background:var(--p-pale); }
+
+.t-body { flex:1; min-width:0; }
+.t-title { font-size:13px; font-weight:600; color:var(--txt); line-height:1.3; }
+.t-msg   { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
+
+/* action button bên trong toast */
+.t-action {
+  margin-top:8px; border:none; border-radius:6px; padding:6px 12px;
+  font-size:12px; font-weight:600; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif;
+  transition:background .15s;
+}
+.toast-item.warn .t-action { background:#fef3c7; color:#92400e; }
+.toast-item.warn .t-action:hover { background:#fde68a; }
+.toast-item.err  .t-action { background:#feecec; color:var(--acc); }
+.toast-item.err  .t-action:hover { background:#fcd5d7; }
+
+.t-close {
+  flex-shrink:0; width:20px; height:20px; border:none; background:none;
+  color:var(--muted); cursor:pointer; font-size:14px; border-radius:4px;
+  display:flex; align-items:center; justify-content:center; padding:0;
+  transition:background .15s;
+}
+.t-close:hover { background:#f0f2f6; }
+
+/* progress bar tự đóng */
+.t-progress {
+  position:absolute; bottom:0; left:0; height:2px;
+  background:currentColor; opacity:.2; border-radius:0 0 0 12px;
+  animation:tprog linear both;
+}
+.toast-item.ok    .t-progress { color:var(--suc); }
+.toast-item.err   .t-progress { color:var(--acc); }
+.toast-item.warn  .t-progress { color:var(--warn); }
+.toast-item.info  .t-progress { color:var(--p); }
+@keyframes tprog { from{width:100%} to{width:0%} }
+
+/* ── CONFLICT DIALOG (modal nhỏ) ── */
+.cdlg-ov {
+  position:fixed; inset:0; background:rgba(10,20,40,.5); z-index:500;
+  display:none; align-items:center; justify-content:center; padding:16px;
+}
+.cdlg-ov.open { display:flex; }
+.cdlg {
+  background:var(--card); border-radius:16px; padding:24px;
+  max-width:380px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,.2);
+  animation:slideUp .25s cubic-bezier(.25,.46,.45,.94);
+}
+.cdlg-icon { font-size:36px; margin-bottom:12px; text-align:center; }
+.cdlg-title { font-size:17px; font-weight:700; color:var(--txt); text-align:center; margin-bottom:8px; }
+.cdlg-msg { font-size:13px; color:var(--muted); text-align:center; line-height:1.6; margin-bottom:6px; }
+.cdlg-meta {
+  background:#f6f8fc; border:1px solid var(--bdr); border-radius:8px;
+  padding:10px 12px; margin:12px 0; font-size:12px; color:var(--muted); line-height:1.6;
+}
+.cdlg-meta strong { color:var(--p); font-weight:600; }
+.cdlg-btns { display:flex; gap:8px; margin-top:16px; }
+.cdlg-btns .mbtn { font-size:13px; }
 
 /* ── RATE LIMIT ── */
 .rl-warn { background:#fef3c7; border:1px solid #fbbf24; border-radius:8px; padding:8px 12px; font-size:12px; color:#92400e; margin-bottom:8px; display:none; }
@@ -179,6 +265,7 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   .cal-grid { grid-template-columns:repeat(7,1fr); gap:10px; }
   .sheet { max-width:500px; }
   table { min-width:760px; }
+  #toast-stack { bottom:40px; }
 }
 @media (max-width:400px) {
   .logo-sub { display:none; }
@@ -246,6 +333,24 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 </div>
 
 <button id="fab" class="fab hidden" onclick="openAdd()">＋ Thêm lịch</button>
+
+<!-- TOAST STACK -->
+<div id="toast-stack"></div>
+
+<!-- ═══ CONFLICT DIALOG ═══ -->
+<div class="cdlg-ov" id="conflictOv">
+  <div class="cdlg">
+    <div class="cdlg-icon">⚡</div>
+    <div class="cdlg-title">Xung đột dữ liệu</div>
+    <div class="cdlg-msg">Lịch này vừa được chỉnh sửa bởi người khác trong khi bạn đang sửa.</div>
+    <div class="cdlg-meta" id="conflictMeta"></div>
+    <p style="font-size:12px;color:var(--muted);text-align:center;">Bạn muốn làm gì tiếp theo?</p>
+    <div class="cdlg-btns">
+      <button class="mbtn cancel" onclick="closeConflict()">❌ Hủy bỏ thay đổi</button>
+      <button class="mbtn save" id="conflictReloadBtn" onclick="conflictReload()">🔄 Tải lại & xem</button>
+    </div>
+  </div>
+</div>
 
 <!-- PIN SHEET -->
 <div class="ov" id="pinOv" onclick="bgClose(event,closePin)">
@@ -330,17 +435,15 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
 // ════════════════════════════════════════════════════════
 //  CẤU HÌNH
 // ════════════════════════════════════════════════════════
-const API = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
+const API        = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
 const THU        = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
 const CACHE_TTL  = 60_000;
 const MAX_RETRY  = 2;
-const RATE_LIMIT = 3_000;
+const RATE_LIMIT = 800; // giảm từ 3000 → 800ms
 
 // ════════════════════════════════════════════════════════
 //  STATE
@@ -349,45 +452,29 @@ let cu = null, isAdm = false, cu_pin = null;
 let allD = [], wOff = 0, edId = null, cv = 'table';
 let isLoading = false, cacheTime = 0;
 let lastWriteTime = 0;
-let pinTimer = null, toastTimer = null;
-
-// Thời gian hiện tại dạng "DD/MM/YYYY HH:MM" theo giờ VN — dùng cho local cache
-function nowLocal() {
-  const d   = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  const vn  = new Date(d.getTime() + 7 * 3600 * 1000);
-  return `${pad(vn.getUTCDate())}/${pad(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${pad(vn.getUTCHours())}:${pad(vn.getUTCMinutes())}`;
-}
+let pinTimer = null;
+let _editOpenedAt = 0; // timestamp khi user mở form edit → gửi lên để check conflict
 
 // ════════════════════════════════════════════════════════
-//  DOM CACHE — query một lần, dùng mãi
+//  DOM CACHE
 // ════════════════════════════════════════════════════════
-// Các element được dùng lặp lại nhiều lần trong render/updUI
-// được cache ở đây thay vì getElementById mỗi lần gọi.
 const $ = id => document.getElementById(id);
 const D = {
-  tbody:    null, cgrid:    null, actCol:   null,
-  tvw:      null, cvw:      null,
-  wt:       null, wr:       null,
-  ubadge:   null, uname:    null,
-  btnAdm:   null, btnLogin: null, btnOut:   null,
-  fab:      null,
-  toast:    null, rlWarn:   null,
-  lichOv:   null, pinOv:    null, usrOv:    null,
-  pinBtn:   null, perr:     null, pinInputArea: null, lockedBox: null, lockedMsg: null,
-  saveBtn:  null, mtitle:   null,
-  fNgay:    null, fThu:     null, fTg:      null, fNd:      null,
-  fDd:      null, fCt:      null, fTp:      null,
-  usrList:  null, lockedList: null, lockCount: null,
-  tabUsers: null, tabLocked: null,
-  panelUsers: null, panelLocked: null,
-  nUN:      null, nUP:      null, addUsrBtn: null,
-  p1: null, p2: null, p3: null, p4: null,
+  tbody:null, cgrid:null, actCol:null, tvw:null, cvw:null,
+  wt:null, wr:null, ubadge:null, uname:null,
+  btnAdm:null, btnLogin:null, btnOut:null, fab:null,
+  lichOv:null, pinOv:null, usrOv:null,
+  pinBtn:null, perr:null, pinInputArea:null, lockedBox:null, lockedMsg:null,
+  saveBtn:null, mtitle:null,
+  fNgay:null, fThu:null, fTg:null, fNd:null, fDd:null, fCt:null, fTp:null,
+  usrList:null, lockedList:null, lockCount:null,
+  tabUsers:null, tabLocked:null, panelUsers:null, panelLocked:null,
+  nUN:null, nUP:null, addUsrBtn:null,
+  p1:null, p2:null, p3:null, p4:null,
+  rlWarn:null,
+  conflictOv:null, conflictMeta:null, conflictReloadBtn:null,
 };
-// Khởi tạo sau khi DOM sẵn sàng
-function initDOM() {
-  Object.keys(D).forEach(k => { D[k] = $(k); });
-}
+function initDOM() { Object.keys(D).forEach(k => { D[k] = $(k); }); }
 
 // ════════════════════════════════════════════════════════
 //  SECURITY HELPERS
@@ -404,7 +491,7 @@ function isValidPin(s)  { return /^\d{4}$/.test(s); }
 function isRateLimited() {
   if (Date.now() - lastWriteTime < RATE_LIMIT) {
     D.rlWarn.classList.add('show');
-    setTimeout(() => D.rlWarn.classList.remove('show'), 2500);
+    setTimeout(() => D.rlWarn.classList.remove('show'), 2000);
     return true;
   }
   return false;
@@ -441,13 +528,13 @@ function wkDays(off = 0) {
     const x = new Date(mon); x.setDate(mon.getDate() + i); return x;
   });
 }
-function fmt(d) { return d.toISOString().split('T')[0]; }
-function dsp(s) {
+function fmt(d)  { return d.toISOString().split('T')[0]; }
+function dsp(s)  {
   if (!s) return '';
   const d = new Date(s + 'T00:00:00');
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 }
-function wkn(d) {
+function wkn(d)  {
   const j = new Date(d.getFullYear(), 0, 1);
   return Math.ceil(((d - j) / 86400000 + j.getDay() + 1) / 7);
 }
@@ -461,13 +548,20 @@ function chW(d) { wOff = d === 0 ? 0 : wOff + d; invalidateWkCache(); updHdr(); 
 // ════════════════════════════════════════════════════════
 //  DATA
 // ════════════════════════════════════════════════════════
+function nowLocal() {
+  const d = new Date(), vn = new Date(d.getTime() + 7*3600*1000);
+  const p = n => String(n).padStart(2,'0');
+  return `${p(vn.getUTCDate())}/${p(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${p(vn.getUTCHours())}:${p(vn.getUTCMinutes())}`;
+}
+
 function cleanRow(r) {
   if (r.ngay?.includes('T')) {
     const d = new Date(r.ngay); d.setHours(d.getHours() + 7);
     r.ngay = d.toISOString().split('T')[0];
   }
   if (r.thoigian?.includes('T')) r.thoigian = '';
-  r.id = String(r.id ?? '');
+  r.id        = String(r.id ?? '');
+  r.updatedAt = Number(r.updatedAt) || 0;   // version token
   ['thu','thoigian','noidung','diadiem','chutri','thanhphan',
    'nguoiTao','thoiGianTao','nguoiSua','thoiGianSua'].forEach(k => {
     r[k] = san(r[k] ?? '', 300);
@@ -484,23 +578,20 @@ async function load(force = false) {
     allD = Array.isArray(d) ? d.map(cleanRow) : [];
     cacheTime = Date.now();
     invalidateWkCache();
-  } catch(e) { toast('Không thể tải dữ liệu, thử lại sau', 'err'); }
+  } catch(e) { toast({ type:'err', title:'Không tải được dữ liệu', msg:'Kiểm tra kết nối và thử lại.' }); }
   finally { isLoading = false; }
   render();
 }
 
 function showLoading() {
-  D.tbody.innerHTML =
-    '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
+  D.tbody.innerHTML = '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
 }
 
 // ════════════════════════════════════════════════════════
-//  wkData CACHE — chỉ filter lại khi allD hoặc wOff thay đổi
+//  wkData CACHE
 // ════════════════════════════════════════════════════════
 let _wkCache = null, _wkOff = null, _wkVer = 0, _allDVer = 0;
-
 function invalidateWkCache() { _allDVer++; }
-
 function wkData() {
   if (_wkCache && _wkOff === wOff && _wkVer === _allDVer) return _wkCache;
   const dates = new Set(wkDays(wOff).map(d => fmt(d)));
@@ -511,28 +602,12 @@ function wkData() {
 }
 
 // ════════════════════════════════════════════════════════
-//  AUDIT TRAIL HELPER
+//  AUDIT TRAIL
 // ════════════════════════════════════════════════════════
-/**
- * Tạo HTML dòng audit nhỏ dưới nội dung.
- * Chỉ hiển thị nếu có dữ liệu.
- */
 function auditHtml(r) {
   const lines = [];
-  if (r.nguoiTao) {
-    lines.push(`<span class="audit-line">
-      <span class="a-icon">✏️</span>
-      <span>Tạo bởi <span class="a-name">${esc(r.nguoiTao)}</span>
-      ${r.thoiGianTao ? `<span class="a-time">— ${esc(r.thoiGianTao)}</span>` : ''}</span>
-    </span>`);
-  }
-  if (r.nguoiSua) {
-    lines.push(`<span class="audit-line">
-      <span class="a-icon">🔄</span>
-      <span>Sửa bởi <span class="a-name">${esc(r.nguoiSua)}</span>
-      ${r.thoiGianSua ? `<span class="a-time">— ${esc(r.thoiGianSua)}</span>` : ''}</span>
-    </span>`);
-  }
+  if (r.nguoiTao) lines.push(`<span class="audit-line"><span class="a-icon">✏️</span><span>Tạo bởi <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span></span>`);
+  if (r.nguoiSua) lines.push(`<span class="audit-line"><span class="a-icon">🔄</span><span>Sửa bởi <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span></span>`);
   if (!lines.length) return '';
   return `<div class="audit">${lines.join('')}</div>`;
 }
@@ -556,25 +631,17 @@ function renderT() {
   const b    = D.tbody;
   const data = wkData();
   D.actCol.classList.toggle('hidden', !cu);
-
   if (!data.length) {
     b.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Không có lịch nào trong tuần này</td></tr>`;
     b.onclick = null; return;
   }
-
-  data.sort((a,b) =>
-    (a.ngay||'').localeCompare(b.ngay||'') || (a.thoigian||'').localeCompare(b.thoigian||'')
-  );
-
+  data.sort((a,b) => (a.ngay||'').localeCompare(b.ngay||'') || (a.thoigian||'').localeCompare(b.thoigian||''));
   b.innerHTML = data.map(r => `
     <tr>
       <td class="td-date">${esc(dsp(r.ngay))}</td>
       <td class="td-day">${esc(r.thu)}</td>
       <td><span class="pill${r.thoigian==='Cả ngày'?' all':''}">${esc(r.thoigian)}</span></td>
-      <td class="td-content">
-        <div class="td-noidung">${esc(r.noidung)}</div>
-        ${auditHtml(r)}
-      </td>
+      <td class="td-content"><div class="td-noidung">${esc(r.noidung)}</div>${auditHtml(r)}</td>
       <td class="td-muted">${esc(r.diadiem)}</td>
       <td class="td-muted">${esc(r.chutri)}</td>
       <td class="td-muted">${esc(r.thanhphan)}</td>
@@ -583,7 +650,6 @@ function renderT() {
         <button class="ibtn del"  data-id="${esc(r.id)}" title="Xóa">🗑</button>
       </td>` : '<td></td>'}
     </tr>`).join('');
-
   b.onclick = e => {
     const ed = e.target.closest('.ibtn.edit');
     const dl = e.target.closest('.ibtn.del');
@@ -605,24 +671,97 @@ function renderC() {
         <div class="cal-dt">${day.getDate()}/${day.getMonth()+1}</div>
       </div>
       <div class="cal-body">
-        ${dd.length
-          ? dd.map(r => {
-              // Trong lịch: hiển thị người tạo/sửa gọn hơn
-              const auditCal = r.nguoiSua
-                ? `<div class="cevent-audit">🔄 ${esc(r.nguoiSua)} — ${esc(r.thoiGianSua)}</div>`
-                : r.nguoiTao
-                  ? `<div class="cevent-audit">✏️ ${esc(r.nguoiTao)} — ${esc(r.thoiGianTao)}</div>`
-                  : '';
-              return `<div class="cevent">
-                <div class="cevent-time">${esc(r.thoigian)}</div>
-                <div class="cevent-title">${esc(r.noidung)}</div>
-                ${auditCal}
-              </div>`;
-            }).join('')
-          : '<div class="cal-empty">Không có lịch</div>'}
+        ${dd.length ? dd.map(r => {
+          const ac = r.nguoiSua
+            ? `<div class="cevent-audit">🔄 ${esc(r.nguoiSua)} — ${esc(r.thoiGianSua)}</div>`
+            : r.nguoiTao ? `<div class="cevent-audit">✏️ ${esc(r.nguoiTao)} — ${esc(r.thoiGianTao)}</div>` : '';
+          return `<div class="cevent"><div class="cevent-time">${esc(r.thoigian)}</div><div class="cevent-title">${esc(r.noidung)}</div>${ac}</div>`;
+        }).join('') : '<div class="cal-empty">Không có lịch</div>'}
       </div>
     </div>`;
   }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+//  TOAST SYSTEM MỚI
+//  toast({ type, title, msg, action, actionLabel, duration })
+//  type: 'ok' | 'err' | 'warn' | 'info'
+// ════════════════════════════════════════════════════════
+const TOAST_ICONS = { ok:'✅', err:'❌', warn:'⚠️', info:'ℹ️' };
+let _toastId = 0;
+
+function toast({ type = 'info', title = '', msg = '', action = null, actionLabel = 'Thực hiện', duration = 4000 }) {
+  const stack = $('toast-stack');
+  const id    = ++_toastId;
+
+  const item  = document.createElement('div');
+  item.className = `toast-item ${type}`;
+  item.dataset.id = id;
+
+  const actionHtml = action
+    ? `<button class="t-action" onclick="_toastAction(${id})">${esc(actionLabel)}</button>` : '';
+
+  item.innerHTML = `
+    <div class="t-icon">${TOAST_ICONS[type] || 'ℹ️'}</div>
+    <div class="t-body">
+      <div class="t-title">${esc(title)}</div>
+      ${msg ? `<div class="t-msg">${esc(msg)}</div>` : ''}
+      ${actionHtml}
+    </div>
+    <button class="t-close" onclick="_toastClose(${id})">✕</button>
+    <div class="t-progress" style="animation-duration:${duration}ms"></div>`;
+
+  if (action) item._toastCb = action;
+  stack.appendChild(item);
+
+  // Tự đóng
+  setTimeout(() => _toastClose(id), duration);
+  return id;
+}
+
+function _toastClose(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (!el) return;
+  el.classList.add('leaving');
+  setTimeout(() => el.remove(), 260);
+}
+
+function _toastAction(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (el && el._toastCb) el._toastCb();
+  _toastClose(id);
+}
+
+// ════════════════════════════════════════════════════════
+//  CONFLICT DIALOG
+// ════════════════════════════════════════════════════════
+function showConflictDialog(conflictedBy, conflictTime) {
+  if (conflictedBy || conflictTime) {
+    D.conflictMeta.innerHTML = `
+      <strong>Người sửa:</strong> ${esc(conflictedBy || '(không rõ)')}<br>
+      <strong>Thời điểm:</strong> ${esc(conflictTime || '(không rõ)')}`;
+  } else {
+    D.conflictMeta.innerHTML = '<em>Không có thông tin chi tiết.</em>';
+  }
+  D.conflictOv.classList.add('open');
+}
+
+function closeConflict() {
+  D.conflictOv.classList.remove('open');
+  // Reset save button
+  D.saveBtn.disabled = false;
+  D.saveBtn.textContent = '💾 Lưu lịch';
+}
+
+async function conflictReload() {
+  D.conflictReloadBtn.disabled = true;
+  D.conflictReloadBtn.textContent = 'Đang tải...';
+  await load(true);
+  D.conflictOv.classList.remove('open');
+  closeLich(); // đóng form edit
+  D.conflictReloadBtn.disabled = false;
+  D.conflictReloadBtn.textContent = '🔄 Tải lại & xem';
+  toast({ type:'info', title:'Đã tải lại dữ liệu', msg:'Vui lòng mở lại lịch để chỉnh sửa.' });
 }
 
 // ════════════════════════════════════════════════════════
@@ -659,23 +798,20 @@ function pnxt(el, nxt) {
 }
 
 function pinKey(e, prevId, curId) {
-  if (e.key === 'Backspace' && e.target.value === '' && prevId)
-    D[prevId].focus();
+  if (e.key === 'Backspace' && e.target.value === '' && prevId) D[prevId].focus();
 }
 
 async function verPin() {
   if (D.pinBtn.disabled) return;
-
   const pin = [D.p1, D.p2, D.p3, D.p4].map(el => el.value).join('');
   if (!isValidPin(pin)) { D.perr.textContent = 'Vui lòng nhập đủ 4 chữ số'; return; }
-
   D.pinBtn.disabled = true; D.pinBtn.textContent = '...';
   try {
     const d = await apiFetch({ action: 'verifyPin', pin });
     if (d.success) {
       cu = san(d.ten, 50); isAdm = !!d.isAdmin; cu_pin = pin;
       closePin(); updUI();
-      toast(`Xin chào, ${esc(d.ten)}! 👋`, 'ok');
+      toast({ type:'ok', title:`Xin chào, ${d.ten}! 👋`, msg: isAdm ? 'Bạn đăng nhập với quyền Admin.' : 'Đăng nhập thành công.' });
       render();
     } else if (d.error === 'locked') {
       showLockedUI(d.message);
@@ -694,7 +830,8 @@ async function verPin() {
 
 function logout() {
   cu = null; isAdm = false; cu_pin = null;
-  updUI(); render(); toast('Đã đăng xuất');
+  updUI(); render();
+  toast({ type:'info', title:'Đã đăng xuất', msg:'Hẹn gặp lại!' });
 }
 
 function updUI() {
@@ -718,7 +855,7 @@ function resetForm() {
 
 function openAdd() {
   if (!cu) return;
-  edId = null;
+  edId = null; _editOpenedAt = 0;
   D.mtitle.textContent = '➕ Thêm lịch mới';
   resetForm();
   D.lichOv.classList.add('open');
@@ -730,6 +867,7 @@ function openEdit(id) {
   const r = allD.find(x => x.id === id);
   if (!r) return;
   edId = id;
+  _editOpenedAt = r.updatedAt || 0;  // ← lưu version token lúc mở form
   D.mtitle.textContent = '✏️ Chỉnh sửa lịch';
   D.fNgay.value = r.ngay      || '';
   D.fThu.value  = r.thu       || '';
@@ -744,82 +882,78 @@ function openEdit(id) {
 
 function autoThu() {
   const v = D.fNgay.value;
-  if (v && isValidDate(v))
-    D.fThu.value = THU[new Date(v + 'T00:00:00').getDay()];
+  if (v && isValidDate(v)) D.fThu.value = THU[new Date(v + 'T00:00:00').getDay()];
 }
 
 function closeLich() { D.lichOv.classList.remove('open'); }
 
 async function saveLich() {
-  if (!cu || !cu_pin) return;
-  if (D.saveBtn.disabled) return;
+  if (!cu || !cu_pin || D.saveBtn.disabled) return;
   if (isRateLimited()) return;
-
   const ngay = D.fNgay.value;
-  if (!isValidDate(ngay)) { toast('Ngày không hợp lệ', 'err'); return; }
+  if (!isValidDate(ngay)) { toast({ type:'err', title:'Ngày không hợp lệ', msg:'Vui lòng chọn lại ngày.' }); return; }
   const nd = san(D.fNd.value, 200);
-  if (!nd) { toast('Vui lòng nhập Nội dung', 'err'); return; }
+  if (!nd) { toast({ type:'warn', title:'Thiếu nội dung', msg:'Vui lòng nhập nội dung công việc.' }); return; }
 
   const payload = {
-    action:    edId ? 'updateRow' : 'addRow',
-    pin:       cu_pin,
-    id:        edId || '',
+    action:          edId ? 'updateRow' : 'addRow',
+    pin:             cu_pin,
+    id:              edId || '',
     ngay,
-    thu:       san(D.fThu.value, 20),
-    thoigian:  san(D.fTg.value, 50),
-    noidung:   nd,
-    diadiem:   san(D.fDd.value, 100),
-    chutri:    san(D.fCt.value, 100),
-    thanhphan: san(D.fTp.value, 200),
+    thu:             san(D.fThu.value, 20),
+    thoigian:        san(D.fTg.value, 50),
+    noidung:         nd,
+    diadiem:         san(D.fDd.value, 100),
+    chutri:          san(D.fCt.value, 100),
+    thanhphan:       san(D.fTp.value, 200),
+    clientUpdatedAt: edId ? _editOpenedAt : undefined,  // ← gửi version token
   };
 
   D.saveBtn.disabled = true; D.saveBtn.textContent = 'Đang lưu...';
   lastWriteTime = Date.now();
   try {
     const d = await apiFetch(payload);
+
+    // ── CONFLICT: ai đó đã sửa trước ──
+    if (d.error === 'conflict') {
+      showConflictDialog(d.conflictedBy, d.conflictTime);
+      // saveBtn reset nằm trong closeConflict / conflictReload
+      return;
+    }
+
     if (d.success) {
       closeLich();
-      toast(edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', 'ok');
+      toast({ type:'ok', title: edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', msg: edId ? `Chỉnh sửa bởi ${cu}` : `Tạo bởi ${cu}` });
 
       if (edId) {
         const idx = allD.findIndex(r => r.id === edId);
         if (idx !== -1) {
-          allD[idx] = cleanRow(Object.assign(allD[idx], {
-            ngay:        payload.ngay,
-            thu:         payload.thu,
-            thoigian:    payload.thoigian,
-            noidung:     payload.noidung,
-            diadiem:     payload.diadiem,
-            chutri:      payload.chutri,
-            thanhphan:   payload.thanhphan,
-            nguoiSua:    d.nguoiSua    || cu,
-            thoiGianSua: d.thoiGianSua || nowLocal(),
+          allD[idx] = cleanRow(Object.assign({}, allD[idx], {
+            ngay: payload.ngay, thu: payload.thu, thoigian: payload.thoigian,
+            noidung: payload.noidung, diadiem: payload.diadiem,
+            chutri: payload.chutri, thanhphan: payload.thanhphan,
+            nguoiSua: d.nguoiSua || cu, thoiGianSua: d.thoiGianSua || nowLocal(),
+            updatedAt: d.updatedAt || Date.now(),
           }));
         }
       } else {
         allD.push(cleanRow({
-          id:          d.id,
-          ngay:        payload.ngay,
-          thu:         payload.thu,
-          thoigian:    payload.thoigian,
-          noidung:     payload.noidung,
-          diadiem:     payload.diadiem,
-          chutri:      payload.chutri,
-          thanhphan:   payload.thanhphan,
-          nguoiTao:    cu,
-          thoiGianTao: d.thoiGianTao || nowLocal(),
-          nguoiSua:    '',
-          thoiGianSua: '',
+          id: d.id, ngay: payload.ngay, thu: payload.thu,
+          thoigian: payload.thoigian, noidung: payload.noidung,
+          diadiem: payload.diadiem, chutri: payload.chutri,
+          thanhphan: payload.thanhphan,
+          nguoiTao: cu, thoiGianTao: d.thoiGianTao || nowLocal(),
+          nguoiSua: '', thoiGianSua: '',
+          updatedAt: d.updatedAt || Date.now(),
         }));
       }
-      invalidateWkCache();
-      render();
+      invalidateWkCache(); render();
     } else {
-      toast('Lỗi: ' + esc(d.error || 'không xác định'), 'err');
+      toast({ type:'err', title:'Lỗi lưu dữ liệu', msg: esc(d.error || 'Không xác định') });
       D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
     }
   } catch(e) {
-    toast('Lỗi kết nối, thử lại sau', 'err');
+    toast({ type:'err', title:'Lỗi kết nối', msg:'Vui lòng thử lại sau.' });
     D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
   }
 }
@@ -833,13 +967,13 @@ async function delL(id) {
   try {
     const d = await apiFetch({ action: 'deleteRow', pin: cu_pin, id });
     if (d.success) {
-      toast('Đã xóa lịch ✓', 'ok');
+      toast({ type:'ok', title:'Đã xóa lịch ✓' });
       allD = allD.filter(r => r.id !== id);
-      invalidateWkCache();
-      render();
+      invalidateWkCache(); render();
+    } else {
+      toast({ type:'err', title:'Lỗi xóa dữ liệu', msg: esc(d.error || '') });
     }
-    else toast('Lỗi xóa dữ liệu: ' + esc(d.error || ''), 'err');
-  } catch(e) { toast('Lỗi kết nối, thử lại sau', 'err'); }
+  } catch(e) { toast({ type:'err', title:'Lỗi kết nối', msg:'Vui lòng thử lại.' }); }
 }
 
 // ════════════════════════════════════════════════════════
@@ -874,11 +1008,10 @@ async function loadUsersList() {
         ${u.ten !== 'Admin'
           ? `<button class="del-usr" data-ten="${esc(u.ten)}"
                style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;font-family:'Be Vietnam Pro',sans-serif;">
-               🗑 Xóa</button>`
-          : ''}
+               🗑 Xóa</button>` : ''}
       </div>`).join('');
     D.usrList.onclick = e => { const b = e.target.closest('.del-usr'); if (b) delUsr(b.dataset.ten); };
-  } catch(e) { toast('Lỗi tải danh sách', 'err'); }
+  } catch(e) { toast({ type:'err', title:'Lỗi tải danh sách người dùng' }); }
 }
 
 async function refreshLocked(silent = false) {
@@ -901,7 +1034,7 @@ async function refreshLocked(silent = false) {
         D.lockedList.onclick = e => { const b = e.target.closest('.unlock-btn'); if (b) doUnlock(b.dataset.pin, b); };
       }
     }
-  } catch(e) { if (!silent) toast('Lỗi tải danh sách khóa', 'err'); }
+  } catch(e) { if (!silent) toast({ type:'err', title:'Lỗi tải danh sách khóa' }); }
 }
 
 async function doUnlock(targetPin, btnEl) {
@@ -910,28 +1043,38 @@ async function doUnlock(targetPin, btnEl) {
   if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
   try {
     const d = await apiFetch({ action: 'unlockPin', pin: cu_pin, targetPin });
-    if (d.success) { toast('Đã mở khóa thành công ✓', 'ok'); await refreshLocked(); }
-    else { toast('Lỗi mở khóa: ' + esc(d.error || ''), 'err'); if (btnEl) { btnEl.disabled=false; btnEl.textContent='🔓 Mở khóa'; } }
-  } catch(e) { toast('Lỗi kết nối', 'err'); if (btnEl) { btnEl.disabled=false; btnEl.textContent='🔓 Mở khóa'; } }
+    if (d.success) {
+      toast({ type:'ok', title:'Đã mở khóa thành công ✓' });
+      await refreshLocked();
+    } else {
+      toast({ type:'err', title:'Lỗi mở khóa', msg: esc(d.error || '') });
+      if (btnEl) { btnEl.disabled=false; btnEl.textContent='🔓 Mở khóa'; }
+    }
+  } catch(e) {
+    toast({ type:'err', title:'Lỗi kết nối' });
+    if (btnEl) { btnEl.disabled=false; btnEl.textContent='🔓 Mở khóa'; }
+  }
 }
 
 async function addUsr() {
   if (!isAdm || !cu_pin) return;
   const ten    = san(D.nUN.value, 50);
   const newpin = D.nUP.value.trim();
-  if (!ten)                { toast('Vui lòng nhập tên', 'err'); return; }
-  if (!isValidPin(newpin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
+  if (!ten)                { toast({ type:'warn', title:'Vui lòng nhập tên người dùng' }); return; }
+  if (!isValidPin(newpin)) { toast({ type:'warn', title:'PIN không hợp lệ', msg:'PIN phải là 4 chữ số (0-9).' }); return; }
   D.addUsrBtn.disabled = true; D.addUsrBtn.textContent = 'Đang thêm...';
   try {
     const d = await apiFetch({ action: 'addUser', pin: cu_pin, ten, newpin });
     if (d.success) {
       D.nUN.value = ''; D.nUP.value = '';
-      toast(`Đã thêm ${esc(ten)} ✓`, 'ok');
+      toast({ type:'ok', title:`Đã thêm ${ten} ✓` });
       await loadUsersList();
     } else if (d.error === 'PIN already exists') {
-      toast('PIN này đã được dùng, chọn PIN khác', 'err');
-    } else { toast('Lỗi thêm người dùng', 'err'); }
-  } catch(e) { toast('Lỗi kết nối', 'err'); }
+      toast({ type:'warn', title:'PIN đã được dùng', msg:'Vui lòng chọn mã PIN khác.' });
+    } else {
+      toast({ type:'err', title:'Lỗi thêm người dùng' });
+    }
+  } catch(e) { toast({ type:'err', title:'Lỗi kết nối' }); }
   finally { D.addUsrBtn.disabled = false; D.addUsrBtn.textContent = '➕ Thêm'; }
 }
 
@@ -940,9 +1083,13 @@ async function delUsr(ten) {
   if (!confirm(`Xác nhận xóa người dùng "${ten}"?`)) return;
   try {
     const d = await apiFetch({ action: 'deleteUser', pin: cu_pin, ten });
-    if (d.success) { toast('Đã xóa người dùng ✓', 'ok'); await loadUsersList(); }
-    else toast('Lỗi xóa người dùng', 'err');
-  } catch(e) { toast('Lỗi kết nối', 'err'); }
+    if (d.success) {
+      toast({ type:'ok', title:'Đã xóa người dùng ✓' });
+      await loadUsersList();
+    } else {
+      toast({ type:'err', title:'Lỗi xóa người dùng' });
+    }
+  } catch(e) { toast({ type:'err', title:'Lỗi kết nối' }); }
 }
 
 // ════════════════════════════════════════════════════════
@@ -950,23 +1097,15 @@ async function delUsr(ten) {
 // ════════════════════════════════════════════════════════
 function bgClose(e, closeFn) { if (e.target === e.currentTarget) closeFn(); }
 
-function toast(msg, type = '') {
-  D.toast.textContent = String(msg).slice(0, 80);
-  D.toast.className   = `toast ${type} show`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => D.toast.classList.remove('show'), 3000);
-}
-
 // ════════════════════════════════════════════════════════
-//  INIT — initDOM() phải chạy đầu tiên, mọi thứ dùng D.* đều sau đây
+//  INIT
 // ════════════════════════════════════════════════════════
 initDOM();
 updHdr();
 load();
 
 setInterval(() => {
-  const formOpen = D.lichOv.classList.contains('open');
-  if (!document.hidden && !isLoading && !formOpen) load(true);
+  if (!document.hidden && !isLoading && !D.lichOv.classList.contains('open')) load(true);
 }, 300_000);
 
 document.addEventListener('visibilitychange', () => {
