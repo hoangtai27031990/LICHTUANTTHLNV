@@ -31,79 +31,134 @@ body{
   -moz-osx-font-smoothing:grayscale;
 }
 
-/* ── HEADER ── */
+/* ── HEADER (top bar only) ── */
 .hdr{
   background:var(--p);color:#fff;
-  padding:calc(14px + var(--safe-top)) 16px 12px;
+  padding:calc(10px + var(--safe-top)) 12px 10px;
   position:sticky;top:0;z-index:50;
-  /* iOS Safari sticky fix */
   -webkit-transform:translateZ(0);transform:translateZ(0);
 }
-.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.logo-wrap{display:flex;align-items:center;gap:9px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo-wrap{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
 .logo-icon{
-  width:36px;height:36px;
-  background:rgba(255,255,255,.15);border-radius:9px;
-  display:flex;align-items:center;justify-content:center;font-size:18px;
-  flex-shrink:0;
+  width:32px;height:32px;flex-shrink:0;
+  background:rgba(255,255,255,.15);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
 }
-.logo-text{font-size:15px;font-weight:600;line-height:1.2}
-.logo-sub{font-size:11px;font-weight:400;opacity:.65;margin-top:1px}
-.hdr-actions{display:flex;align-items:center;gap:6px}
+.logo-text{font-size:14px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo-sub{font-size:10px;font-weight:400;opacity:.65;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
 .hbtn{
   border:none;background:rgba(255,255,255,.15);color:#fff;
-  border-radius:8px;padding:8px 11px;font-size:12.5px;font-weight:500;
-  cursor:pointer;display:flex;align-items:center;gap:5px;
+  border-radius:8px;padding:7px 10px;font-size:12px;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;gap:4px;
   font-family:'Be Vietnam Pro',sans-serif;
-  /* min 44px tap target */
-  min-height:44px;min-width:44px;
-  touch-action:manipulation;
-  -webkit-appearance:none;
-  transition:background .15s;
-}
-.hbtn:hover{background:rgba(255,255,255,.22)}
-.hbtn:active{background:rgba(255,255,255,.3)}
-.ubadge{
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  border-radius:20px;padding:5px 11px;font-size:12px;
-  display:flex;align-items:center;gap:6px;
-}
-.udot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0}
-
-/* ── WEEK BAR ── */
-.week-bar{
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
-  border-radius:10px;padding:10px 12px;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-}
-.week-info .wt{font-size:14px;font-weight:600;color:#fff}
-.week-info .wr{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
-.week-ctrl{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.vtabs{display:flex;background:rgba(0,0,0,.2);border-radius:7px;padding:2px;gap:2px}
-.vtab{
-  border:none;background:none;color:rgba(255,255,255,.6);
-  border-radius:5px;padding:6px 10px;font-size:12px;font-weight:500;
-  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
-  min-height:36px;touch-action:manipulation;-webkit-appearance:none;
-  transition:all .15s;
-}
-.vtab.on{background:rgba(255,255,255,.92);color:var(--p)}
-.navbtn{
-  width:36px;height:36px;border-radius:7px;
-  border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);
-  color:rgba(255,255,255,.85);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:13px;
+  min-height:36px;min-width:36px;
   touch-action:manipulation;-webkit-appearance:none;
   transition:background .15s;
 }
-.navbtn:active{background:rgba(255,255,255,.25)}
+.hbtn:active{background:rgba(255,255,255,.3)}
+.ubadge{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:4px 10px;font-size:11.5px;
+  display:flex;align-items:center;gap:5px;max-width:110px;
+  overflow:hidden;
+}
+.ubadge span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.udot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
+
+/* ── WEEK TAB BAR (below header, sticky) ── */
+.week-tabbar{
+  background:var(--p);
+  padding:0 12px 10px;
+  position:sticky;top:calc(52px + var(--safe-top));
+  z-index:49;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+  /* subtle separator */
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.wtb-row1{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  margin-bottom:8px;
+}
+.week-info{min-width:0;flex:1}
+.week-info .wt{font-size:13.5px;font-weight:600;color:#fff;white-space:nowrap}
+.week-info .wr{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px;white-space:nowrap}
+.week-nav{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.navbtn{
+  width:34px;height:34px;border-radius:7px;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.85);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  touch-action:manipulation;-webkit-appearance:none;
+  transition:background .15s;
+}
+.navbtn:active{background:rgba(255,255,255,.22)}
+.wtb-row2{display:flex;align-items:center;gap:6px}
+.vtabs{
+  display:flex;background:rgba(0,0,0,.18);border-radius:8px;
+  padding:2px;gap:2px;flex:1;
+}
+.vtab{
+  flex:1;border:none;background:none;color:rgba(255,255,255,.55);
+  border-radius:6px;padding:7px 8px;font-size:12px;font-weight:500;
+  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
+  min-height:36px;touch-action:manipulation;-webkit-appearance:none;
+  transition:all .15s;white-space:nowrap;
+}
+.vtab.on{background:rgba(255,255,255,.92);color:var(--p)}
 
 /* ── MAIN ── */
 .main{
   padding:12px;
   padding-left:calc(12px + var(--safe-l));
   padding-right:calc(12px + var(--safe-r));
-  padding-bottom:calc(80px + var(--safe-bot));
+  padding-bottom:calc(74px + var(--safe-bot));
+}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:60;
+  background:var(--card);
+  border-top:1px solid var(--bdr);
+  padding:8px 16px calc(8px + var(--safe-bot));
+  padding-left:calc(16px + var(--safe-l));
+  padding-right:calc(16px + var(--safe-r));
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+}
+.sync-info{
+  display:flex;align-items:center;gap:7px;
+  font-size:12px;color:var(--muted);
+  cursor:pointer;touch-action:manipulation;
+  padding:6px 0;min-height:44px;
+}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:#4ade80}
+.sync-dot.syncing{background:#fbbf24;animation:pulse .8s ease-in-out infinite}
+.sync-dot.err{background:#f87171}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-txt{white-space:nowrap;font-size:11.5px}
+.upd-inline{
+  display:none;align-items:center;gap:7px;
+  background:var(--p-pale);border:1px solid #b5d4f4;
+  border-radius:8px;padding:7px 10px;flex:1;
+}
+.upd-inline.show{display:flex}
+.upd-inline-text{flex:1;color:var(--p);font-weight:500;font-size:12px;line-height:1.3}
+.upd-inline-btn{
+  border:none;background:var(--p);color:#fff;border-radius:6px;
+  padding:6px 10px;font-size:11.5px;font-weight:600;cursor:pointer;
+  font-family:'Be Vietnam Pro',sans-serif;
+  touch-action:manipulation;-webkit-appearance:none;white-space:nowrap;min-height:32px;
+}
+.upd-inline-btn:active{background:var(--p-light)}
+.upd-inline-close{
+  border:none;background:none;color:var(--muted);font-size:14px;cursor:pointer;
+  padding:4px;touch-action:manipulation;-webkit-appearance:none;
+  display:flex;align-items:center;
 }
 .scroll-hint{
   display:flex;align-items:center;gap:5px;
@@ -195,26 +250,19 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
 .cevent-title{font-size:11.5px;font-weight:500;color:var(--txt);line-height:1.3}
 .cevent-audit{font-size:10px;color:#8a96aa;margin-top:3px}
 
-/* ── FAB ── */
+/* ── FAB (inside bottom bar) ── */
 .fab{
-  position:fixed;
-  bottom:calc(20px + var(--safe-bot));
-  right:calc(16px + var(--safe-r));
-  z-index:60;
   background:var(--p);color:#fff;
-  border:none;border-radius:50px;padding:14px 20px;
-  font-size:14px;font-weight:600;cursor:pointer;
-  display:flex;align-items:center;gap:7px;
+  border:none;border-radius:10px;padding:10px 16px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
   font-family:'Be Vietnam Pro',sans-serif;
-  box-shadow:0 4px 16px rgba(26,58,92,.35);
+  min-height:44px;
   touch-action:manipulation;-webkit-appearance:none;
-  min-height:50px;
-  transition:transform .15s,box-shadow .15s;
-  /* GPU layer for smooth animation */
+  transition:transform .15s,background .15s;
   -webkit-transform:translateZ(0);transform:translateZ(0);
-  will-change:transform;
 }
-.fab:active{transform:scale(.96) translateZ(0)}
+.fab:active{background:var(--p-light);transform:scale(.97) translateZ(0)}
 
 /* ── OVERLAY / BOTTOM SHEETS ── */
 .ov{
@@ -491,52 +539,7 @@ input[type="date"].fi{
 }
 .rl-warn.show{display:block}
 
-/* ── SYNC BAR ── */
-.sync-bar{
-  display:flex;align-items:center;gap:7px;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);
-  border-radius:8px;padding:6px 10px;font-size:11px;color:rgba(255,255,255,.75);
-  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;
-  min-height:36px;min-width:36px;
-  transition:background .15s;user-select:none;flex-shrink:0;
-}
-.sync-bar:active{background:rgba(255,255,255,.18)}
-.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .3s}
-.sync-dot.ok{background:#4ade80}
-.sync-dot.syncing{background:#fbbf24;animation:pulse .8s ease-in-out infinite}
-.sync-dot.err{background:#f87171}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.sync-txt{white-space:nowrap}
 
-/* ── UPDATE BANNER ── */
-.upd-banner{
-  display:none;align-items:center;gap:10px;
-  background:linear-gradient(90deg,#1e4976,#2a5a8a);
-  color:#fff;padding:10px 14px;border-radius:10px;
-  font-size:13px;margin-bottom:10px;animation:slideDown .3s ease;
-}
-.upd-banner.show{display:flex}
-@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-.upd-icon{font-size:18px;flex-shrink:0}
-.upd-text{flex:1;line-height:1.4}
-.upd-text strong{font-weight:600}
-.upd-btn{
-  border:none;background:rgba(255,255,255,.2);color:#fff;
-  border-radius:7px;padding:8px 13px;font-size:12.5px;font-weight:600;
-  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
-  touch-action:manipulation;-webkit-appearance:none;
-  min-height:36px;transition:background .15s;white-space:nowrap;flex-shrink:0;
-}
-.upd-btn:active{background:rgba(255,255,255,.3)}
-.upd-close{
-  border:none;background:none;color:rgba(255,255,255,.6);
-  font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0;
-  touch-action:manipulation;-webkit-appearance:none;
-  min-width:28px;min-height:28px;
-  display:flex;align-items:center;justify-content:center;
-  transition:color .15s;
-}
-.upd-close:active{color:#fff}
 .hidden{display:none!important}
 
 /* ── HIGHLIGHT NEW ROW ── */
@@ -549,12 +552,9 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 
 /* ── RESPONSIVE ── */
 @media(min-width:769px){
-  .hdr{padding:16px 32px}
-  .hdr{padding-top:calc(16px + var(--safe-top))}
-  .hdr-top{margin-bottom:14px}
-  .week-bar{padding:12px 16px}
-  .week-info .wt{font-size:15px}
-  .main{max-width:1200px;margin:0 auto;padding:20px 24px calc(60px + var(--safe-bot))}
+  .hdr{padding:12px 32px calc(12px + var(--safe-top))}
+  .week-tabbar{padding:0 32px 12px;top:calc(54px + var(--safe-top))}
+  .main{max-width:1200px;margin:0 auto;padding:20px 24px calc(70px + var(--safe-bot))}
   .cal-grid{grid-template-columns:repeat(7,1fr);gap:10px}
   .sheet{max-width:500px}
   table{min-width:760px}
@@ -582,7 +582,7 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- HEADER (top bar) -->
 <div class="hdr">
   <div class="hdr-top">
     <div class="logo-wrap">
@@ -599,23 +599,25 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
       <button id="btnOut" class="hbtn hidden" onclick="logout()">🚪</button>
     </div>
   </div>
-  <div class="week-bar">
+</div>
+
+<!-- WEEK TAB BAR -->
+<div class="week-tabbar">
+  <div class="wtb-row1">
     <div class="week-info">
       <div class="wt" id="wt">--</div>
       <div class="wr" id="wr">--</div>
     </div>
-    <div class="week-ctrl">
-      <div id="syncBar" class="sync-bar" onclick="syncNow()" title="Nhấn để đồng bộ ngay">
-        <div class="sync-dot ok" id="syncDot"></div>
-        <span class="sync-txt" id="syncTxt">Đồng bộ</span>
-      </div>
-      <div class="vtabs">
-        <button class="vtab on" onclick="setView('table')">📋 Bảng</button>
-        <button class="vtab" onclick="setView('cal')">📅 Lịch</button>
-      </div>
+    <div class="week-nav">
       <button class="navbtn" onclick="chW(-1)" title="Tuần trước">◀</button>
       <button class="navbtn" onclick="chW(0)" title="Tuần hiện tại">●</button>
       <button class="navbtn" onclick="chW(1)" title="Tuần sau">▶</button>
+    </div>
+  </div>
+  <div class="wtb-row2">
+    <div class="vtabs">
+      <button class="vtab on" onclick="setView('table')">📋 Bảng</button>
+      <button class="vtab" onclick="setView('cal')">📅 Lịch</button>
     </div>
   </div>
 </div>
@@ -623,12 +625,6 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 <!-- MAIN -->
 <div class="main">
   <div class="rl-warn" id="rlWarn">⚠️ Bạn thao tác quá nhanh, vui lòng chờ một chút...</div>
-  <div class="upd-banner" id="updBanner">
-    <span class="upd-icon">🔄</span>
-    <div class="upd-text"><strong id="updCount"></strong> <span id="updMsg">có thay đổi mới</span></div>
-    <button class="upd-btn" onclick="applyUpdate()">Cập nhật ngay</button>
-    <button class="upd-close" onclick="dismissUpdate()" title="Bỏ qua">✕</button>
-  </div>
 
   <div id="tvw">
     <div class="scroll-hint"><div class="scroll-hint-dot"></div>Vuốt ngang để xem đầy đủ thông tin</div>
@@ -650,6 +646,22 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 </div>
 
 <button id="fab" class="fab hidden" onclick="openAdd()">＋ Thêm lịch</button>
+
+<!-- BOTTOM BAR: sync status + update inline + FAB -->
+<div class="bottom-bar">
+  <!-- Normal state: sync info -->
+  <div id="syncInfo" class="sync-info" onclick="syncNow()" title="Nhấn để đồng bộ ngay">
+    <div class="sync-dot ok" id="syncDot"></div>
+    <span class="sync-txt" id="syncTxt">Đồng bộ</span>
+  </div>
+  <!-- Update available state -->
+  <div id="updBanner" class="upd-inline">
+    <div class="upd-inline-text"><strong id="updCount"></strong> <span id="updMsg"></span></div>
+    <button class="upd-inline-btn" onclick="applyUpdate()">Cập nhật</button>
+    <button class="upd-inline-close" onclick="dismissUpdate()">✕</button>
+  </div>
+  <button id="fabBtn" class="fab hidden" onclick="openAdd()">＋ Thêm</button>
+</div>
 
 <!-- TOAST STACK -->
 <div id="toast-stack"></div>
@@ -817,7 +829,7 @@ const $=id=>document.getElementById(id);
 const D={
   tbody:null,cgrid:null,actCol:null,tvw:null,cvw:null,
   wt:null,wr:null,ubadge:null,uname:null,
-  btnAdm:null,btnLogin:null,btnOut:null,fab:null,
+  btnAdm:null,btnLogin:null,btnOut:null,fabBtn:null,
   lichOv:null,pinOv:null,usrOv:null,
   pinBtn:null,perr:null,pinInputArea:null,lockedBox:null,lockedMsg:null,
   saveBtn:null,mtitle:null,
@@ -830,7 +842,7 @@ const D={
   conflictOv:null,conflictMeta:null,conflictReloadBtn:null,
   delOv:null,delConfirmBtn:null,
   dpNgay:null,dpTg:null,dpNd:null,dpDd:null,dpDdRow:null,
-  syncDot:null,syncTxt:null,
+  syncDot:null,syncTxt:null,syncInfo:null,
   updBanner:null,updCount:null,updMsg:null,
 };
 function initDOM(){Object.keys(D).forEach(k=>{D[k]=$(k);})}
