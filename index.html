@@ -120,25 +120,48 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .pin-row { display:flex; gap:8px; justify-content:center; margin:14px 0 6px; }
 .pin-i { width:52px; height:56px; border:1.5px solid var(--bdr); border-radius:10px; text-align:center; font-size:22px; font-weight:600; outline:none; font-family:'Be Vietnam Pro',sans-serif; color:var(--txt); background:#f8fafd; transition:border-color .2s; }
 .pin-i:focus { border-color:var(--p); background:#fff; }
+.pin-i:disabled { background:#f0f2f6; opacity:.5; cursor:not-allowed; }
 .pin-err { color:var(--acc); font-size:12px; text-align:center; min-height:18px; margin-bottom:6px; }
 
-/* ── USERS ── */
-.usr-list { max-height:220px; overflow-y:auto; margin-bottom:4px; }
+/* ── LOCKED STATE trong PIN sheet ── */
+.locked-box {
+  background:#feecec; border:1px solid #fca5a5; border-radius:10px;
+  padding:16px; text-align:center; margin:8px 0 12px;
+}
+.locked-box .lock-icon { font-size:32px; margin-bottom:8px; }
+.locked-box .lock-title { font-size:14px; font-weight:600; color:var(--acc); margin-bottom:4px; }
+.locked-box .lock-msg { font-size:12px; color:#7f1d1d; line-height:1.5; }
+
+/* ── USERS PANEL ── */
+.usr-tabs { display:flex; background:#f0f2f6; border-radius:8px; padding:3px; gap:2px; margin-bottom:14px; }
+.usr-tab { flex:1; border:none; background:none; border-radius:6px; padding:8px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; color:var(--muted); transition:all .15s; }
+.usr-tab.on { background:#fff; color:var(--p); box-shadow:0 1px 4px rgba(0,0,0,.1); }
+.usr-list { max-height:240px; overflow-y:auto; margin-bottom:4px; }
 .usr-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--bdr); }
 .usr-row:last-child { border-bottom:none; }
 .usr-name { font-weight:500; font-size:14px; }
 .usr-pin { font-size:11px; color:var(--muted); margin-top:2px; }
 .admin-badge { background:#fef3c7; color:#92400e; font-size:10px; font-weight:600; padding:2px 7px; border-radius:5px; margin-left:6px; }
+.locked-badge { background:#feecec; color:var(--acc); font-size:10px; font-weight:600; padding:2px 7px; border-radius:5px; margin-left:6px; }
 .sdiv { border-top:1px solid var(--bdr); padding-top:14px; margin-top:4px; }
 .slabel { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+
+/* Lockout list */
+.lock-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--bdr); }
+.lock-row:last-child { border-bottom:none; }
+.lock-row-name { font-weight:500; font-size:14px; }
+.lock-row-info { font-size:11px; color:var(--acc); margin-top:2px; }
+.unlock-btn { border:none; background:#e8f5ee; color:var(--suc); border-radius:7px; padding:6px 12px; cursor:pointer; font-size:12.5px; font-weight:600; font-family:'Be Vietnam Pro',sans-serif; transition:background .15s; }
+.unlock-btn:hover { background:#d1ede0; }
+.no-locked { text-align:center; padding:24px 0; color:var(--muted); font-size:13px; }
 
 /* ── TOAST ── */
 .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--p); color:#fff; padding:10px 20px; border-radius:50px; font-size:13px; font-weight:500; opacity:0; transition:all .3s; z-index:999; white-space:nowrap; pointer-events:none; max-width:90vw; overflow:hidden; text-overflow:ellipsis; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-.toast.ok { background:var(--suc); }
+.toast.ok  { background:var(--suc); }
 .toast.err { background:var(--acc); }
 
-/* ── RATE LIMIT INDICATOR ── */
+/* ── RATE LIMIT ── */
 .rl-warn { background:#fef3c7; border:1px solid #fbbf24; border-radius:8px; padding:8px 12px; font-size:12px; color:#92400e; margin-bottom:8px; display:none; }
 .rl-warn.show { display:block; }
 
@@ -227,14 +250,25 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
     <div class="sheet-handle"></div>
     <div class="sheet-title">🔐 Nhập mã PIN <button class="xcls" onclick="closePin()">✕</button></div>
     <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:4px;">Nhập PIN 4 chữ số để đăng nhập chỉnh sửa</p>
-    <div class="pin-row">
-      <input class="pin-i" maxlength="1" type="password" id="p1" inputmode="numeric" oninput="pnxt(this,'p2')" onkeydown="pinKey(event,null,'p1')">
-      <input class="pin-i" maxlength="1" type="password" id="p2" inputmode="numeric" oninput="pnxt(this,'p3')" onkeydown="pinKey(event,'p1','p2')">
-      <input class="pin-i" maxlength="1" type="password" id="p3" inputmode="numeric" oninput="pnxt(this,'p4')" onkeydown="pinKey(event,'p2','p3')">
-      <input class="pin-i" maxlength="1" type="password" id="p4" inputmode="numeric" oninput="pnxt(this,null)"  onkeydown="pinKey(event,'p3','p4')">
+
+    <!-- Vùng nhập PIN (ẩn khi bị khóa) -->
+    <div id="pinInputArea">
+      <div class="pin-row">
+        <input class="pin-i" maxlength="1" type="password" id="p1" inputmode="numeric" oninput="pnxt(this,'p2')" onkeydown="pinKey(event,null,'p1')">
+        <input class="pin-i" maxlength="1" type="password" id="p2" inputmode="numeric" oninput="pnxt(this,'p3')" onkeydown="pinKey(event,'p1','p2')">
+        <input class="pin-i" maxlength="1" type="password" id="p3" inputmode="numeric" oninput="pnxt(this,'p4')" onkeydown="pinKey(event,'p2','p3')">
+        <input class="pin-i" maxlength="1" type="password" id="p4" inputmode="numeric" oninput="pnxt(this,null)"  onkeydown="pinKey(event,'p3','p4')">
+      </div>
+      <div class="pin-err" id="perr"></div>
     </div>
-    <div class="pin-err" id="perr"></div>
-    <div id="lockMsg" style="color:var(--acc);font-size:12px;text-align:center;margin-bottom:8px;display:none;"></div>
+
+    <!-- Thông báo bị khóa (hiện khi bị khóa) -->
+    <div id="lockedBox" class="locked-box hidden">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">Tài khoản bị khóa</div>
+      <div class="lock-msg" id="lockedMsg">Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.</div>
+    </div>
+
     <div class="mf">
       <button class="mbtn cancel" onclick="closePin()">Hủy</button>
       <button class="mbtn save" id="pinBtn" onclick="verPin()">Xác nhận</button>
@@ -270,18 +304,38 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">👥 Quản lý người dùng <button class="xcls" onclick="closeUsers()">✕</button></div>
-    <div class="usr-list" id="usrList"></div>
-    <div class="sdiv">
-      <div class="slabel">Thêm người dùng mới</div>
-      <div class="fr">
-        <div class="fg"><label class="fl">Tên hiển thị</label><input class="fi" type="text" id="nUN" placeholder="Nguyễn Văn A" maxlength="50"></div>
-        <div class="fg"><label class="fl">Mã PIN (4 số)</label><input class="fi" type="text" id="nUP" maxlength="4" inputmode="numeric" placeholder="1234"></div>
-      </div>
-      <div class="mf" style="margin-top:8px;">
-        <button class="mbtn cancel" onclick="closeUsers()">Đóng</button>
-        <button class="mbtn save" id="addUsrBtn" onclick="addUsr()">➕ Thêm</button>
+
+    <!-- Tab bar -->
+    <div class="usr-tabs">
+      <button class="usr-tab on" id="tabUsers"   onclick="switchUsrTab('users')">👤 Danh sách</button>
+      <button class="usr-tab"    id="tabLocked"  onclick="switchUsrTab('locked')">🔒 Bị khóa <span id="lockCount"></span></button>
+    </div>
+
+    <!-- Tab: Danh sách người dùng -->
+    <div id="panelUsers">
+      <div class="usr-list" id="usrList"></div>
+      <div class="sdiv">
+        <div class="slabel">Thêm người dùng mới</div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Tên hiển thị</label><input class="fi" type="text" id="nUN" placeholder="Nguyễn Văn A" maxlength="50"></div>
+          <div class="fg"><label class="fl">Mã PIN (4 số)</label><input class="fi" type="text" id="nUP" maxlength="4" inputmode="numeric" placeholder="1234"></div>
+        </div>
+        <div class="mf" style="margin-top:8px;">
+          <button class="mbtn cancel" onclick="closeUsers()">Đóng</button>
+          <button class="mbtn save" id="addUsrBtn" onclick="addUsr()">➕ Thêm</button>
+        </div>
       </div>
     </div>
+
+    <!-- Tab: Danh sách bị khóa -->
+    <div id="panelLocked" class="hidden">
+      <div class="usr-list" id="lockedList"></div>
+      <div class="mf" style="margin-top:8px;">
+        <button class="mbtn cancel" onclick="closeUsers()">Đóng</button>
+        <button class="mbtn save" onclick="refreshLocked()">🔄 Làm mới</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -289,34 +343,28 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 
 <script>
 // ════════════════════════════════════════════════════════
-//  CẤU HÌNH
+//  CẤU HÌNH — chỉ cần đổi URL này
 // ════════════════════════════════════════════════════════
 const API = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
-const THU = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
-const CACHE_TTL        = 60_000;  // Cache dữ liệu 60 giây
-const MAX_RETRY        = 2;       // Số lần thử lại khi lỗi mạng
-const RATE_LIMIT       = 3_000;   // Tối thiểu 3 giây giữa các lần ghi
-const PIN_LOCKOUT_LIMIT = 5;      // Khóa sau 5 lần nhập sai
-const PIN_LOCKOUT_MS   = 120_000; // Khóa 2 phút
+
+const THU            = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+const CACHE_TTL      = 60_000;   // Cache 60 giây
+const MAX_RETRY      = 2;
+const RATE_LIMIT     = 3_000;    // 3 giây giữa các lần ghi
 
 // ════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════
-// [SỬA 1] Thêm cu_pin để lưu PIN sau khi đăng nhập thành công
 let cu = null, isAdm = false, cu_pin = null;
 let allD = [], wOff = 0, edId = null, cv = 'table';
 let isLoading = false, cacheTime = 0;
 let lastWriteTime = 0;
-let pinFailCount = 0;
-let pinLockedUntil = 0;
 let pinTimer = null;
 let toastTimer = null;
 
 // ════════════════════════════════════════════════════════
 //  SECURITY HELPERS
 // ════════════════════════════════════════════════════════
-
-/** Escape HTML — chống XSS khi render innerHTML */
 function esc(s) {
   if (s == null) return '';
   return String(s)
@@ -325,25 +373,20 @@ function esc(s) {
     .replace(/'/g,'&#39;');
 }
 
-/** Sanitize input: trim + giới hạn độ dài */
 function san(s, max = 300) {
   return String(s ?? '').trim().slice(0, max);
 }
 
-/** Validate ngày YYYY-MM-DD */
 function isValidDate(s) {
   return /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s));
 }
 
-/** Validate PIN: đúng 4 chữ số */
 function isValidPin(s) {
   return /^\d{4}$/.test(s);
 }
 
-/** Rate-limit ghi: trả true nếu đang bị chặn */
 function isRateLimited() {
-  const now = Date.now();
-  if (now - lastWriteTime < RATE_LIMIT) {
+  if (Date.now() - lastWriteTime < RATE_LIMIT) {
     document.getElementById('rlWarn').classList.add('show');
     setTimeout(() => document.getElementById('rlWarn').classList.remove('show'), 2500);
     return true;
@@ -352,15 +395,15 @@ function isRateLimited() {
 }
 
 // ════════════════════════════════════════════════════════
-//  NETWORK — fetch với retry + timeout
+//  NETWORK
 // ════════════════════════════════════════════════════════
 async function apiFetch(params, retries = MAX_RETRY) {
   const url = `${API}?${new URLSearchParams(params)}`;
   for (let i = 0; i <= retries; i++) {
     try {
       const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), 12_000);
-      const res = await fetch(url, { signal: ctrl.signal });
+      const tid  = setTimeout(() => ctrl.abort(), 12_000);
+      const res  = await fetch(url, { signal: ctrl.signal });
       clearTimeout(tid);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
@@ -422,9 +465,7 @@ function cleanRow(r) {
 }
 
 async function load(force = false) {
-  if (!force && allD.length && (Date.now() - cacheTime) < CACHE_TTL) {
-    render(); return;
-  }
+  if (!force && allD.length && (Date.now() - cacheTime) < CACHE_TTL) { render(); return; }
   if (isLoading) return;
   isLoading = true;
   showLoading();
@@ -466,14 +507,13 @@ function setView(v) {
 }
 
 function renderT() {
-  const b = document.getElementById('tbody');
+  const b    = document.getElementById('tbody');
   const data = wkData();
   document.getElementById('actCol').classList.toggle('hidden', !cu);
 
   if (!data.length) {
     b.innerHTML = `<tr class="empty-row"><td colspan="8">📭 Không có lịch nào trong tuần này</td></tr>`;
-    b.onclick = null;
-    return;
+    b.onclick = null; return;
   }
 
   data.sort((a,b) =>
@@ -504,7 +544,7 @@ function renderT() {
 }
 
 function renderC() {
-  const g = document.getElementById('cgrid');
+  const g     = document.getElementById('cgrid');
   const today = fmt(new Date());
   g.innerHTML = wkDays(wOff).map(day => {
     const ds = fmt(day);
@@ -528,22 +568,42 @@ function renderC() {
 }
 
 // ════════════════════════════════════════════════════════
-//  PIN / LOGIN
+//  PIN / LOGIN  — Lockout hoàn toàn do server quản lý
 // ════════════════════════════════════════════════════════
 function openPin() {
-  if (Date.now() < pinLockedUntil) {
-    const sec = Math.ceil((pinLockedUntil - Date.now()) / 1000);
-    toast(`PIN bị khóa, thử lại sau ${sec}s`, 'err'); return;
-  }
-  ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('perr').textContent = '';
-  document.getElementById('lockMsg').style.display = 'none';
-  const btn = document.getElementById('pinBtn');
-  btn.disabled = false; btn.textContent = 'Xác nhận';
+  resetPinUI();
   document.getElementById('pinOv').classList.add('open');
   setTimeout(() => document.getElementById('p1').focus(), 150);
 }
-function closePin() { document.getElementById('pinOv').classList.remove('open'); }
+
+function closePin() {
+  document.getElementById('pinOv').classList.remove('open');
+}
+
+/** Reset giao diện PIN về trạng thái ban đầu */
+function resetPinUI() {
+  ['p1','p2','p3','p4'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.disabled = false;
+  });
+  document.getElementById('perr').textContent     = '';
+  document.getElementById('pinInputArea').classList.remove('hidden');
+  document.getElementById('lockedBox').classList.add('hidden');
+  const btn = document.getElementById('pinBtn');
+  btn.disabled = false; btn.textContent = 'Xác nhận';
+}
+
+/** Hiển thị trạng thái bị khóa trên UI */
+function showLockedUI(msg) {
+  ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).disabled = true);
+  document.getElementById('perr').textContent = '';
+  document.getElementById('pinInputArea').classList.add('hidden');
+  document.getElementById('lockedMsg').innerHTML = esc(msg) ||
+    'Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.';
+  document.getElementById('lockedBox').classList.remove('hidden');
+  const btn = document.getElementById('pinBtn');
+  btn.disabled = true; btn.textContent = 'Bị khóa';
+}
 
 function pnxt(el, nxt) {
   el.value = el.value.replace(/\D/g, '');
@@ -554,7 +614,6 @@ function pnxt(el, nxt) {
   }
 }
 
-// [SỬA 2] Thêm tham số curId (khắc phục lỗi tham số bị bỏ qua)
 function pinKey(e, prevId, curId) {
   if (e.key === 'Backspace' && e.target.value === '' && prevId) {
     document.getElementById(prevId).focus();
@@ -565,12 +624,6 @@ async function verPin() {
   const btn = document.getElementById('pinBtn');
   if (btn.disabled) return;
 
-  if (Date.now() < pinLockedUntil) {
-    const sec = Math.ceil((pinLockedUntil - Date.now()) / 1000);
-    document.getElementById('perr').textContent = `Bị khóa, thử lại sau ${sec}s`;
-    return;
-  }
-
   const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
   if (!isValidPin(pin)) {
     document.getElementById('perr').textContent = 'Vui lòng nhập đủ 4 chữ số';
@@ -578,40 +631,34 @@ async function verPin() {
   }
 
   btn.disabled = true; btn.textContent = '...';
+
   try {
-    const d = await apiFetch({ action: 'verifyPin', pin: encodeURIComponent(pin) });
+    const d = await apiFetch({ action: 'verifyPin', pin });
+
     if (d.success) {
-      pinFailCount = 0;
-      cu = san(d.ten, 50);
-      isAdm = !!d.isAdmin;
-      cu_pin = pin; // [SỬA 3] Lưu PIN để gửi kèm request ghi
+      // Đăng nhập thành công
+      cu     = san(d.ten, 50);
+      isAdm  = !!d.isAdmin;
+      cu_pin = pin;
       closePin();
       updUI();
       toast(`Xin chào, ${esc(d.ten)}! 👋`, 'ok');
       render();
+
+    } else if (d.error === 'locked') {
+      // Bị khóa — hiển thị màn hình khóa, không cho nhập nữa
+      showLockedUI(d.message);
+
     } else {
-      pinFailCount++;
-      if (pinFailCount >= PIN_LOCKOUT_LIMIT) {
-        pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
-        pinFailCount = 0;
-        document.getElementById('perr').textContent = '';
-        const msg = document.getElementById('lockMsg');
-        msg.textContent = `❌ Nhập sai quá nhiều lần. Bị khóa 2 phút.`;
-        msg.style.display = 'block';
-        btn.disabled = true; btn.textContent = 'Bị khóa';
-        setTimeout(() => {
-          btn.disabled = false; btn.textContent = 'Xác nhận';
-          msg.style.display = 'none';
-        }, PIN_LOCKOUT_MS);
-      } else {
-        const remain = PIN_LOCKOUT_LIMIT - pinFailCount;
-        document.getElementById('perr').textContent =
-          `❌ PIN không đúng. Còn ${remain} lần thử.`;
-        ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('p1').focus();
-        btn.disabled = false; btn.textContent = 'Xác nhận';
-      }
+      // Sai PIN — server trả về số lần còn lại
+      const remain = d.remaining ?? '?';
+      document.getElementById('perr').textContent =
+        `❌ PIN không đúng. Còn ${remain} lần thử.`;
+      ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('p1').focus();
+      btn.disabled = false; btn.textContent = 'Xác nhận';
     }
+
   } catch(e) {
     document.getElementById('perr').textContent = 'Lỗi kết nối, thử lại sau';
     btn.disabled = false; btn.textContent = 'Xác nhận';
@@ -619,11 +666,8 @@ async function verPin() {
 }
 
 function logout() {
-  cu = null;
-  isAdm = false;
-  cu_pin = null; // [SỬA 4] Xóa PIN khi đăng xuất
-  updUI();
-  render();
+  cu = null; isAdm = false; cu_pin = null;
+  updUI(); render();
   toast('Đã đăng xuất');
 }
 
@@ -663,14 +707,14 @@ function openEdit(id) {
   const r = allD.find(x => x.id === id);
   if (!r) return;
   edId = id;
-  document.getElementById('mtitle').textContent = '✏️ Chỉnh sửa lịch';
-  document.getElementById('fNgay').value = r.ngay     || '';
-  document.getElementById('fThu').value  = r.thu      || '';
-  document.getElementById('fTg').value   = r.thoigian || '';
-  document.getElementById('fNd').value   = r.noidung  || '';
-  document.getElementById('fDd').value   = r.diadiem  || '';
-  document.getElementById('fCt').value   = r.chutri   || '';
-  document.getElementById('fTp').value   = r.thanhphan || '';
+  document.getElementById('mtitle').textContent   = '✏️ Chỉnh sửa lịch';
+  document.getElementById('fNgay').value  = r.ngay      || '';
+  document.getElementById('fThu').value   = r.thu       || '';
+  document.getElementById('fTg').value    = r.thoigian  || '';
+  document.getElementById('fNd').value    = r.noidung   || '';
+  document.getElementById('fDd').value    = r.diadiem   || '';
+  document.getElementById('fCt').value    = r.chutri    || '';
+  document.getElementById('fTp').value    = r.thanhphan || '';
   const btn = document.getElementById('saveBtn');
   btn.disabled = false; btn.textContent = '💾 Lưu lịch';
   document.getElementById('lichOv').classList.add('open');
@@ -698,7 +742,6 @@ async function saveLich() {
   btn.disabled = true; btn.textContent = 'Đang lưu...';
   lastWriteTime = Date.now();
   try {
-    // [SỬA 5] Gửi kèm pin để backend xác thực quyền
     const d = await apiFetch({
       action:    edId ? 'updateRow' : 'addRow',
       pin:       cu_pin,
@@ -734,7 +777,6 @@ async function delL(id) {
 
   lastWriteTime = Date.now();
   try {
-    // [SỬA 6] Gửi kèm pin để backend xác thực quyền
     const d = await apiFetch({
       action: 'deleteRow',
       pin:    cu_pin,
@@ -749,14 +791,33 @@ async function delL(id) {
 }
 
 // ════════════════════════════════════════════════════════
-//  USERS
+//  USERS PANEL
 // ════════════════════════════════════════════════════════
+let currentUsrTab = 'users';
+
+function switchUsrTab(tab) {
+  currentUsrTab = tab;
+  document.getElementById('tabUsers').classList.toggle('on',  tab === 'users');
+  document.getElementById('tabLocked').classList.toggle('on', tab === 'locked');
+  document.getElementById('panelUsers').classList.toggle('hidden',  tab !== 'users');
+  document.getElementById('panelLocked').classList.toggle('hidden', tab !== 'locked');
+  if (tab === 'locked') refreshLocked();
+}
+
 async function openUsers() {
   if (!isAdm || !cu_pin) return;
+  switchUsrTab('users'); // Reset về tab đầu
+  await loadUsersList();
+  await refreshLocked(true); // Load ngầm để cập nhật badge
+  document.getElementById('usrOv').classList.add('open');
+}
+
+function closeUsers() { document.getElementById('usrOv').classList.remove('open'); }
+
+async function loadUsersList() {
   try {
-    // [SỬA 7] Gửi kèm pin — backend chỉ cho admin
     const users = await apiFetch({ action: 'getUsers', pin: cu_pin });
-    const list = document.getElementById('usrList');
+    const list  = document.getElementById('usrList');
     list.innerHTML = (Array.isArray(users) ? users : []).map(u => `
       <div class="usr-row">
         <div>
@@ -765,39 +826,87 @@ async function openUsers() {
         </div>
         ${u.ten !== 'Admin'
           ? `<button class="del-usr" data-ten="${esc(u.ten)}"
-               style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;">
+               style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;font-family:'Be Vietnam Pro',sans-serif;">
                🗑 Xóa</button>`
           : ''}
       </div>`).join('');
-    // [SỬA 8] Xóa user bằng tên thay vì PIN (PIN giờ là "••••" từ backend)
     list.onclick = e => {
       const b = e.target.closest('.del-usr');
       if (b) delUsr(b.dataset.ten);
     };
   } catch(e) { toast('Lỗi tải danh sách', 'err'); }
-  document.getElementById('usrOv').classList.add('open');
 }
-function closeUsers() { document.getElementById('usrOv').classList.remove('open'); }
+
+/** Tải danh sách bị khóa; silent=true thì chỉ cập nhật badge, không render list */
+async function refreshLocked(silent = false) {
+  try {
+    const locked = await apiFetch({ action: 'getLockouts', pin: cu_pin });
+    const count  = Array.isArray(locked) ? locked.length : 0;
+
+    // Cập nhật badge số lượng
+    document.getElementById('lockCount').textContent = count > 0 ? ` (${count})` : '';
+
+    if (!silent) {
+      const list = document.getElementById('lockedList');
+      if (!count) {
+        list.innerHTML = '<div class="no-locked">✅ Không có tài khoản nào bị khóa</div>';
+      } else {
+        list.innerHTML = locked.map(u => `
+          <div class="lock-row">
+            <div>
+              <div class="lock-row-name">${esc(u.ten)}</div>
+              <div class="lock-row-info">🔒 Bị khóa do nhập sai PIN</div>
+            </div>
+            <button class="unlock-btn" data-pin="${esc(u.targetPin)}">🔓 Mở khóa</button>
+          </div>`).join('');
+        list.onclick = e => {
+          const b = e.target.closest('.unlock-btn');
+          if (b) doUnlock(b.dataset.pin, b);
+        };
+      }
+    }
+  } catch(e) {
+    if (!silent) toast('Lỗi tải danh sách khóa', 'err');
+  }
+}
+
+async function doUnlock(targetPin, btnEl) {
+  if (!isAdm || !cu_pin) return;
+  if (!confirm('Xác nhận mở khóa tài khoản này?')) return;
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
+  try {
+    const d = await apiFetch({ action: 'unlockPin', pin: cu_pin, targetPin });
+    if (d.success) {
+      toast('Đã mở khóa thành công ✓', 'ok');
+      await refreshLocked(false); // Reload danh sách
+    } else {
+      toast('Lỗi mở khóa: ' + esc(d.error || ''), 'err');
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔓 Mở khóa'; }
+    }
+  } catch(e) {
+    toast('Lỗi kết nối', 'err');
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔓 Mở khóa'; }
+  }
+}
 
 async function addUsr() {
   if (!isAdm || !cu_pin) return;
-  const btn = document.getElementById('addUsrBtn');
-  const ten = san(document.getElementById('nUN').value, 50);
-  const pin = document.getElementById('nUP').value.trim();
-  if (!ten)             { toast('Vui lòng nhập tên', 'err'); return; }
-  if (!isValidPin(pin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
+  const btn    = document.getElementById('addUsrBtn');
+  const ten    = san(document.getElementById('nUN').value, 50);
+  const newpin = document.getElementById('nUP').value.trim();
+  if (!ten)              { toast('Vui lòng nhập tên', 'err'); return; }
+  if (!isValidPin(newpin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
 
   btn.disabled = true; btn.textContent = 'Đang thêm...';
   try {
-    // [SỬA 9] Gửi kèm pin admin để backend xác thực
-    const d = await apiFetch({ action: 'addUser', pin: cu_pin, ten, newpin: pin });
+    const d = await apiFetch({ action: 'addUser', pin: cu_pin, ten, newpin });
     if (d.success) {
       document.getElementById('nUN').value = '';
       document.getElementById('nUP').value = '';
       toast(`Đã thêm ${esc(ten)} ✓`, 'ok');
-      openUsers();
+      await loadUsersList();
     } else if (d.error === 'PIN already exists') {
-      toast('PIN này đã được dùng, chọn PIN khác', 'err'); // [SỬA 10] Xử lý lỗi PIN trùng
+      toast('PIN này đã được dùng, chọn PIN khác', 'err');
     } else {
       toast('Lỗi thêm người dùng', 'err');
     }
@@ -810,9 +919,8 @@ async function delUsr(ten) {
   if (!ten || ten === 'Admin') return;
   if (!confirm(`Xác nhận xóa người dùng "${ten}"?`)) return;
   try {
-    // [SỬA 11] Gửi kèm pin admin + tên user cần xóa
     const d = await apiFetch({ action: 'deleteUser', pin: cu_pin, ten });
-    if (d.success) { toast('Đã xóa người dùng ✓', 'ok'); openUsers(); }
+    if (d.success) { toast('Đã xóa người dùng ✓', 'ok'); await loadUsersList(); }
     else toast('Lỗi xóa người dùng', 'err');
   } catch(e) { toast('Lỗi kết nối', 'err'); }
 }
@@ -827,16 +935,15 @@ function bgClose(e, closeFn) {
 function toast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = String(msg).slice(0, 80);
-  t.className = `toast ${type} show`;
+  t.className   = `toast ${type} show`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 // ════════════════════════════════════════════════════════
-//  AUTO REFRESH — Tự động tải lại mỗi 5 phút
+//  AUTO REFRESH
 // ════════════════════════════════════════════════════════
 setInterval(() => {
-  // [SỬA 12] Không refresh khi form đang mở tránh conflict dữ liệu
   const formOpen = document.getElementById('lichOv').classList.contains('open');
   if (!document.hidden && !isLoading && !formOpen) load(true);
 }, 300_000);
