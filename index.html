@@ -351,6 +351,14 @@ let isLoading = false, cacheTime = 0;
 let lastWriteTime = 0;
 let pinTimer = null, toastTimer = null;
 
+// Thời gian hiện tại dạng "DD/MM/YYYY HH:MM" theo giờ VN — dùng cho local cache
+function nowLocal() {
+  const d   = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const vn  = new Date(d.getTime() + 7 * 3600 * 1000);
+  return `${pad(vn.getUTCDate())}/${pad(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${pad(vn.getUTCHours())}:${pad(vn.getUTCMinutes())}`;
+}
+
 // ════════════════════════════════════════════════════════
 //  SECURITY HELPERS
 // ════════════════════════════════════════════════════════
@@ -712,30 +720,67 @@ async function saveLich() {
   if (btn.disabled) return;
   if (isRateLimited()) return;
 
-  const ngay = document.getElementById('fNgay').value;
+  const ngay     = document.getElementById('fNgay').value;
   if (!isValidDate(ngay)) { toast('Ngày không hợp lệ', 'err'); return; }
   const nd = san(document.getElementById('fNd').value, 200);
   if (!nd) { toast('Vui lòng nhập Nội dung', 'err'); return; }
 
+  // Snapshot form values trước khi disable
+  const payload = {
+    action:    edId ? 'updateRow' : 'addRow',
+    pin:       cu_pin,
+    id:        edId || '',
+    ngay,
+    thu:       san(document.getElementById('fThu').value, 20),
+    thoigian:  san(document.getElementById('fTg').value, 50),
+    noidung:   nd,
+    diadiem:   san(document.getElementById('fDd').value, 100),
+    chutri:    san(document.getElementById('fCt').value, 100),
+    thanhphan: san(document.getElementById('fTp').value, 200),
+  };
+
   btn.disabled = true; btn.textContent = 'Đang lưu...';
   lastWriteTime = Date.now();
   try {
-    const d = await apiFetch({
-      action:    edId ? 'updateRow' : 'addRow',
-      pin:       cu_pin,
-      id:        edId || '',
-      ngay,
-      thu:       san(document.getElementById('fThu').value, 20),
-      thoigian:  san(document.getElementById('fTg').value, 50),
-      noidung:   nd,
-      diadiem:   san(document.getElementById('fDd').value, 100),
-      chutri:    san(document.getElementById('fCt').value, 100),
-      thanhphan: san(document.getElementById('fTp').value, 200),
-    });
+    const d = await apiFetch(payload);
     if (d.success) {
       closeLich();
       toast(edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', 'ok');
-      await load(true);
+
+      if (edId) {
+        // --- UPDATE: sửa trực tiếp trong allD, không fetch lại ---
+        const idx = allD.findIndex(r => r.id === edId);
+        if (idx !== -1) {
+          allD[idx] = cleanRow(Object.assign(allD[idx], {
+            ngay:      payload.ngay,
+            thu:       payload.thu,
+            thoigian:  payload.thoigian,
+            noidung:   payload.noidung,
+            diadiem:   payload.diadiem,
+            chutri:    payload.chutri,
+            thanhphan: payload.thanhphan,
+            nguoiSua:    d.nguoiSua    || cu,
+            thoiGianSua: d.thoiGianSua || nowLocal(),
+          }));
+        }
+      } else {
+        // --- ADD: push thẳng vào allD, không fetch lại ---
+        allD.push(cleanRow({
+          id:          d.id,
+          ngay:        payload.ngay,
+          thu:         payload.thu,
+          thoigian:    payload.thoigian,
+          noidung:     payload.noidung,
+          diadiem:     payload.diadiem,
+          chutri:      payload.chutri,
+          thanhphan:   payload.thanhphan,
+          nguoiTao:    cu,
+          thoiGianTao: d.thoiGianTao || nowLocal(),
+          nguoiSua:    '',
+          thoiGianSua: '',
+        }));
+      }
+      render(); // render từ cache cục bộ — không round-trip
     } else {
       toast('Lỗi: ' + esc(d.error || 'không xác định'), 'err');
       btn.disabled = false; btn.textContent = '💾 Lưu lịch';
@@ -754,7 +799,12 @@ async function delL(id) {
   lastWriteTime = Date.now();
   try {
     const d = await apiFetch({ action: 'deleteRow', pin: cu_pin, id });
-    if (d.success) { toast('Đã xóa lịch ✓', 'ok'); await load(true); }
+    if (d.success) {
+      toast('Đã xóa lịch ✓', 'ok');
+      // Xóa trực tiếp trong allD — không fetch lại từ server
+      allD = allD.filter(r => r.id !== id);
+      render();
+    }
     else toast('Lỗi xóa dữ liệu: ' + esc(d.error || ''), 'err');
   } catch(e) { toast('Lỗi kết nối, thử lại sau', 'err'); }
 }
