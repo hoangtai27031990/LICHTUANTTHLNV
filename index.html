@@ -28,10 +28,9 @@ body{
   min-height:100%;min-height:-webkit-fill-available;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
 }
 
-/* ── HEADER (top bar only) ── */
+/* ── HEADER ── */
 .hdr{
   background:var(--p);color:#fff;
   padding:calc(10px + var(--safe-top)) 12px 10px;
@@ -61,20 +60,18 @@ body{
 .ubadge{
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
   border-radius:20px;padding:4px 10px;font-size:11.5px;
-  display:flex;align-items:center;gap:5px;max-width:110px;
-  overflow:hidden;
+  display:flex;align-items:center;gap:5px;max-width:100px;overflow:hidden;
 }
 .ubadge span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .udot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
 
-/* ── WEEK TAB BAR (below header, sticky) ── */
+/* ── WEEK TAB BAR ── */
 .week-tabbar{
   background:var(--p);
   padding:0 12px 10px;
   position:sticky;top:calc(52px + var(--safe-top));
   z-index:49;
   -webkit-transform:translateZ(0);transform:translateZ(0);
-  /* subtle separator */
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .wtb-row1{
@@ -113,63 +110,101 @@ body{
   padding:12px;
   padding-left:calc(12px + var(--safe-l));
   padding-right:calc(12px + var(--safe-r));
-  padding-bottom:calc(74px + var(--safe-bot));
+  padding-bottom:calc(68px + var(--safe-bot));
 }
 
-/* ── BOTTOM BAR ── */
+/* ── BOTTOM BAR (compact) ── */
 .bottom-bar{
   position:fixed;
   bottom:0;left:0;right:0;
   z-index:60;
   background:var(--card);
   border-top:1px solid var(--bdr);
-  padding:8px 16px calc(8px + var(--safe-bot));
-  padding-left:calc(16px + var(--safe-l));
-  padding-right:calc(16px + var(--safe-r));
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:6px 12px calc(6px + var(--safe-bot));
+  padding-left:calc(12px + var(--safe-l));
+  padding-right:calc(12px + var(--safe-r));
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:52px;
   -webkit-transform:translateZ(0);transform:translateZ(0);
 }
+/* Sync status - compact */
 .sync-info{
-  display:flex;align-items:center;gap:7px;
-  font-size:12px;color:var(--muted);
+  display:flex;align-items:center;gap:5px;
   cursor:pointer;touch-action:manipulation;
-  padding:6px 0;min-height:44px;
+  padding:4px 0;
+  flex-shrink:0;
 }
-.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background .3s}
 .sync-dot.ok{background:#4ade80}
 .sync-dot.syncing{background:#fbbf24;animation:pulse .8s ease-in-out infinite}
 .sync-dot.err{background:#f87171}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.sync-txt{white-space:nowrap;font-size:11.5px}
+.sync-txt{white-space:nowrap;font-size:11px;color:var(--muted)}
+
+/* Update banner - compact inline */
 .upd-inline{
-  display:none;align-items:center;gap:7px;
+  display:none;align-items:center;gap:6px;
   background:var(--p-pale);border:1px solid #b5d4f4;
-  border-radius:8px;padding:7px 10px;flex:1;
+  border-radius:8px;padding:5px 8px;flex:1;min-width:0;
 }
 .upd-inline.show{display:flex}
-.upd-inline-text{flex:1;color:var(--p);font-weight:500;font-size:12px;line-height:1.3}
+.upd-inline-text{
+  flex:1;color:var(--p);font-weight:500;font-size:11px;
+  line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
 .upd-inline-btn{
   border:none;background:var(--p);color:#fff;border-radius:6px;
-  padding:6px 10px;font-size:11.5px;font-weight:600;cursor:pointer;
+  padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer;
   font-family:'Be Vietnam Pro',sans-serif;
-  touch-action:manipulation;-webkit-appearance:none;white-space:nowrap;min-height:32px;
+  touch-action:manipulation;-webkit-appearance:none;white-space:nowrap;
+  min-height:28px;flex-shrink:0;
 }
 .upd-inline-btn:active{background:var(--p-light)}
 .upd-inline-close{
-  border:none;background:none;color:var(--muted);font-size:14px;cursor:pointer;
-  padding:4px;touch-action:manipulation;-webkit-appearance:none;
-  display:flex;align-items:center;
-}
-.scroll-hint{
-  display:flex;align-items:center;gap:5px;
-  font-size:11px;color:var(--muted);margin-bottom:7px;padding:0 3px;
-}
-.scroll-hint-dot{
-  width:16px;height:3px;border-radius:2px;
-  background:linear-gradient(90deg,var(--p) 0%,transparent 100%);
+  border:none;background:none;color:var(--muted);font-size:12px;cursor:pointer;
+  padding:3px;touch-action:manipulation;-webkit-appearance:none;
+  display:flex;align-items:center;flex-shrink:0;
+  min-width:22px;min-height:22px;justify-content:center;
 }
 
-/* ── TABLE ── */
+/* ── FAB (Add button in bottom bar) ── */
+.fab{
+  background:var(--p);color:#fff;
+  border:none;border-radius:10px;padding:9px 14px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
+  font-family:'Be Vietnam Pro',sans-serif;
+  min-height:40px;
+  touch-action:manipulation;-webkit-appearance:none;
+  transition:transform .15s,background .15s;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
+  white-space:nowrap;
+}
+.fab:active{background:var(--p-light);transform:scale(.97) translateZ(0)}
+
+/* ── AUDIT ── */
+.audit{display:flex;flex-direction:column;gap:2px;margin-top:3px}
+.audit-line{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;color:var(--muted);line-height:1.3;
+}
+.audit-line .a-name{color:var(--p);font-weight:600}
+.audit-line .a-time{color:#8a96aa}
+.ibtn{
+  border:none;border-radius:6px;padding:6px 10px;
+  cursor:pointer;font-size:12px;font-weight:500;
+  display:flex;align-items:center;gap:4px;
+  min-height:32px;
+  touch-action:manipulation;-webkit-appearance:none;
+  font-family:'Be Vietnam Pro',sans-serif;
+  transition:all .15s;
+}
+.ibtn.edit{background:var(--p-pale);color:var(--p)}
+.ibtn.edit:active{background:#d4e4f8}
+.ibtn.del{background:#feecec;color:var(--acc)}
+.ibtn.del:active{background:#fcd5d7}
+
+/* ── TABLE VIEW (for wider screens) ── */
 .tcard{background:var(--card);border-radius:12px;border:1px solid var(--bdr);overflow:hidden}
 .tscroll{
   overflow-x:auto;
@@ -180,51 +215,30 @@ body{
 .tscroll::-webkit-scrollbar{height:4px}
 .tscroll::-webkit-scrollbar-track{background:transparent}
 .tscroll::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
-table{border-collapse:collapse;min-width:600px;width:100%}
+table{border-collapse:collapse;min-width:700px;width:100%}
 thead tr{background:var(--p)}
 thead th{
-  padding:11px 14px;text-align:left;
+  padding:11px 12px;text-align:left;
   font-size:11px;font-weight:600;
   color:rgba(255,255,255,.85);white-space:nowrap;letter-spacing:.4px;
 }
 tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:nth-child(even){background:#f6f8fc}
-/* Touch-friendly hover - only on non-touch devices */
-@media (hover:hover){tbody tr:hover{background:#edf3fc}}
-tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
+@media(hover:hover){tbody tr:hover{background:#edf3fc}}
+tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .td-date{font-weight:600;color:var(--p);white-space:nowrap}
 .td-day{font-size:11px;color:var(--muted);white-space:nowrap}
+.td-content{white-space:normal;min-width:140px;max-width:200px;line-height:1.4}
+.td-noidung{font-weight:500}
+.td-muted{color:var(--muted);font-size:12px}
 .pill{
   background:var(--p-pale);color:var(--p);
-  border-radius:6px;padding:3px 9px;font-size:11.5px;font-weight:500;
+  border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;
   display:inline-block;white-space:nowrap;
 }
 .pill.all{background:#fef3c7;color:#92400e}
-.td-content{white-space:normal;min-width:160px;max-width:220px;line-height:1.4}
-.td-noidung{font-weight:500}
-.audit{margin-top:5px;display:flex;flex-direction:column;gap:2px}
-.audit-line{
-  display:inline-flex;align-items:center;gap:4px;
-  font-size:10.5px;color:var(--muted);line-height:1.3;
-}
-.audit-line .a-icon{font-size:10px;flex-shrink:0}
-.audit-line .a-name{color:var(--p);font-weight:600}
-.audit-line .a-time{color:#8a96aa}
-.td-muted{color:var(--muted)}
-.td-acts{display:flex;gap:5px}
-.ibtn{
-  border:none;border-radius:6px;padding:8px 10px;
-  cursor:pointer;font-size:14px;
-  display:flex;align-items:center;
-  min-width:44px;min-height:44px;justify-content:center;
-  touch-action:manipulation;-webkit-appearance:none;
-  transition:all .15s;
-}
-.ibtn.edit{background:var(--p-pale);color:var(--p)}
-.ibtn.edit:active{background:#d4e4f8}
-.ibtn.del{background:#feecec;color:var(--acc)}
-.ibtn.del:active{background:#fcd5d7}
+.td-acts{display:flex;gap:4px;align-items:center}
 .empty-row td,.loading-row td{text-align:center;padding:44px 20px;color:var(--muted);font-size:13px}
 .spinner{
   display:inline-block;width:18px;height:18px;
@@ -250,36 +264,19 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
 .cevent-title{font-size:11.5px;font-weight:500;color:var(--txt);line-height:1.3}
 .cevent-audit{font-size:10px;color:#8a96aa;margin-top:3px}
 
-/* ── FAB (inside bottom bar) ── */
-.fab{
-  background:var(--p);color:#fff;
-  border:none;border-radius:10px;padding:10px 16px;
-  font-size:13px;font-weight:600;cursor:pointer;
-  display:flex;align-items:center;gap:6px;flex-shrink:0;
-  font-family:'Be Vietnam Pro',sans-serif;
-  min-height:44px;
-  touch-action:manipulation;-webkit-appearance:none;
-  transition:transform .15s,background .15s;
-  -webkit-transform:translateZ(0);transform:translateZ(0);
-}
-.fab:active{background:var(--p-light);transform:scale(.97) translateZ(0)}
-
-/* ── OVERLAY / BOTTOM SHEETS ── */
+/* ── OVERLAY / SHEETS ── */
 .ov{
   position:fixed;inset:0;
   background:rgba(10,20,40,.5);
   z-index:200;display:none;
   align-items:flex-end;justify-content:center;
-  /* iOS Safari: prevent scroll bleed */
   overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
 }
 .ov.open{display:flex}
 .sheet{
   background:var(--card);
   border-radius:18px 18px 0 0;
   width:100%;max-width:540px;
-  /* safe area for home indicator */
   max-height:calc(92vh - var(--safe-top));
   max-height:calc(92dvh - var(--safe-top));
   overflow-y:auto;
@@ -287,7 +284,6 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
   overscroll-behavior:contain;
   padding:0 16px calc(20px + var(--safe-bot));
   animation:slideUp .25s cubic-bezier(.25,.46,.45,.94);
-  /* GPU compositing */
   -webkit-transform:translateZ(0);transform:translateZ(0);
   will-change:transform;
 }
@@ -305,35 +301,26 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle}
   width:36px;height:36px;
   display:flex;align-items:center;justify-content:center;
   font-size:15px;cursor:pointer;color:var(--muted);
-  touch-action:manipulation;-webkit-appearance:none;
-  flex-shrink:0;
+  touch-action:manipulation;-webkit-appearance:none;flex-shrink:0;
 }
 .xcls:active{background:#e4e7ed}
 
 /* ── FORM ── */
 .fg{margin-bottom:11px}
-.fl{
-  display:block;font-size:11px;font-weight:600;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;
-}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
 .fi{
   width:100%;padding:12px;
   border:1.5px solid var(--bdr);border-radius:9px;
   font-family:'Be Vietnam Pro',sans-serif;
-  /* CRITICAL: font-size≥16px prevents iOS auto-zoom */
   font-size:16px;
   color:var(--txt);background:#f8fafd;outline:none;
   -webkit-appearance:none;appearance:none;
-  /* Better touch hit area */
   min-height:46px;
   transition:border-color .2s,background .2s;
 }
 .fi:focus{border-color:var(--p);background:#fff}
 .fi[readonly]{background:#f0f2f6;color:var(--muted)}
-/* iOS date input fix */
-input[type="date"].fi{
-  -webkit-min-logical-width:calc(100% - 32px);
-}
+input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mf{display:flex;gap:8px;margin-top:16px}
 .mbtn{
@@ -356,9 +343,7 @@ input[type="date"].fi{
 .pin-i{
   width:60px;height:64px;
   border:1.5px solid var(--bdr);border-radius:10px;
-  text-align:center;
-  /* CRITICAL: ≥16px prevents iOS zoom */
-  font-size:22px;font-weight:600;
+  text-align:center;font-size:22px;font-weight:600;
   outline:none;font-family:'Be Vietnam Pro',sans-serif;
   color:var(--txt);background:#f8fafd;
   -webkit-appearance:none;appearance:none;
@@ -403,10 +388,7 @@ input[type="date"].fi{
 }
 .sdiv{border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px}
 .slabel{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.lock-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 0;border-bottom:1px solid var(--bdr);
-}
+.lock-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)}
 .lock-row:last-child{border-bottom:none}
 .lock-row-name{font-weight:500;font-size:14px}
 .lock-row-info{font-size:11px;color:var(--acc);margin-top:2px}
@@ -448,7 +430,7 @@ input[type="date"].fi{
 /* ── TOAST ── */
 #toast-stack{
   position:fixed;
-  bottom:calc(80px + var(--safe-bot));
+  bottom:calc(64px + var(--safe-bot));
   left:50%;transform:translateX(-50%);
   z-index:999;display:flex;flex-direction:column;align-items:center;
   gap:8px;pointer-events:none;width:min(92vw,420px);
@@ -482,20 +464,11 @@ input[type="date"].fi{
 .t-body{flex:1;min-width:0}
 .t-title{font-size:13px;font-weight:600;color:var(--txt);line-height:1.3}
 .t-msg{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
-.t-action{
-  margin-top:8px;border:none;border-radius:6px;padding:8px 12px;
-  font-size:12px;font-weight:600;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
-  touch-action:manipulation;-webkit-appearance:none;
-  transition:background .15s;
-}
-.toast-item.warn .t-action{background:#fef3c7;color:#92400e}
-.toast-item.err .t-action{background:#feecec;color:var(--acc)}
 .t-close{
   flex-shrink:0;width:28px;height:28px;border:none;background:none;
   color:var(--muted);cursor:pointer;font-size:14px;border-radius:4px;
   display:flex;align-items:center;justify-content:center;padding:0;
-  touch-action:manipulation;-webkit-appearance:none;
-  transition:background .15s;
+  touch-action:manipulation;-webkit-appearance:none;transition:background .15s;
 }
 .t-close:active{background:#f0f2f6}
 .t-progress{
@@ -539,16 +512,12 @@ input[type="date"].fi{
 }
 .rl-warn.show{display:block}
 
-
 .hidden{display:none!important}
 
-/* ── HIGHLIGHT NEW ROW ── */
 @keyframes highlightNew{
-  0%{background:#d1fae5}
-  70%{background:#d1fae5}
-  100%{background:transparent}
+  0%{background:#d1fae5}70%{background:#d1fae5}100%{background:transparent}
 }
-tbody tr.row-new{animation:highlightNew 3s ease forwards}
+.row-new{animation:highlightNew 3s ease forwards}
 
 /* ── RESPONSIVE ── */
 @media(min-width:769px){
@@ -556,25 +525,17 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
   .week-tabbar{padding:0 32px 12px;top:calc(54px + var(--safe-top))}
   .main{max-width:1200px;margin:0 auto;padding:20px 24px calc(70px + var(--safe-bot))}
   .cal-grid{grid-template-columns:repeat(7,1fr);gap:10px}
-  .sheet{max-width:500px}
-  table{min-width:760px}
   #toast-stack{bottom:calc(40px + var(--safe-bot))}
 }
 @media(max-width:400px){
   .logo-sub{display:none}
   .hbtn span{display:none}
   .week-info .wr{display:none}
-  .pin-row{gap:6px}
-  .pin-i{width:52px;height:60px}
 }
-/* Very small screens */
 @media(max-width:320px){
   .fr{grid-template-columns:1fr}
   .pin-i{width:44px;height:54px;font-size:20px}
 }
-
-/* iOS keyboard push fix: when soft keyboard is open,
-   prevent sheet from being hidden behind keyboard */
 @supports(height:100dvh){
   .sheet{max-height:calc(88dvh - var(--safe-top))}
 }
@@ -582,7 +543,7 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 </head>
 <body>
 
-<!-- HEADER (top bar) -->
+<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-top">
     <div class="logo-wrap">
@@ -596,7 +557,7 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
       <div id="ubadge" class="ubadge hidden"><div class="udot"></div><span id="uname"></span></div>
       <button id="btnAdm" class="hbtn hidden" onclick="openUsers()">👥 <span>Người dùng</span></button>
       <button id="btnLogin" class="hbtn" onclick="openPin()">🔐 <span>Đăng nhập</span></button>
-      <button id="btnOut" class="hbtn hidden" onclick="logout()">🚪</button>
+      <button id="btnOut" class="hbtn hidden" onclick="logout()" title="Đăng xuất">🚪</button>
     </div>
   </div>
 </div>
@@ -626,8 +587,8 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 <div class="main">
   <div class="rl-warn" id="rlWarn">⚠️ Bạn thao tác quá nhanh, vui lòng chờ một chút...</div>
 
+  <!-- TABLE VIEW -->
   <div id="tvw">
-    <div class="scroll-hint"><div class="scroll-hint-dot"></div>Vuốt ngang để xem đầy đủ thông tin</div>
     <div class="tcard"><div class="tscroll">
       <table>
         <thead><tr>
@@ -642,31 +603,28 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
     </div></div>
   </div>
 
+  <!-- CALENDAR VIEW -->
   <div id="cvw" class="hidden"><div class="cal-grid" id="cgrid"></div></div>
 </div>
 
-<button id="fab" class="fab hidden" onclick="openAdd()">＋ Thêm lịch</button>
-
-<!-- BOTTOM BAR: sync status + update inline + FAB -->
+<!-- BOTTOM BAR -->
 <div class="bottom-bar">
-  <!-- Normal state: sync info -->
-  <div id="syncInfo" class="sync-info" onclick="syncNow()" title="Nhấn để đồng bộ ngay">
+  <div id="syncInfo" class="sync-info" onclick="syncNow()" title="Nhấn để đồng bộ">
     <div class="sync-dot ok" id="syncDot"></div>
     <span class="sync-txt" id="syncTxt">Đồng bộ</span>
   </div>
-  <!-- Update available state -->
   <div id="updBanner" class="upd-inline">
-    <div class="upd-inline-text"><strong id="updCount"></strong> <span id="updMsg"></span></div>
+    <div class="upd-inline-text">🔔 <strong id="updCount"></strong> <span id="updMsg"></span></div>
     <button class="upd-inline-btn" onclick="applyUpdate()">Cập nhật</button>
     <button class="upd-inline-close" onclick="dismissUpdate()">✕</button>
   </div>
-  <button id="fabBtn" class="fab hidden" onclick="openAdd()">＋ Thêm</button>
+  <button id="fabBtn" class="fab hidden" onclick="openAdd()">＋ Thêm lịch</button>
 </div>
 
-<!-- TOAST STACK -->
+<!-- TOAST -->
 <div id="toast-stack"></div>
 
-<!-- ═══ CONFLICT DIALOG ═══ -->
+<!-- CONFLICT DIALOG -->
 <div class="cdlg-ov" id="conflictOv">
   <div class="cdlg">
     <div class="cdlg-icon">⚡</div>
@@ -675,8 +633,8 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
     <div class="cdlg-meta" id="conflictMeta"></div>
     <p style="font-size:12px;color:var(--muted);text-align:center;">Bạn muốn làm gì tiếp theo?</p>
     <div class="cdlg-btns">
-      <button class="mbtn cancel" onclick="closeConflict()">❌ Hủy bỏ thay đổi</button>
-      <button class="mbtn save" id="conflictReloadBtn" onclick="conflictReload()">🔄 Tải lại & xem</button>
+      <button class="mbtn cancel" onclick="closeConflict()">❌ Hủy bỏ</button>
+      <button class="mbtn save" id="conflictReloadBtn" onclick="conflictReload()">🔄 Tải lại</button>
     </div>
   </div>
 </div>
@@ -803,13 +761,26 @@ tbody tr.row-new{animation:highlightNew 3s ease forwards}
 
 <script>
 // ════════════════════════════════════════════════════════
-//  CẤU HÌNH
+//  CONFIG
 // ════════════════════════════════════════════════════════
 const API        = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
 const THU        = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+// Week starts Monday: Mon=0..Sun=6 in our order
+const THU_ORDER  = ['Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy','Chủ Nhật'];
 const CACHE_TTL  = 60_000;
 const MAX_RETRY  = 2;
 const RATE_LIMIT = 800;
+
+// Greeting helpers
+function getGreeting(){
+  const h=new Date().getHours();
+  if(h>=5&&h<12)return'Chào buổi sáng';
+  if(h>=12&&h<18)return'Chào buổi chiều';
+  return'Chào buổi tối';
+}
+function getRoleMsg(isAdmin){
+  return isAdmin?'Bạn đang đăng nhập với quyền Admin.':'Đăng nhập thành công.';
+}
 
 // ════════════════════════════════════════════════════════
 //  STATE
@@ -823,7 +794,7 @@ let _editOpenedAt=0;
 let _pendingDelId=null;
 
 // ════════════════════════════════════════════════════════
-//  DOM CACHE
+//  DOM
 // ════════════════════════════════════════════════════════
 const $=id=>document.getElementById(id);
 const D={
@@ -845,7 +816,7 @@ const D={
   syncDot:null,syncTxt:null,syncInfo:null,
   updBanner:null,updCount:null,updMsg:null,
 };
-function initDOM(){Object.keys(D).forEach(k=>{D[k]=$(k);})}
+function initDOM(){Object.keys(D).forEach(k=>{D[k]=$(k)})}
 
 // ════════════════════════════════════════════════════════
 //  SECURITY
@@ -888,10 +859,11 @@ async function apiFetch(params,retries=MAX_RETRY){
 }
 
 // ════════════════════════════════════════════════════════
-//  WEEK HELPERS
+//  WEEK HELPERS — Mon to Sun
 // ════════════════════════════════════════════════════════
 function wkDays(off=0){
   const n=new Date(),d=n.getDay();
+  // Monday = start of week; if today is Sunday (0) go back 6 days
   const mon=new Date(n);
   mon.setDate(n.getDate()-(d===0?6:d-1)+off*7);
   return Array.from({length:7},(_,i)=>{
@@ -904,14 +876,17 @@ function dsp(s){
   const d=new Date(s+'T00:00:00');
   return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 }
-function wkn(d){
-  const j=new Date(d.getFullYear(),0,1);
-  return Math.ceil(((d-j)/86400000+j.getDay()+1)/7);
+// ISO week number (Mon-based)
+function isoWeek(d){
+  const tmp=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  tmp.setUTCDate(tmp.getUTCDate()+4-(tmp.getUTCDay()||7));
+  const y1=new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
+  return Math.ceil(((tmp-y1)/86400000+1)/7);
 }
 function updHdr(){
   const days=wkDays(wOff),s=days[0],e=days[6];
-  D.wt.textContent=`Tuần ${wkn(s)} — Năm ${s.getFullYear()}`;
-  D.wr.textContent=`Từ ${dsp(fmt(s))} đến ${dsp(fmt(e))}/${e.getFullYear()}`;
+  D.wt.textContent=`Tuần ${isoWeek(s)} — Năm ${s.getFullYear()}`;
+  D.wr.textContent=`${dsp(fmt(s))} — ${dsp(fmt(e))}/${e.getFullYear()}`;
 }
 function chW(d){wOff=d===0?0:wOff+d;invalidateWkCache();updHdr();render()}
 
@@ -952,7 +927,7 @@ async function load(force=false){
   render();
 }
 function showLoading(){
-  D.tbody.innerHTML='<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
+  if(D.tbody)D.tbody.innerHTML='<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
 }
 
 // ════════════════════════════════════════════════════════
@@ -969,12 +944,12 @@ function wkData(){
 }
 
 // ════════════════════════════════════════════════════════
-//  AUDIT TRAIL
+//  AUDIT
 // ════════════════════════════════════════════════════════
 function auditHtml(r){
   const lines=[];
-  if(r.nguoiTao)lines.push(`<span class="audit-line"><span class="a-icon">✏️</span><span>Tạo bởi <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span></span>`);
-  if(r.nguoiSua)lines.push(`<span class="audit-line"><span class="a-icon">🔄</span><span>Sửa bởi <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span></span>`);
+  if(r.nguoiTao)lines.push(`<span class="audit-line">✏️ <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span>`);
+  if(r.nguoiSua)lines.push(`<span class="audit-line">🔄 <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span>`);
   if(!lines.length)return'';
   return`<div class="audit">${lines.join('')}</div>`;
 }
@@ -982,18 +957,23 @@ function auditHtml(r){
 // ════════════════════════════════════════════════════════
 //  RENDER
 // ════════════════════════════════════════════════════════
-function render(){cv==='table'?renderT():renderC()}
+function render(){
+  if(cv==='table')renderT();
+  else renderC();
+}
 function setView(v){
   cv=v;
-  document.querySelectorAll('.vtab').forEach((t,i)=>
-    t.classList.toggle('on',(i===0&&v==='table')||(i===1&&v==='cal'))
-  );
+  document.querySelectorAll('.vtab').forEach((t,i)=>{
+    t.classList.toggle('on',(i===0&&v==='table')||(i===1&&v==='cal'));
+  });
   D.tvw.classList.toggle('hidden',v!=='table');
   D.cvw.classList.toggle('hidden',v!=='cal');
   render();
 }
+
+// ── TABLE VIEW ──
 function renderT(){
-  const b=D.tbody;const data=wkData();
+  const b=D.tbody,data=wkData();
   D.actCol.classList.toggle('hidden',!cu);
   if(!data.length){
     b.innerHTML=`<tr class="empty-row"><td colspan="8">📭 Không có lịch nào trong tuần này</td></tr>`;
@@ -1010,8 +990,8 @@ function renderT(){
       <td class="td-muted">${esc(r.chutri)}</td>
       <td class="td-muted">${esc(r.thanhphan)}</td>
       ${cu?`<td class="td-acts">
-        <button class="ibtn edit" data-id="${esc(r.id)}" title="Chỉnh sửa">✏️</button>
-        <button class="ibtn del" data-id="${esc(r.id)}" title="Xóa">🗑</button>
+        <button class="ibtn edit" data-id="${esc(r.id)}" style="padding:6px 8px;min-height:36px;" title="Sửa">✏️</button>
+        <button class="ibtn del" data-id="${esc(r.id)}" style="padding:6px 8px;min-height:36px;" title="Xóa">🗑</button>
       </td>`:'<td></td>'}
     </tr>`).join('');
   b.onclick=e=>{
@@ -1021,8 +1001,10 @@ function renderT(){
     if(dl)openDel(dl.dataset.id);
   };
 }
+
+// ── CALENDAR VIEW ──
 function renderC(){
-  const g=D.cgrid;const today=fmt(new Date());
+  const g=D.cgrid,today=fmt(new Date());
   g.innerHTML=wkDays(wOff).map(day=>{
     const ds=fmt(day);
     const dd=allD.filter(r=>r.ngay===ds)
@@ -1035,39 +1017,34 @@ function renderC(){
       <div class="cal-body">
         ${dd.length?dd.map(r=>{
           const ac=r.nguoiSua
-            ?`<div class="cevent-audit">🔄 ${esc(r.nguoiSua)} — ${esc(r.thoiGianSua)}</div>`
-            :r.nguoiTao?`<div class="cevent-audit">✏️ ${esc(r.nguoiTao)} — ${esc(r.thoiGianTao)}</div>`:'';
+            ?`<div class="cevent-audit">🔄 ${esc(r.nguoiSua)}</div>`
+            :r.nguoiTao?`<div class="cevent-audit">✏️ ${esc(r.nguoiTao)}</div>`:'';
           return`<div class="cevent"><div class="cevent-time">${esc(r.thoigian)}</div><div class="cevent-title">${esc(r.noidung)}</div>${ac}</div>`;
-        }).join(''):'<div class="cal-empty">Không có lịch</div>'}
+        }).join(''):'<div style="font-size:11px;color:var(--muted);padding:4px 0;">Không có lịch</div>'}
       </div>
     </div>`;
   }).join('');
 }
 
 // ════════════════════════════════════════════════════════
-//  TOAST SYSTEM
+//  TOAST
 // ════════════════════════════════════════════════════════
 const TOAST_ICONS={ok:'✅',err:'❌',warn:'⚠️',info:'ℹ️'};
 let _toastId=0;
-function toast({type='info',title='',msg='',action=null,actionLabel='Thực hiện',duration=4000}){
-  const stack=$('toast-stack');
-  const id=++_toastId;
+function toast({type='info',title='',msg='',duration=4000}){
+  const stack=$('toast-stack'),id=++_toastId;
   const item=document.createElement('div');
   item.className=`toast-item ${type}`;item.dataset.id=id;
-  const actionHtml=action?`<button class="t-action" onclick="_toastAction(${id})">${esc(actionLabel)}</button>`:'';
   item.innerHTML=`
     <div class="t-icon">${TOAST_ICONS[type]||'ℹ️'}</div>
     <div class="t-body">
       <div class="t-title">${esc(title)}</div>
       ${msg?`<div class="t-msg">${esc(msg)}</div>`:''}
-      ${actionHtml}
     </div>
     <button class="t-close" onclick="_toastClose(${id})">✕</button>
     <div class="t-progress" style="animation-duration:${duration}ms"></div>`;
-  if(action)item._toastCb=action;
   stack.appendChild(item);
   setTimeout(()=>_toastClose(id),duration);
-  return id;
 }
 function _toastClose(id){
   const el=document.querySelector(`[data-id="${id}"]`);
@@ -1075,19 +1052,14 @@ function _toastClose(id){
   el.classList.add('leaving');
   setTimeout(()=>el.remove(),260);
 }
-function _toastAction(id){
-  const el=document.querySelector(`[data-id="${id}"]`);
-  if(el&&el._toastCb)el._toastCb();
-  _toastClose(id);
-}
 
 // ════════════════════════════════════════════════════════
 //  CONFLICT DIALOG
 // ════════════════════════════════════════════════════════
-function showConflictDialog(conflictedBy,conflictTime){
-  D.conflictMeta.innerHTML=conflictedBy||conflictTime
-    ?`<strong>Người sửa:</strong> ${esc(conflictedBy||'(không rõ)')}<br><strong>Thời điểm:</strong> ${esc(conflictTime||'(không rõ)')}`
-    :'<em>Không có thông tin chi tiết.</em>';
+function showConflictDialog(by,time){
+  D.conflictMeta.innerHTML=by||time
+    ?`<strong>Người sửa:</strong> ${esc(by||'(không rõ)')}<br><strong>Thời điểm:</strong> ${esc(time||'(không rõ)')}`
+    :'<em>Không có thông tin.</em>';
   D.conflictOv.classList.add('open');
 }
 function closeConflict(){
@@ -1098,7 +1070,7 @@ async function conflictReload(){
   D.conflictReloadBtn.disabled=true;D.conflictReloadBtn.textContent='Đang tải...';
   await load(true);
   D.conflictOv.classList.remove('open');closeLich(true);
-  D.conflictReloadBtn.disabled=false;D.conflictReloadBtn.textContent='🔄 Tải lại & xem';
+  D.conflictReloadBtn.disabled=false;D.conflictReloadBtn.textContent='🔄 Tải lại';
   toast({type:'info',title:'Đã tải lại dữ liệu',msg:'Vui lòng mở lại lịch để chỉnh sửa.'});
 }
 
@@ -1108,7 +1080,6 @@ async function conflictReload(){
 function openPin(){
   resetPinUI();
   D.pinOv.classList.add('open');
-  // Delay focus để tránh animation jank trên iOS
   setTimeout(()=>D.p1.focus(),300);
 }
 function closePin(){D.pinOv.classList.remove('open')}
@@ -1145,7 +1116,12 @@ async function verPin(){
     if(d.success){
       cu=san(d.ten,50);isAdm=!!d.isAdmin;cu_pin=pin;
       closePin();updUI();
-      toast({type:'ok',title:`Xin chào, ${d.ten}! 👋`,msg:isAdm?'Bạn đăng nhập với quyền Admin.':'Đăng nhập thành công.'});
+      toast({
+        type:'ok',
+        title:`${getGreeting()}, ${d.ten}! 👋`,
+        msg:getRoleMsg(isAdm),
+        duration:4000
+      });
       render();
     }else if(d.error==='locked'){
       showLockedUI(d.message);
@@ -1162,9 +1138,10 @@ async function verPin(){
   }
 }
 function logout(){
+  const name=cu;
   cu=null;isAdm=false;cu_pin=null;
   updUI();render();
-  toast({type:'info',title:'Đã đăng xuất',msg:'Hẹn gặp lại!'});
+  toast({type:'info',title:`Tạm biệt, ${name||'bạn'}! 👋`,msg:'Đã đăng xuất. Hẹn gặp lại!',duration:3500});
 }
 function updUI(){
   const on=!!cu;
@@ -1173,12 +1150,12 @@ function updUI(){
   D.btnAdm.classList.toggle('hidden',!isAdm);
   D.btnLogin.classList.toggle('hidden',on);
   D.btnOut.classList.toggle('hidden',!on);
-  D.fab.classList.toggle('hidden',!on);
-  D.actCol.classList.toggle('hidden',!on);
+  D.fabBtn.classList.toggle('hidden',!on);
+  if(D.actCol)D.actCol.classList.toggle('hidden',!on);
 }
 
 // ════════════════════════════════════════════════════════
-//  ADD / EDIT LỊCH
+//  ADD / EDIT
 // ════════════════════════════════════════════════════════
 function resetForm(){
   [D.fNgay,D.fThu,D.fTg,D.fNd,D.fDd,D.fCt,D.fTp].forEach(el=>el.value='');
@@ -1190,7 +1167,6 @@ function openAdd(){
   D.mtitle.textContent='➕ Thêm lịch mới';
   resetForm();
   D.lichOv.classList.add('open');
-  // Scroll sheet to top
   setTimeout(()=>{const s=D.lichOv.querySelector('.sheet');if(s)s.scrollTop=0},100);
 }
 function openEdit(id){
@@ -1236,7 +1212,12 @@ async function saveLich(){
     if(d.error==='conflict'){showConflictDialog(d.conflictedBy,d.conflictTime);return}
     if(d.success){
       closeLich(true);
-      toast({type:'ok',title:edId?'Đã cập nhật lịch ✓':'Đã thêm lịch mới ✓',msg:edId?`Chỉnh sửa bởi ${cu}`:`Tạo bởi ${cu}`});
+      toast({
+        type:'ok',
+        title:edId?'✓ Đã cập nhật lịch':'✓ Đã thêm lịch mới',
+        msg:edId?`Chỉnh sửa bởi ${cu}`:`Tạo bởi ${cu}`,
+        duration:3500
+      });
       if(edId){
         const idx=allD.findIndex(r=>r.id===edId);
         if(idx!==-1){
@@ -1271,7 +1252,7 @@ async function saveLich(){
 }
 
 // ════════════════════════════════════════════════════════
-//  DELETE CONFIRM SHEET
+//  DELETE
 // ════════════════════════════════════════════════════════
 function openDel(id){
   if(!cu||!cu_pin)return;
@@ -1298,7 +1279,8 @@ async function confirmDel(){
   try{
     const d=await apiFetch({action:'deleteRow',pin:cu_pin,id});
     if(d.success){
-      closeDel();toast({type:'ok',title:'Đã xóa lịch ✓'});
+      closeDel();
+      toast({type:'ok',title:'✓ Đã xóa lịch',msg:`Xóa bởi ${cu}`,duration:3000});
       allD=allD.filter(r=>r.id!==id);invalidateWkCache();render();
       _lastHash=hashData(allD);
     }else{
@@ -1312,7 +1294,7 @@ async function confirmDel(){
 }
 
 // ════════════════════════════════════════════════════════
-//  USERS PANEL
+//  USERS
 // ════════════════════════════════════════════════════════
 function switchUsrTab(tab){
   D.tabUsers.classList.toggle('on',tab==='users');
@@ -1339,7 +1321,7 @@ async function loadUsersList(){
         </div>
         ${u.ten!=='Admin'
           ?`<button class="del-usr" data-ten="${esc(u.ten)}"
-               style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:10px 14px;cursor:pointer;font-size:13px;font-family:'Be Vietnam Pro',sans-serif;min-height:44px;touch-action:manipulation;-webkit-appearance:none;">
+               style="border:none;background:#feecec;color:var(--acc);border-radius:7px;padding:10px 14px;cursor:pointer;font-size:13px;font-family:'Be Vietnam Pro',sans-serif;min-height:44px;touch-action:manipulation;">
                🗑 Xóa</button>`:''}
       </div>`).join('');
     D.usrList.onclick=e=>{const b=e.target.closest('.del-usr');if(b)delUsr(b.dataset.ten)};
@@ -1387,7 +1369,7 @@ async function addUsr(){
   if(!isAdm||!cu_pin)return;
   const ten=san(D.nUN.value,50);const newpin=D.nUP.value.trim();
   if(!ten){toast({type:'warn',title:'Vui lòng nhập tên người dùng'});return}
-  if(!isValidPin(newpin)){toast({type:'warn',title:'PIN không hợp lệ',msg:'PIN phải là 4 chữ số (0-9).'});return}
+  if(!isValidPin(newpin)){toast({type:'warn',title:'PIN không hợp lệ',msg:'PIN phải là 4 chữ số.'});return}
   D.addUsrBtn.disabled=true;D.addUsrBtn.textContent='Đang thêm...';
   try{
     const d=await apiFetch({action:'addUser',pin:cu_pin,ten,newpin});
@@ -1416,7 +1398,7 @@ async function delUsr(ten){
 function bgClose(e,closeFn){if(e.target===e.currentTarget)closeFn()}
 
 // ════════════════════════════════════════════════════════
-//  REALTIME POLLING ENGINE
+//  POLLING
 // ════════════════════════════════════════════════════════
 const POLL_INTERVAL=15_000;
 let _pollTimer=null,_pendingData=null,_lastHash='',_pollFailCnt=0,_newIds=new Set();
@@ -1454,11 +1436,11 @@ function applyNewData(newArr,diff){
 function showUpdateBanner(diff){
   _pendingData=diff._newArr;
   const parts=[];
-  if(diff.added)parts.push(`${diff.added} lịch mới`);
-  if(diff.updated)parts.push(`${diff.updated} lịch thay đổi`);
-  if(diff.removed)parts.push(`${diff.removed} lịch đã xóa`);
+  if(diff.added)parts.push(`${diff.added} mới`);
+  if(diff.updated)parts.push(`${diff.updated} thay đổi`);
+  if(diff.removed)parts.push(`${diff.removed} đã xóa`);
   D.updCount.textContent=parts.join(', ');
-  D.updMsg.textContent='— có thay đổi từ người dùng khác';
+  D.updMsg.textContent='— có cập nhật';
   D.updBanner.classList.add('show');
 }
 function applyUpdate(){
@@ -1472,8 +1454,8 @@ function isAnyFormOpen(){
   return D.lichOv.classList.contains('open')||D.delOv.classList.contains('open');
 }
 async function pollData(){
-  if(document.hidden)return;if(isLoading)return;
-  setSyncState('syncing','Đang đồng bộ...');
+  if(document.hidden||isLoading)return;
+  setSyncState('syncing','...');
   try{
     const raw=await apiFetch({action:'getLich',t:Date.now()});
     const newArr=Array.isArray(raw)?raw.map(cleanRow):[];
@@ -1485,12 +1467,12 @@ async function pollData(){
     else{applyNewData(newArr,diff);setSyncState('ok',fmtSyncTime())}
   }catch(e){
     _pollFailCnt++;
-    setSyncState(_pollFailCnt>=3?'err':'ok',_pollFailCnt>=3?'Mất kết nối':fmtSyncTime());
+    setSyncState(_pollFailCnt>=3?'err':'ok',_pollFailCnt>=3?'Mất KN':fmtSyncTime());
   }
 }
 function fmtSyncTime(){
   const now=new Date();
-  return`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  return`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 }
 async function syncNow(){clearTimeout(_pollTimer);await pollData();schedulePoll()}
 function schedulePoll(){
@@ -1499,7 +1481,7 @@ function schedulePoll(){
 }
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden){clearTimeout(_pollTimer);pollData().then(schedulePoll)}
-  else{clearTimeout(_pollTimer)}
+  else clearTimeout(_pollTimer);
 });
 function onFormClosed(){
   if(_pendingData){
