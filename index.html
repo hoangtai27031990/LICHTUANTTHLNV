@@ -272,7 +272,58 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .rl-warn { background:#fef3c7; border:1px solid #fbbf24; border-radius:8px; padding:8px 12px; font-size:12px; color:#92400e; margin-bottom:8px; display:none; }
 .rl-warn.show { display:block; }
 
+/* ── SYNC INDICATOR ── */
+.sync-bar {
+  display:flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.13);
+  border-radius:8px; padding:5px 10px; font-size:11px; color:rgba(255,255,255,.75);
+  cursor:pointer; transition:background .15s; user-select:none; flex-shrink:0;
+}
+.sync-bar:hover { background:rgba(255,255,255,.14); }
+.sync-dot {
+  width:7px; height:7px; border-radius:50%; flex-shrink:0; transition:background .3s;
+}
+.sync-dot.ok     { background:#4ade80; }
+.sync-dot.syncing{ background:#fbbf24; animation:pulse .8s ease-in-out infinite; }
+.sync-dot.err    { background:#f87171; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.sync-txt { white-space:nowrap; }
+
+/* ── UPDATE BANNER ── */
+.upd-banner {
+  display:none; align-items:center; gap:10px;
+  background:linear-gradient(90deg,#1e4976,#2a5a8a);
+  color:#fff; padding:10px 14px; border-radius:10px;
+  font-size:13px; margin-bottom:10px; animation:slideDown .3s ease;
+}
+.upd-banner.show { display:flex; }
+@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:none} }
+.upd-icon { font-size:18px; flex-shrink:0; }
+.upd-text { flex:1; line-height:1.4; }
+.upd-text strong { font-weight:600; }
+.upd-btn {
+  border:none; background:rgba(255,255,255,.2); color:#fff;
+  border-radius:7px; padding:7px 13px; font-size:12.5px; font-weight:600;
+  cursor:pointer; font-family:'Be Vietnam Pro',sans-serif;
+  transition:background .15s; white-space:nowrap; flex-shrink:0;
+}
+.upd-btn:hover { background:rgba(255,255,255,.3); }
+.upd-close {
+  border:none; background:none; color:rgba(255,255,255,.6);
+  font-size:16px; cursor:pointer; padding:0 2px; flex-shrink:0;
+  transition:color .15s;
+}
+.upd-close:hover { color:#fff; }
+
 .hidden { display:none !important; }
+
+/* ── HIGHLIGHT ROW MỚI ── */
+@keyframes highlightNew {
+  0%   { background:#d1fae5; }
+  70%  { background:#d1fae5; }
+  100% { background:transparent; }
+}
+tbody tr.row-new { animation:highlightNew 3s ease forwards; }
 
 @media (min-width:769px) {
   .hdr { padding:16px 32px; }
@@ -316,6 +367,10 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
       <div class="wr" id="wr">--</div>
     </div>
     <div class="week-ctrl">
+      <div id="syncBar" class="sync-bar" onclick="syncNow()" title="Nhấn để đồng bộ ngay">
+        <div class="sync-dot ok" id="syncDot"></div>
+        <span class="sync-txt" id="syncTxt">Đồng bộ</span>
+      </div>
       <div class="vtabs">
         <button class="vtab on" onclick="setView('table')">📋 Bảng</button>
         <button class="vtab" onclick="setView('cal')">📅 Lịch</button>
@@ -330,6 +385,12 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 <!-- MAIN -->
 <div class="main">
   <div class="rl-warn" id="rlWarn">⚠️ Bạn thao tác quá nhanh, vui lòng chờ một chút...</div>
+  <div class="upd-banner" id="updBanner">
+    <span class="upd-icon">🔄</span>
+    <div class="upd-text"><strong id="updCount"></strong> <span id="updMsg">có thay đổi mới</span></div>
+    <button class="upd-btn" onclick="applyUpdate()">Cập nhật ngay</button>
+    <button class="upd-close" onclick="dismissUpdate()" title="Bỏ qua">✕</button>
+  </div>
 
   <div id="tvw">
     <div class="scroll-hint"><div class="scroll-hint-dot"></div>Vuốt ngang để xem đầy đủ thông tin</div>
@@ -531,6 +592,8 @@ const D = {
   conflictOv:null, conflictMeta:null, conflictReloadBtn:null,
   delOv:null, delConfirmBtn:null,
   dpNgay:null, dpTg:null, dpNd:null, dpDd:null, dpDdRow:null,
+  syncDot:null, syncTxt:null,
+  updBanner:null, updCount:null, updMsg:null,
 };
 function initDOM() { Object.keys(D).forEach(k => { D[k] = $(k); }); }
 
@@ -635,6 +698,7 @@ async function load(force = false) {
     const d = await apiFetch({ action: 'getLich', t: Date.now() });
     allD = Array.isArray(d) ? d.map(cleanRow) : [];
     cacheTime = Date.now();
+    _lastHash = hashData(allD);
     invalidateWkCache();
   } catch(e) { toast({ type:'err', title:'Không tải được dữ liệu', msg:'Kiểm tra kết nối và thử lại.' }); }
   finally { isLoading = false; }
@@ -695,7 +759,7 @@ function renderT() {
   }
   data.sort((a,b) => (a.ngay||'').localeCompare(b.ngay||'') || (a.thoigian||'').localeCompare(b.thoigian||''));
   b.innerHTML = data.map(r => `
-    <tr>
+    <tr${_newIds.has(r.id) ? ' class="row-new"' : ''}>
       <td class="td-date">${esc(dsp(r.ngay))}</td>
       <td class="td-day">${esc(r.thu)}</td>
       <td><span class="pill${r.thoigian==='Cả ngày'?' all':''}">${esc(r.thoigian)}</span></td>
@@ -934,7 +998,7 @@ function autoThu() {
   if (v && isValidDate(v)) D.fThu.value = THU[new Date(v + 'T00:00:00').getDay()];
 }
 
-function closeLich() { D.lichOv.classList.remove('open'); }
+function closeLich() { D.lichOv.classList.remove('open'); onFormClosed(); }
 
 async function saveLich() {
   if (!cu || !cu_pin || D.saveBtn.disabled) return;
@@ -995,6 +1059,7 @@ async function saveLich() {
         }));
       }
       invalidateWkCache(); render();
+      _lastHash = hashData(allD);
     } else {
       toast({ type:'err', title:'Lỗi lưu dữ liệu', msg: esc(d.error || 'Không xác định') });
       D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
@@ -1031,6 +1096,7 @@ function openDel(id) {
 function closeDel() {
   D.delOv.classList.remove('open');
   _pendingDelId = null;
+  onFormClosed();
 }
 
 async function confirmDel() {
@@ -1047,6 +1113,7 @@ async function confirmDel() {
       toast({ type:'ok', title:'Đã xóa lịch ✓' });
       allD = allD.filter(r => r.id !== id);
       invalidateWkCache(); render();
+      _lastHash = hashData(allD);
     } else {
       toast({ type:'err', title:'Lỗi xóa dữ liệu', msg: esc(d.error || '') });
       D.delConfirmBtn.disabled = false;
@@ -1181,19 +1248,198 @@ async function delUsr(ten) {
 function bgClose(e, closeFn) { if (e.target === e.currentTarget) closeFn(); }
 
 // ════════════════════════════════════════════════════════
+//  REALTIME POLLING ENGINE
+//  - Poll mỗi POLL_INTERVAL ms khi tab active
+//  - So sánh checksum để phát hiện thay đổi thực sự
+//  - Khi đang mở form edit/add → hiện banner "có thay đổi mới"
+//    thay vì cập nhật ngay (tránh mất dữ liệu đang nhập)
+//  - Khi không có form mở → cập nhật silent + highlight dòng mới
+// ════════════════════════════════════════════════════════
+const POLL_INTERVAL = 15_000;   // 15 giây
+let _pollTimer   = null;
+let _pendingData = null;        // data mới chưa áp dụng (khi form đang mở)
+let _lastHash    = '';          // checksum của allD hiện tại
+let _pollFailCnt = 0;           // đếm lỗi liên tiếp
+let _newIds      = new Set();   // id vừa được thêm từ server → highlight
+
+// Tạo hash đơn giản từ mảng dữ liệu để so sánh nhanh
+function hashData(arr) {
+  if (!arr || !arr.length) return '0';
+  return arr.map(r => `${r.id}:${r.updatedAt}`).sort().join('|');
+}
+
+// Cập nhật trạng thái dot + text sync
+function setSyncState(state, label) {
+  if (!D.syncDot || !D.syncTxt) return;
+  D.syncDot.className = 'sync-dot ' + state;
+  D.syncTxt.textContent = label;
+}
+
+// Tính diff giữa data mới và allD hiện tại
+function diffData(newArr) {
+  const oldMap = new Map(allD.map(r => [r.id, r]));
+  const newMap = new Map(newArr.map(r => [r.id, r]));
+  let added = 0, updated = 0, removed = 0;
+  const addedIds = [];
+
+  for (const [id, nr] of newMap) {
+    if (!oldMap.has(id)) { added++; addedIds.push(id); }
+    else if (oldMap.get(id).updatedAt !== nr.updatedAt) updated++;
+  }
+  for (const id of oldMap.keys()) {
+    if (!newMap.has(id)) removed++;
+  }
+  return { added, updated, removed, addedIds, total: added + updated + removed };
+}
+
+// Áp dụng data mới vào allD và re-render
+function applyNewData(newArr, diff) {
+  _newIds = new Set(diff.addedIds);
+  allD    = newArr;
+  cacheTime = Date.now();
+  invalidateWkCache();
+  render();
+  // Xóa highlight sau 3s
+  if (_newIds.size) setTimeout(() => { _newIds = new Set(); render(); }, 3000);
+
+  // Thông báo ngắn gọn
+  const parts = [];
+  if (diff.added)   parts.push(`+${diff.added} mới`);
+  if (diff.updated) parts.push(`${diff.updated} cập nhật`);
+  if (diff.removed) parts.push(`-${diff.removed} đã xóa`);
+  if (parts.length) {
+    toast({ type:'info', title:'Lịch vừa được cập nhật', msg: parts.join(' · '), duration:3500 });
+  }
+}
+
+// Hiện banner "có thay đổi" khi form đang mở
+function showUpdateBanner(diff) {
+  _pendingData = diff._newArr;
+  const parts = [];
+  if (diff.added)   parts.push(`${diff.added} lịch mới`);
+  if (diff.updated) parts.push(`${diff.updated} lịch thay đổi`);
+  if (diff.removed) parts.push(`${diff.removed} lịch đã xóa`);
+  D.updCount.textContent = parts.join(', ');
+  D.updMsg.textContent   = '— có thay đổi từ người dùng khác';
+  D.updBanner.classList.add('show');
+}
+
+function applyUpdate() {
+  if (!_pendingData) return;
+  const diff = diffData(_pendingData);
+  diff._newArr = _pendingData;
+  applyNewData(_pendingData, diff);
+  _pendingData = null;
+  D.updBanner.classList.remove('show');
+}
+
+function dismissUpdate() {
+  _pendingData = null;
+  D.updBanner.classList.remove('show');
+}
+
+// Kiểm tra xem có form nào đang mở không
+function isAnyFormOpen() {
+  return D.lichOv.classList.contains('open') ||
+         D.delOv.classList.contains('open');
+}
+
+// Hàm poll chính
+async function pollData() {
+  if (document.hidden) return;
+  if (isLoading) return;
+
+  setSyncState('syncing', 'Đang đồng bộ...');
+  try {
+    const raw = await apiFetch({ action: 'getLich', t: Date.now() });
+    const newArr  = Array.isArray(raw) ? raw.map(cleanRow) : [];
+    const newHash = hashData(newArr);
+
+    _pollFailCnt = 0;
+
+    if (newHash === _lastHash) {
+      // Không có gì thay đổi
+      setSyncState('ok', fmtSyncTime());
+      return;
+    }
+
+    // Có thay đổi — tính diff
+    const diff = diffData(newArr);
+    diff._newArr = newArr;
+    _lastHash    = newHash;
+
+    if (isAnyFormOpen()) {
+      // Form đang mở → hiện banner, không cập nhật ngay
+      showUpdateBanner(diff);
+      setSyncState('ok', fmtSyncTime());
+    } else {
+      applyNewData(newArr, diff);
+      setSyncState('ok', fmtSyncTime());
+    }
+  } catch(e) {
+    _pollFailCnt++;
+    if (_pollFailCnt >= 3) {
+      setSyncState('err', 'Mất kết nối');
+    } else {
+      setSyncState('ok', fmtSyncTime());
+    }
+  }
+}
+
+function fmtSyncTime() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+}
+
+// Nhấn icon sync để đồng bộ ngay
+async function syncNow() {
+  clearTimeout(_pollTimer);
+  await pollData();
+  schedulePoll();
+}
+
+function schedulePoll() {
+  clearTimeout(_pollTimer);
+  _pollTimer = setTimeout(async () => {
+    await pollData();
+    schedulePoll();
+  }, POLL_INTERVAL);
+}
+
+// Khi tab trở lại active → poll ngay
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    clearTimeout(_pollTimer);
+    pollData().then(schedulePoll);
+  } else {
+    clearTimeout(_pollTimer);
+  }
+});
+
+// Khi đóng form edit/add → áp dụng pending data nếu có
+function onFormClosed() {
+  if (_pendingData) {
+    const diff = diffData(_pendingData);
+    diff._newArr = _pendingData;
+    applyNewData(_pendingData, diff);
+    _pendingData = null;
+    D.updBanner.classList.remove('show');
+  }
+}
+
+// ════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════
 initDOM();
 updHdr();
-load();
 
-setInterval(() => {
-  if (!document.hidden && !isLoading && !D.lichOv.classList.contains('open')) load(true);
-}, 300_000);
-
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && (Date.now() - cacheTime) > 60_000) load();
-});
+// Load lần đầu rồi bắt đầu polling
+(async () => {
+  await load();
+  _lastHash = hashData(allD);
+  setSyncState('ok', fmtSyncTime());
+  schedulePoll();
+})();
 </script>
 </body>
 </html>
