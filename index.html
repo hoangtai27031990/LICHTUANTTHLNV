@@ -127,7 +127,6 @@ body{
   min-height:52px;
   -webkit-transform:translateZ(0);transform:translateZ(0);
 }
-/* Sync status - compact */
 .sync-info{
   display:flex;align-items:center;gap:5px;
   cursor:pointer;touch-action:manipulation;
@@ -141,7 +140,6 @@ body{
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .sync-txt{white-space:nowrap;font-size:11px;color:var(--muted)}
 
-/* Update banner - compact inline */
 .upd-inline{
   display:none;align-items:center;gap:6px;
   background:var(--p-pale);border:1px solid #b5d4f4;
@@ -167,7 +165,7 @@ body{
   min-width:22px;min-height:22px;justify-content:center;
 }
 
-/* ── FAB (Add button in bottom bar) ── */
+/* ── FAB ── */
 .fab{
   background:var(--p);color:#fff;
   border:none;border-radius:10px;padding:9px 14px;
@@ -204,7 +202,7 @@ body{
 .ibtn.del{background:#feecec;color:var(--acc)}
 .ibtn.del:active{background:#fcd5d7}
 
-/* ── TABLE VIEW (for wider screens) ── */
+/* ── TABLE VIEW ── */
 .tcard{background:var(--card);border-radius:12px;border:1px solid var(--bdr);overflow:hidden}
 .tscroll{
   overflow-x:auto;
@@ -765,15 +763,29 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 // ════════════════════════════════════════════════════════
 const API        = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
 const THU        = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
-// Week starts Monday: Mon=0..Sun=6 in our order
 const THU_ORDER  = ['Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy','Chủ Nhật'];
 const CACHE_TTL  = 60_000;
 const MAX_RETRY  = 2;
 const RATE_LIMIT = 800;
 
+// ════════════════════════════════════════════════════════
+//  GMT+7 CORE HELPERS
+// ════════════════════════════════════════════════════════
+// nowVN(): trả về Date object mà getUTC*() = giờ VN hiện tại
+function nowVN(){return new Date(Date.now()+7*3600*1000)}
+
+// fmtVN(d): chuyển bất kỳ Date nào về chuỗi YYYY-MM-DD theo GMT+7
+function fmtVN(d){
+  const vn=new Date(d.getTime()+7*3600*1000);
+  return`${vn.getUTCFullYear()}-${String(vn.getUTCMonth()+1).padStart(2,'0')}-${String(vn.getUTCDate()).padStart(2,'0')}`;
+}
+
+// todayVN(): chuỗi YYYY-MM-DD hôm nay theo GMT+7
+function todayVN(){return fmtVN(new Date())}
+
 // Greeting helpers
 function getGreeting(){
-  const h=new Date().getHours();
+  const h=nowVN().getUTCHours();
   if(h>=5&&h<12)return'Chào buổi sáng';
   if(h>=12&&h<18)return'Chào buổi chiều';
   return'Chào buổi tối';
@@ -859,49 +871,66 @@ async function apiFetch(params,retries=MAX_RETRY){
 }
 
 // ════════════════════════════════════════════════════════
-//  WEEK HELPERS — Mon to Sun
+//  WEEK HELPERS — Mon to Sun, luôn theo GMT+7
 // ════════════════════════════════════════════════════════
-function wkDays(off=0){
-  const n=new Date(),d=n.getDay();
-  // Monday = start of week; if today is Sunday (0) go back 6 days
-  const mon=new Date(n);
-  mon.setDate(n.getDate()-(d===0?6:d-1)+off*7);
-  return Array.from({length:7},(_,i)=>{
-    const x=new Date(mon);x.setDate(mon.getDate()+i);return x;
-  });
+
+// fmt(d): chuỗi YYYY-MM-DD từ Date tạo bởi Date.UTC (dùng UTC getters)
+function fmt(d){
+  return`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
 }
-function fmt(d){return d.toISOString().split('T')[0]}
+
+// wkDays(off): trả về mảng 7 Date (Mon→Sun) theo tuần GMT+7
+// Dùng nowVN() để xác định "hôm nay" theo múi giờ VN,
+// sau đó tạo Date bằng Date.UTC để tránh phụ thuộc local timezone của browser
+function wkDays(off=0){
+  const n=nowVN(); // getUTC*() của n = giờ VN
+  const dow=n.getUTCDay(); // 0=CN, 1=T2, ..., 6=T7
+  // Tính offset về Thứ Hai: nếu CN (0) thì lùi 6, các ngày khác lùi (dow-1)
+  const offsetToMon=dow===0?6:dow-1;
+  // Timestamp UTC của Thứ Hai tuần này (00:00:00 UTC = 07:00 VN — không quan trọng vì chỉ dùng ngày)
+  const monMs=Date.UTC(
+    n.getUTCFullYear(),
+    n.getUTCMonth(),
+    n.getUTCDate()-offsetToMon+off*7
+  );
+  return Array.from({length:7},(_,i)=>new Date(monMs+i*86400000));
+}
+
 function dsp(s){
   if(!s)return'';
-  const d=new Date(s+'T00:00:00');
-  return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+  const[y,m,d]=s.split('-');
+  return`${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}`;
 }
-// ISO week number (Mon-based)
+
 function isoWeek(d){
-  const tmp=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  // d từ wkDays: dùng UTC getters
+  const tmp=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
   tmp.setUTCDate(tmp.getUTCDate()+4-(tmp.getUTCDay()||7));
   const y1=new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
   return Math.ceil(((tmp-y1)/86400000+1)/7);
 }
+
 function updHdr(){
   const days=wkDays(wOff),s=days[0],e=days[6];
-  D.wt.textContent=`Tuần ${isoWeek(s)} — Năm ${s.getFullYear()}`;
-  D.wr.textContent=`${dsp(fmt(s))} — ${dsp(fmt(e))}/${e.getFullYear()}`;
+  D.wt.textContent=`Tuần ${isoWeek(s)} — Năm ${s.getUTCFullYear()}`;
+  D.wr.textContent=`${dsp(fmt(s))} — ${dsp(fmt(e))}/${e.getUTCFullYear()}`;
 }
+
 function chW(d){wOff=d===0?0:wOff+d;invalidateWkCache();updHdr();render()}
 
 // ════════════════════════════════════════════════════════
 //  DATA
 // ════════════════════════════════════════════════════════
 function nowLocal(){
-  const d=new Date(),vn=new Date(d.getTime()+7*3600*1000);
+  const vn=nowVN();
   const p=n=>String(n).padStart(2,'0');
   return`${p(vn.getUTCDate())}/${p(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${p(vn.getUTCHours())}:${p(vn.getUTCMinutes())}`;
 }
+
 function cleanRow(r){
   if(r.ngay?.includes('T')){
-    const d=new Date(r.ngay);d.setHours(d.getHours()+7);
-    r.ngay=d.toISOString().split('T')[0];
+    // Chuyển ISO timestamp về ngày theo GMT+7
+    r.ngay=fmtVN(new Date(r.ngay));
   }
   if(r.thoigian?.includes('T'))r.thoigian='';
   r.id=String(r.id??'');
@@ -912,6 +941,7 @@ function cleanRow(r){
   });
   return r;
 }
+
 async function load(force=false){
   if(!force&&allD.length&&(Date.now()-cacheTime)<CACHE_TTL){render();return}
   if(isLoading)return;
@@ -926,6 +956,7 @@ async function load(force=false){
   finally{isLoading=false}
   render();
 }
+
 function showLoading(){
   if(D.tbody)D.tbody.innerHTML='<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
 }
@@ -961,6 +992,7 @@ function render(){
   if(cv==='table')renderT();
   else renderC();
 }
+
 function setView(v){
   cv=v;
   document.querySelectorAll('.vtab').forEach((t,i)=>{
@@ -1004,15 +1036,15 @@ function renderT(){
 
 // ── CALENDAR VIEW ──
 function renderC(){
-  const g=D.cgrid,today=fmt(new Date());
+  const g=D.cgrid,today=todayVN();
   g.innerHTML=wkDays(wOff).map(day=>{
     const ds=fmt(day);
     const dd=allD.filter(r=>r.ngay===ds)
       .sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
     return`<div class="cal-day">
       <div class="cal-hdr${ds===today?' today':''}">
-        <div class="cal-thu">${esc(THU[day.getDay()])}</div>
-        <div class="cal-dt">${day.getDate()}/${day.getMonth()+1}</div>
+        <div class="cal-thu">${esc(THU[day.getUTCDay()])}</div>
+        <div class="cal-dt">${day.getUTCDate()}/${day.getUTCMonth()+1}</div>
       </div>
       <div class="cal-body">
         ${dd.length?dd.map(r=>{
@@ -1183,10 +1215,17 @@ function openEdit(id){
   D.lichOv.classList.add('open');
   setTimeout(()=>{const s=D.lichOv.querySelector('.sheet');if(s)s.scrollTop=0},100);
 }
+
+// autoThu(): tự điền thứ khi chọn ngày — dùng UTC để tránh lệch múi giờ
 function autoThu(){
   const v=D.fNgay.value;
-  if(v&&isValidDate(v))D.fThu.value=THU[new Date(v+'T00:00:00').getDay()];
+  if(v&&isValidDate(v)){
+    const[y,m,d]=v.split('-');
+    const dow=new Date(Date.UTC(+y,+m-1,+d)).getUTCDay();
+    D.fThu.value=THU[dow];
+  }
 }
+
 function closeLich(skipFormClosed){
   D.lichOv.classList.remove('open');
   if(!skipFormClosed)onFormClosed();
@@ -1471,8 +1510,8 @@ async function pollData(){
   }
 }
 function fmtSyncTime(){
-  const now=new Date();
-  return`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const vn=nowVN();
+  return`${String(vn.getUTCHours()).padStart(2,'0')}:${String(vn.getUTCMinutes()).padStart(2,'0')}`;
 }
 async function syncNow(){clearTimeout(_pollTimer);await pollData();schedulePoll()}
 function schedulePoll(){
