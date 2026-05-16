@@ -62,7 +62,19 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .td-day { font-size:11px; color:var(--muted); white-space:nowrap; }
 .pill { background:var(--p-pale); color:var(--p); border-radius:6px; padding:3px 9px; font-size:11.5px; font-weight:500; display:inline-block; white-space:nowrap; }
 .pill.all { background:#fef3c7; color:#92400e; }
-.td-content { font-weight:500; white-space:normal; min-width:160px; max-width:200px; line-height:1.4; }
+.td-content { white-space:normal; min-width:180px; max-width:240px; line-height:1.4; }
+.td-noidung { font-weight:500; }
+
+/* ── AUDIT TRAIL — dòng nhỏ dưới nội dung ── */
+.audit { margin-top:5px; display:flex; flex-direction:column; gap:2px; }
+.audit-line {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:10.5px; color:var(--muted); line-height:1.3;
+}
+.audit-line .a-icon { font-size:10px; flex-shrink:0; }
+.audit-line .a-name { color:var(--p); font-weight:600; }
+.audit-line .a-time { color:#8a96aa; }
+
 .td-muted { color:var(--muted); }
 .td-acts { display:flex; gap:5px; }
 .ibtn { border:none; border-radius:6px; padding:6px 9px; cursor:pointer; font-size:13px; display:flex; align-items:center; transition:all .15s; }
@@ -85,12 +97,11 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .cevent { background:var(--p-pale); border-left:2.5px solid var(--p); border-radius:0 5px 5px 0; padding:5px 7px; }
 .cevent-time { font-size:10px; color:var(--muted); margin-bottom:1px; }
 .cevent-title { font-size:11.5px; font-weight:500; color:var(--txt); line-height:1.3; }
-.cal-empty { font-size:11px; color:#c0c8d8; text-align:center; padding:14px 6px; }
+.cevent-audit { font-size:10px; color:#8a96aa; margin-top:3px; }
 
 /* ── FAB ── */
 .fab { position:fixed; bottom:20px; right:16px; z-index:60; background:var(--p); color:#fff; border:none; border-radius:50px; padding:13px 20px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:7px; font-family:'Be Vietnam Pro',sans-serif; box-shadow:0 4px 16px rgba(26,58,92,.35); transition:transform .15s,box-shadow .15s; }
 .fab:active { transform:scale(.96); }
-.fab:disabled { opacity:.6; cursor:not-allowed; }
 
 /* ── BOTTOM SHEETS ── */
 .ov { position:fixed; inset:0; background:rgba(10,20,40,.5); z-index:200; display:none; align-items:flex-end; justify-content:center; }
@@ -122,12 +133,7 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .pin-i:focus { border-color:var(--p); background:#fff; }
 .pin-i:disabled { background:#f0f2f6; opacity:.5; cursor:not-allowed; }
 .pin-err { color:var(--acc); font-size:12px; text-align:center; min-height:18px; margin-bottom:6px; }
-
-/* ── LOCKED STATE trong PIN sheet ── */
-.locked-box {
-  background:#feecec; border:1px solid #fca5a5; border-radius:10px;
-  padding:16px; text-align:center; margin:8px 0 12px;
-}
+.locked-box { background:#feecec; border:1px solid #fca5a5; border-radius:10px; padding:16px; text-align:center; margin:8px 0 12px; }
 .locked-box .lock-icon { font-size:32px; margin-bottom:8px; }
 .locked-box .lock-title { font-size:14px; font-weight:600; color:var(--acc); margin-bottom:4px; }
 .locked-box .lock-msg { font-size:12px; color:#7f1d1d; line-height:1.5; }
@@ -142,11 +148,8 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 .usr-name { font-weight:500; font-size:14px; }
 .usr-pin { font-size:11px; color:var(--muted); margin-top:2px; }
 .admin-badge { background:#fef3c7; color:#92400e; font-size:10px; font-weight:600; padding:2px 7px; border-radius:5px; margin-left:6px; }
-.locked-badge { background:#feecec; color:var(--acc); font-size:10px; font-weight:600; padding:2px 7px; border-radius:5px; margin-left:6px; }
 .sdiv { border-top:1px solid var(--bdr); padding-top:14px; margin-top:4px; }
 .slabel { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
-
-/* Lockout list */
 .lock-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--bdr); }
 .lock-row:last-child { border-bottom:none; }
 .lock-row-name { font-weight:500; font-size:14px; }
@@ -250,8 +253,6 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
     <div class="sheet-handle"></div>
     <div class="sheet-title">🔐 Nhập mã PIN <button class="xcls" onclick="closePin()">✕</button></div>
     <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:4px;">Nhập PIN 4 chữ số để đăng nhập chỉnh sửa</p>
-
-    <!-- Vùng nhập PIN (ẩn khi bị khóa) -->
     <div id="pinInputArea">
       <div class="pin-row">
         <input class="pin-i" maxlength="1" type="password" id="p1" inputmode="numeric" oninput="pnxt(this,'p2')" onkeydown="pinKey(event,null,'p1')">
@@ -261,14 +262,11 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
       </div>
       <div class="pin-err" id="perr"></div>
     </div>
-
-    <!-- Thông báo bị khóa (hiện khi bị khóa) -->
     <div id="lockedBox" class="locked-box hidden">
       <div class="lock-icon">🔒</div>
       <div class="lock-title">Tài khoản bị khóa</div>
       <div class="lock-msg" id="lockedMsg">Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.</div>
     </div>
-
     <div class="mf">
       <button class="mbtn cancel" onclick="closePin()">Hủy</button>
       <button class="mbtn save" id="pinBtn" onclick="verPin()">Xác nhận</button>
@@ -304,14 +302,10 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">👥 Quản lý người dùng <button class="xcls" onclick="closeUsers()">✕</button></div>
-
-    <!-- Tab bar -->
     <div class="usr-tabs">
-      <button class="usr-tab on" id="tabUsers"   onclick="switchUsrTab('users')">👤 Danh sách</button>
-      <button class="usr-tab"    id="tabLocked"  onclick="switchUsrTab('locked')">🔒 Bị khóa <span id="lockCount"></span></button>
+      <button class="usr-tab on" id="tabUsers"  onclick="switchUsrTab('users')">👤 Danh sách</button>
+      <button class="usr-tab"   id="tabLocked" onclick="switchUsrTab('locked')">🔒 Bị khóa<span id="lockCount"></span></button>
     </div>
-
-    <!-- Tab: Danh sách người dùng -->
     <div id="panelUsers">
       <div class="usr-list" id="usrList"></div>
       <div class="sdiv">
@@ -326,8 +320,6 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
         </div>
       </div>
     </div>
-
-    <!-- Tab: Danh sách bị khóa -->
     <div id="panelLocked" class="hidden">
       <div class="usr-list" id="lockedList"></div>
       <div class="mf" style="margin-top:8px;">
@@ -335,7 +327,6 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
         <button class="mbtn save" onclick="refreshLocked()">🔄 Làm mới</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -343,14 +334,13 @@ tbody td { padding:10px 14px; font-size:13px; vertical-align:middle; }
 
 <script>
 // ════════════════════════════════════════════════════════
-//  CẤU HÌNH — chỉ cần đổi URL này
+//  CẤU HÌNH
 // ════════════════════════════════════════════════════════
 const API = "https://script.google.com/macros/s/AKfycbywIJWlr6YVawBtwG-Pjl7_4ncV3maiuZFzNtmAvQYd7ha0g59p5mf4ZPxgwEZa0-4/exec";
-
-const THU            = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
-const CACHE_TTL      = 60_000;   // Cache 60 giây
-const MAX_RETRY      = 2;
-const RATE_LIMIT     = 3_000;    // 3 giây giữa các lần ghi
+const THU        = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+const CACHE_TTL  = 60_000;
+const MAX_RETRY  = 2;
+const RATE_LIMIT = 3_000;
 
 // ════════════════════════════════════════════════════════
 //  STATE
@@ -359,31 +349,19 @@ let cu = null, isAdm = false, cu_pin = null;
 let allD = [], wOff = 0, edId = null, cv = 'table';
 let isLoading = false, cacheTime = 0;
 let lastWriteTime = 0;
-let pinTimer = null;
-let toastTimer = null;
+let pinTimer = null, toastTimer = null;
 
 // ════════════════════════════════════════════════════════
 //  SECURITY HELPERS
 // ════════════════════════════════════════════════════════
 function esc(s) {
   if (s == null) return '';
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-    .replace(/'/g,'&#39;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
-function san(s, max = 300) {
-  return String(s ?? '').trim().slice(0, max);
-}
-
-function isValidDate(s) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s));
-}
-
-function isValidPin(s) {
-  return /^\d{4}$/.test(s);
-}
+function san(s, max = 300) { return String(s ?? '').trim().slice(0, max); }
+function isValidDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s)); }
+function isValidPin(s)  { return /^\d{4}$/.test(s); }
 
 function isRateLimited() {
   if (Date.now() - lastWriteTime < RATE_LIMIT) {
@@ -425,26 +403,21 @@ function wkDays(off = 0) {
     const x = new Date(mon); x.setDate(mon.getDate() + i); return x;
   });
 }
-
 function fmt(d) { return d.toISOString().split('T')[0]; }
-
 function dsp(s) {
   if (!s) return '';
   const d = new Date(s + 'T00:00:00');
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 }
-
 function wkn(d) {
   const j = new Date(d.getFullYear(), 0, 1);
   return Math.ceil(((d - j) / 86400000 + j.getDay() + 1) / 7);
 }
-
 function updHdr() {
   const days = wkDays(wOff), s = days[0], e = days[6];
   document.getElementById('wt').textContent = `Tuần ${wkn(s)} — Năm ${s.getFullYear()}`;
   document.getElementById('wr').textContent  = `Từ ${dsp(fmt(s))} đến ${dsp(fmt(e))}/${e.getFullYear()}`;
 }
-
 function chW(d) { wOff = d === 0 ? 0 : wOff + d; updHdr(); render(); }
 
 // ════════════════════════════════════════════════════════
@@ -452,13 +425,13 @@ function chW(d) { wOff = d === 0 ? 0 : wOff + d; updHdr(); render(); }
 // ════════════════════════════════════════════════════════
 function cleanRow(r) {
   if (r.ngay?.includes('T')) {
-    const d = new Date(r.ngay);
-    d.setHours(d.getHours() + 7);
+    const d = new Date(r.ngay); d.setHours(d.getHours() + 7);
     r.ngay = d.toISOString().split('T')[0];
   }
   if (r.thoigian?.includes('T')) r.thoigian = '';
   r.id = String(r.id ?? '');
-  ['thu','thoigian','noidung','diadiem','chutri','thanhphan'].forEach(k => {
+  ['thu','thoigian','noidung','diadiem','chutri','thanhphan',
+   'nguoiTao','thoiGianTao','nguoiSua','thoiGianSua'].forEach(k => {
     r[k] = san(r[k] ?? '', 300);
   });
   return r;
@@ -467,17 +440,13 @@ function cleanRow(r) {
 async function load(force = false) {
   if (!force && allD.length && (Date.now() - cacheTime) < CACHE_TTL) { render(); return; }
   if (isLoading) return;
-  isLoading = true;
-  showLoading();
+  isLoading = true; showLoading();
   try {
     const d = await apiFetch({ action: 'getLich', t: Date.now() });
     allD = Array.isArray(d) ? d.map(cleanRow) : [];
     cacheTime = Date.now();
-  } catch(e) {
-    toast('Không thể tải dữ liệu, thử lại sau', 'err');
-  } finally {
-    isLoading = false;
-  }
+  } catch(e) { toast('Không thể tải dữ liệu, thử lại sau', 'err'); }
+  finally { isLoading = false; }
   render();
 }
 
@@ -489,6 +458,33 @@ function showLoading() {
 function wkData() {
   const dates = new Set(wkDays(wOff).map(d => fmt(d)));
   return allD.filter(r => dates.has(r.ngay));
+}
+
+// ════════════════════════════════════════════════════════
+//  AUDIT TRAIL HELPER
+// ════════════════════════════════════════════════════════
+/**
+ * Tạo HTML dòng audit nhỏ dưới nội dung.
+ * Chỉ hiển thị nếu có dữ liệu.
+ */
+function auditHtml(r) {
+  const lines = [];
+  if (r.nguoiTao) {
+    lines.push(`<span class="audit-line">
+      <span class="a-icon">✏️</span>
+      <span>Tạo bởi <span class="a-name">${esc(r.nguoiTao)}</span>
+      ${r.thoiGianTao ? `<span class="a-time">— ${esc(r.thoiGianTao)}</span>` : ''}</span>
+    </span>`);
+  }
+  if (r.nguoiSua) {
+    lines.push(`<span class="audit-line">
+      <span class="a-icon">🔄</span>
+      <span>Sửa bởi <span class="a-name">${esc(r.nguoiSua)}</span>
+      ${r.thoiGianSua ? `<span class="a-time">— ${esc(r.thoiGianSua)}</span>` : ''}</span>
+    </span>`);
+  }
+  if (!lines.length) return '';
+  return `<div class="audit">${lines.join('')}</div>`;
 }
 
 // ════════════════════════════════════════════════════════
@@ -525,7 +521,10 @@ function renderT() {
       <td class="td-date">${esc(dsp(r.ngay))}</td>
       <td class="td-day">${esc(r.thu)}</td>
       <td><span class="pill${r.thoigian==='Cả ngày'?' all':''}">${esc(r.thoigian)}</span></td>
-      <td class="td-content">${esc(r.noidung)}</td>
+      <td class="td-content">
+        <div class="td-noidung">${esc(r.noidung)}</div>
+        ${auditHtml(r)}
+      </td>
       <td class="td-muted">${esc(r.diadiem)}</td>
       <td class="td-muted">${esc(r.chutri)}</td>
       <td class="td-muted">${esc(r.thanhphan)}</td>
@@ -557,10 +556,19 @@ function renderC() {
       </div>
       <div class="cal-body">
         ${dd.length
-          ? dd.map(r=>`<div class="cevent">
-              <div class="cevent-time">${esc(r.thoigian)}</div>
-              <div class="cevent-title">${esc(r.noidung)}</div>
-            </div>`).join('')
+          ? dd.map(r => {
+              // Trong lịch: hiển thị người tạo/sửa gọn hơn
+              const auditCal = r.nguoiSua
+                ? `<div class="cevent-audit">🔄 ${esc(r.nguoiSua)} — ${esc(r.thoiGianSua)}</div>`
+                : r.nguoiTao
+                  ? `<div class="cevent-audit">✏️ ${esc(r.nguoiTao)} — ${esc(r.thoiGianTao)}</div>`
+                  : '';
+              return `<div class="cevent">
+                <div class="cevent-time">${esc(r.thoigian)}</div>
+                <div class="cevent-title">${esc(r.noidung)}</div>
+                ${auditCal}
+              </div>`;
+            }).join('')
           : '<div class="cal-empty">Không có lịch</div>'}
       </div>
     </div>`;
@@ -568,38 +576,30 @@ function renderC() {
 }
 
 // ════════════════════════════════════════════════════════
-//  PIN / LOGIN  — Lockout hoàn toàn do server quản lý
+//  PIN / LOGIN
 // ════════════════════════════════════════════════════════
 function openPin() {
   resetPinUI();
   document.getElementById('pinOv').classList.add('open');
   setTimeout(() => document.getElementById('p1').focus(), 150);
 }
+function closePin() { document.getElementById('pinOv').classList.remove('open'); }
 
-function closePin() {
-  document.getElementById('pinOv').classList.remove('open');
-}
-
-/** Reset giao diện PIN về trạng thái ban đầu */
 function resetPinUI() {
-  ['p1','p2','p3','p4'].forEach(id => {
-    const el = document.getElementById(id);
-    el.value = ''; el.disabled = false;
-  });
-  document.getElementById('perr').textContent     = '';
+  ['p1','p2','p3','p4'].forEach(id => { const el = document.getElementById(id); el.value=''; el.disabled=false; });
+  document.getElementById('perr').textContent = '';
   document.getElementById('pinInputArea').classList.remove('hidden');
   document.getElementById('lockedBox').classList.add('hidden');
   const btn = document.getElementById('pinBtn');
   btn.disabled = false; btn.textContent = 'Xác nhận';
 }
 
-/** Hiển thị trạng thái bị khóa trên UI */
 function showLockedUI(msg) {
   ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).disabled = true);
   document.getElementById('perr').textContent = '';
   document.getElementById('pinInputArea').classList.add('hidden');
-  document.getElementById('lockedMsg').innerHTML = esc(msg) ||
-    'Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.';
+  document.getElementById('lockedMsg').innerHTML =
+    esc(msg) || 'Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.';
   document.getElementById('lockedBox').classList.remove('hidden');
   const btn = document.getElementById('pinBtn');
   btn.disabled = true; btn.textContent = 'Bị khóa';
@@ -608,16 +608,12 @@ function showLockedUI(msg) {
 function pnxt(el, nxt) {
   el.value = el.value.replace(/\D/g, '');
   if (el.value.length >= 1 && nxt) document.getElementById(nxt).focus();
-  if (!nxt && el.value.length >= 1) {
-    clearTimeout(pinTimer);
-    pinTimer = setTimeout(verPin, 150);
-  }
+  if (!nxt && el.value.length >= 1) { clearTimeout(pinTimer); pinTimer = setTimeout(verPin, 150); }
 }
 
 function pinKey(e, prevId, curId) {
-  if (e.key === 'Backspace' && e.target.value === '' && prevId) {
+  if (e.key === 'Backspace' && e.target.value === '' && prevId)
     document.getElementById(prevId).focus();
-  }
 }
 
 async function verPin() {
@@ -625,40 +621,25 @@ async function verPin() {
   if (btn.disabled) return;
 
   const pin = ['p1','p2','p3','p4'].map(id => document.getElementById(id).value).join('');
-  if (!isValidPin(pin)) {
-    document.getElementById('perr').textContent = 'Vui lòng nhập đủ 4 chữ số';
-    return;
-  }
+  if (!isValidPin(pin)) { document.getElementById('perr').textContent = 'Vui lòng nhập đủ 4 chữ số'; return; }
 
   btn.disabled = true; btn.textContent = '...';
-
   try {
     const d = await apiFetch({ action: 'verifyPin', pin });
-
     if (d.success) {
-      // Đăng nhập thành công
-      cu     = san(d.ten, 50);
-      isAdm  = !!d.isAdmin;
-      cu_pin = pin;
-      closePin();
-      updUI();
+      cu = san(d.ten, 50); isAdm = !!d.isAdmin; cu_pin = pin;
+      closePin(); updUI();
       toast(`Xin chào, ${esc(d.ten)}! 👋`, 'ok');
       render();
-
     } else if (d.error === 'locked') {
-      // Bị khóa — hiển thị màn hình khóa, không cho nhập nữa
       showLockedUI(d.message);
-
     } else {
-      // Sai PIN — server trả về số lần còn lại
       const remain = d.remaining ?? '?';
-      document.getElementById('perr').textContent =
-        `❌ PIN không đúng. Còn ${remain} lần thử.`;
+      document.getElementById('perr').textContent = `❌ PIN không đúng. Còn ${remain} lần thử.`;
       ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('p1').focus();
       btn.disabled = false; btn.textContent = 'Xác nhận';
     }
-
   } catch(e) {
     document.getElementById('perr').textContent = 'Lỗi kết nối, thử lại sau';
     btn.disabled = false; btn.textContent = 'Xác nhận';
@@ -667,8 +648,7 @@ async function verPin() {
 
 function logout() {
   cu = null; isAdm = false; cu_pin = null;
-  updUI(); render();
-  toast('Đã đăng xuất');
+  updUI(); render(); toast('Đã đăng xuất');
 }
 
 function updUI() {
@@ -686,9 +666,7 @@ function updUI() {
 //  ADD / EDIT LỊCH
 // ════════════════════════════════════════════════════════
 function resetForm() {
-  ['fNgay','fThu','fTg','fNd','fDd','fCt','fTp'].forEach(id =>
-    document.getElementById(id).value = ''
-  );
+  ['fNgay','fThu','fTg','fNd','fDd','fCt','fTp'].forEach(id => document.getElementById(id).value = '');
   const btn = document.getElementById('saveBtn');
   btn.disabled = false; btn.textContent = '💾 Lưu lịch';
 }
@@ -707,14 +685,14 @@ function openEdit(id) {
   const r = allD.find(x => x.id === id);
   if (!r) return;
   edId = id;
-  document.getElementById('mtitle').textContent   = '✏️ Chỉnh sửa lịch';
-  document.getElementById('fNgay').value  = r.ngay      || '';
-  document.getElementById('fThu').value   = r.thu       || '';
-  document.getElementById('fTg').value    = r.thoigian  || '';
-  document.getElementById('fNd').value    = r.noidung   || '';
-  document.getElementById('fDd').value    = r.diadiem   || '';
-  document.getElementById('fCt').value    = r.chutri    || '';
-  document.getElementById('fTp').value    = r.thanhphan || '';
+  document.getElementById('mtitle').textContent  = '✏️ Chỉnh sửa lịch';
+  document.getElementById('fNgay').value = r.ngay     || '';
+  document.getElementById('fThu').value  = r.thu      || '';
+  document.getElementById('fTg').value   = r.thoigian || '';
+  document.getElementById('fNd').value   = r.noidung  || '';
+  document.getElementById('fDd').value   = r.diadiem  || '';
+  document.getElementById('fCt').value   = r.chutri   || '';
+  document.getElementById('fTp').value   = r.thanhphan|| '';
   const btn = document.getElementById('saveBtn');
   btn.disabled = false; btn.textContent = '💾 Lưu lịch';
   document.getElementById('lichOv').classList.add('open');
@@ -753,7 +731,6 @@ async function saveLich() {
       diadiem:   san(document.getElementById('fDd').value, 100),
       chutri:    san(document.getElementById('fCt').value, 100),
       thanhphan: san(document.getElementById('fTp').value, 200),
-      nguoiThucHien: san(cu, 50),
     });
     if (d.success) {
       closeLich();
@@ -774,29 +751,18 @@ async function delL(id) {
   if (typeof id !== 'string' || id.length > 20) return;
   if (isRateLimited()) return;
   if (!confirm('Xác nhận xóa lịch này?')) return;
-
   lastWriteTime = Date.now();
   try {
-    const d = await apiFetch({
-      action: 'deleteRow',
-      pin:    cu_pin,
-      id,
-      nguoiThucHien: san(cu, 50),
-    });
+    const d = await apiFetch({ action: 'deleteRow', pin: cu_pin, id });
     if (d.success) { toast('Đã xóa lịch ✓', 'ok'); await load(true); }
     else toast('Lỗi xóa dữ liệu: ' + esc(d.error || ''), 'err');
-  } catch(e) {
-    toast('Lỗi kết nối, thử lại sau', 'err');
-  }
+  } catch(e) { toast('Lỗi kết nối, thử lại sau', 'err'); }
 }
 
 // ════════════════════════════════════════════════════════
 //  USERS PANEL
 // ════════════════════════════════════════════════════════
-let currentUsrTab = 'users';
-
 function switchUsrTab(tab) {
-  currentUsrTab = tab;
   document.getElementById('tabUsers').classList.toggle('on',  tab === 'users');
   document.getElementById('tabLocked').classList.toggle('on', tab === 'locked');
   document.getElementById('panelUsers').classList.toggle('hidden',  tab !== 'users');
@@ -806,12 +772,11 @@ function switchUsrTab(tab) {
 
 async function openUsers() {
   if (!isAdm || !cu_pin) return;
-  switchUsrTab('users'); // Reset về tab đầu
+  switchUsrTab('users');
   await loadUsersList();
-  await refreshLocked(true); // Load ngầm để cập nhật badge
+  await refreshLocked(true);
   document.getElementById('usrOv').classList.add('open');
 }
-
 function closeUsers() { document.getElementById('usrOv').classList.remove('open'); }
 
 async function loadUsersList() {
@@ -830,22 +795,15 @@ async function loadUsersList() {
                🗑 Xóa</button>`
           : ''}
       </div>`).join('');
-    list.onclick = e => {
-      const b = e.target.closest('.del-usr');
-      if (b) delUsr(b.dataset.ten);
-    };
+    list.onclick = e => { const b = e.target.closest('.del-usr'); if (b) delUsr(b.dataset.ten); };
   } catch(e) { toast('Lỗi tải danh sách', 'err'); }
 }
 
-/** Tải danh sách bị khóa; silent=true thì chỉ cập nhật badge, không render list */
 async function refreshLocked(silent = false) {
   try {
     const locked = await apiFetch({ action: 'getLockouts', pin: cu_pin });
     const count  = Array.isArray(locked) ? locked.length : 0;
-
-    // Cập nhật badge số lượng
     document.getElementById('lockCount').textContent = count > 0 ? ` (${count})` : '';
-
     if (!silent) {
       const list = document.getElementById('lockedList');
       if (!count) {
@@ -855,19 +813,14 @@ async function refreshLocked(silent = false) {
           <div class="lock-row">
             <div>
               <div class="lock-row-name">${esc(u.ten)}</div>
-              <div class="lock-row-info">🔒 Bị khóa do nhập sai PIN</div>
+              <div class="lock-row-info">🔒 Đã nhập sai ${esc(String(u.failCount))} lần</div>
             </div>
             <button class="unlock-btn" data-pin="${esc(u.targetPin)}">🔓 Mở khóa</button>
           </div>`).join('');
-        list.onclick = e => {
-          const b = e.target.closest('.unlock-btn');
-          if (b) doUnlock(b.dataset.pin, b);
-        };
+        list.onclick = e => { const b = e.target.closest('.unlock-btn'); if (b) doUnlock(b.dataset.pin, b); };
       }
     }
-  } catch(e) {
-    if (!silent) toast('Lỗi tải danh sách khóa', 'err');
-  }
+  } catch(e) { if (!silent) toast('Lỗi tải danh sách khóa', 'err'); }
 }
 
 async function doUnlock(targetPin, btnEl) {
@@ -876,17 +829,9 @@ async function doUnlock(targetPin, btnEl) {
   if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
   try {
     const d = await apiFetch({ action: 'unlockPin', pin: cu_pin, targetPin });
-    if (d.success) {
-      toast('Đã mở khóa thành công ✓', 'ok');
-      await refreshLocked(false); // Reload danh sách
-    } else {
-      toast('Lỗi mở khóa: ' + esc(d.error || ''), 'err');
-      if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔓 Mở khóa'; }
-    }
-  } catch(e) {
-    toast('Lỗi kết nối', 'err');
-    if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔓 Mở khóa'; }
-  }
+    if (d.success) { toast('Đã mở khóa thành công ✓', 'ok'); await refreshLocked(); }
+    else { toast('Lỗi mở khóa: ' + esc(d.error || ''), 'err'); if (btnEl) { btnEl.disabled=false; btnEl.textContent='🔓 Mở khóa'; } }
+  } catch(e) { toast('Lỗi kết nối', 'err'); if (btnEl) { btnEl.disabled=false; btnEl.textContent='🔓 Mở khóa'; } }
 }
 
 async function addUsr() {
@@ -894,9 +839,8 @@ async function addUsr() {
   const btn    = document.getElementById('addUsrBtn');
   const ten    = san(document.getElementById('nUN').value, 50);
   const newpin = document.getElementById('nUP').value.trim();
-  if (!ten)              { toast('Vui lòng nhập tên', 'err'); return; }
+  if (!ten)               { toast('Vui lòng nhập tên', 'err'); return; }
   if (!isValidPin(newpin)) { toast('PIN phải là 4 chữ số (0-9)', 'err'); return; }
-
   btn.disabled = true; btn.textContent = 'Đang thêm...';
   try {
     const d = await apiFetch({ action: 'addUser', pin: cu_pin, ten, newpin });
@@ -907,16 +851,13 @@ async function addUsr() {
       await loadUsersList();
     } else if (d.error === 'PIN already exists') {
       toast('PIN này đã được dùng, chọn PIN khác', 'err');
-    } else {
-      toast('Lỗi thêm người dùng', 'err');
-    }
+    } else { toast('Lỗi thêm người dùng', 'err'); }
   } catch(e) { toast('Lỗi kết nối', 'err'); }
   finally { btn.disabled = false; btn.textContent = '➕ Thêm'; }
 }
 
 async function delUsr(ten) {
-  if (!isAdm || !cu_pin) return;
-  if (!ten || ten === 'Admin') return;
+  if (!isAdm || !cu_pin || !ten || ten === 'Admin') return;
   if (!confirm(`Xác nhận xóa người dùng "${ten}"?`)) return;
   try {
     const d = await apiFetch({ action: 'deleteUser', pin: cu_pin, ten });
@@ -928,9 +869,7 @@ async function delUsr(ten) {
 // ════════════════════════════════════════════════════════
 //  UI HELPERS
 // ════════════════════════════════════════════════════════
-function bgClose(e, closeFn) {
-  if (e.target === e.currentTarget) closeFn();
-}
+function bgClose(e, closeFn) { if (e.target === e.currentTarget) closeFn(); }
 
 function toast(msg, type = '') {
   const t = document.getElementById('toast');
