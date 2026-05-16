@@ -871,7 +871,7 @@ async function conflictReload() {
   D.conflictReloadBtn.textContent = 'Đang tải...';
   await load(true);
   D.conflictOv.classList.remove('open');
-  closeLich();
+  closeLich(true);
   D.conflictReloadBtn.disabled = false;
   D.conflictReloadBtn.textContent = '🔄 Tải lại & xem';
   toast({ type:'info', title:'Đã tải lại dữ liệu', msg:'Vui lòng mở lại lịch để chỉnh sửa.' });
@@ -998,7 +998,10 @@ function autoThu() {
   if (v && isValidDate(v)) D.fThu.value = THU[new Date(v + 'T00:00:00').getDay()];
 }
 
-function closeLich() { D.lichOv.classList.remove('open'); onFormClosed(); }
+function closeLich(skipFormClosed) {
+  D.lichOv.classList.remove('open');
+  if (!skipFormClosed) onFormClosed();
+}
 
 async function saveLich() {
   if (!cu || !cu_pin || D.saveBtn.disabled) return;
@@ -1033,7 +1036,7 @@ async function saveLich() {
     }
 
     if (d.success) {
-      closeLich();
+      closeLich(true);  // đóng form, KHÔNG gọi onFormClosed (tránh overwrite allD)
       toast({ type:'ok', title: edId ? 'Đã cập nhật lịch ✓' : 'Đã thêm lịch mới ✓', msg: edId ? `Chỉnh sửa bởi ${cu}` : `Tạo bởi ${cu}` });
 
       if (edId) {
@@ -1059,7 +1062,8 @@ async function saveLich() {
         }));
       }
       invalidateWkCache(); render();
-      _lastHash = hashData(allD);
+      _lastHash    = hashData(allD);  // sync hash SAU khi allD đã được cập nhật
+      _pendingData = null;            // huỷ pending cũ nếu có
     } else {
       toast({ type:'err', title:'Lỗi lưu dữ liệu', msg: esc(d.error || 'Không xác định') });
       D.saveBtn.disabled = false; D.saveBtn.textContent = '💾 Lưu lịch';
