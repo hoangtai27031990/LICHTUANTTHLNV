@@ -33,34 +33,35 @@ body{
 /* ── HEADER ── */
 .hdr{
   background:var(--p);color:#fff;
-  padding:calc(10px + var(--safe-top)) 12px 10px;
+  padding:calc(8px + var(--safe-top)) 10px 8px;
   position:sticky;top:0;z-index:50;
   -webkit-transform:translateZ(0);transform:translateZ(0);
 }
-.hdr-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.logo-wrap{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.logo-wrap{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
 .logo-icon{
-  width:32px;height:32px;flex-shrink:0;
-  background:rgba(255,255,255,.15);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-size:16px;
+  width:30px;height:30px;flex-shrink:0;
+  background:rgba(255,255,255,.15);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
 }
-.logo-text{font-size:14px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.logo-sub{font-size:10px;font-weight:400;opacity:.65;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.logo-text{font-size:13px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* logo-sub: luôn hiện, chỉ điều chỉnh cỡ chữ theo màn hình */
+.logo-sub{font-size:9.5px;font-weight:400;opacity:.7;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .hbtn{
   border:none;background:rgba(255,255,255,.15);color:#fff;
-  border-radius:8px;padding:7px 10px;font-size:12px;font-weight:500;
-  cursor:pointer;display:flex;align-items:center;gap:4px;
+  border-radius:8px;padding:6px 8px;font-size:11.5px;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;gap:3px;
   font-family:'Be Vietnam Pro',sans-serif;
-  min-height:36px;min-width:36px;
+  min-height:34px;min-width:34px;
   touch-action:manipulation;-webkit-appearance:none;
   transition:background .15s;
 }
 .hbtn:active{background:rgba(255,255,255,.3)}
 .ubadge{
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  border-radius:20px;padding:4px 10px;font-size:11.5px;
-  display:flex;align-items:center;gap:5px;max-width:100px;overflow:hidden;
+  border-radius:20px;padding:3px 8px;font-size:11px;
+  display:flex;align-items:center;gap:4px;max-width:90px;overflow:hidden;
 }
 .ubadge span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .udot{width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0}
@@ -68,22 +69,26 @@ body{
 /* ── WEEK TAB BAR ── */
 .week-tabbar{
   background:var(--p);
-  padding:0 12px 10px;
-  position:sticky;top:calc(52px + var(--safe-top));
+  padding:0 10px 8px;
+  position:sticky;
+  /* dùng biến động để khớp đúng chiều cao header */
+  top:var(--hdr-h, 50px);
   z-index:49;
   -webkit-transform:translateZ(0);transform:translateZ(0);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .wtb-row1{
   display:flex;align-items:center;justify-content:space-between;gap:6px;
-  margin-bottom:8px;
+  margin-bottom:7px;
 }
 .week-info{min-width:0;flex:1}
-.week-info .wt{font-size:13.5px;font-weight:600;color:#fff;white-space:nowrap}
-.week-info .wr{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px;white-space:nowrap}
-.week-nav{display:flex;align-items:center;gap:4px;flex-shrink:0}
+/* Tuần X — Năm XXXX */
+.week-info .wt{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* từ ngày ... đến ngày: LUÔN hiển thị */
+.week-info .wr{font-size:10.5px;color:rgba(255,255,255,.75);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important}
+.week-nav{display:flex;align-items:center;gap:3px;flex-shrink:0}
 .navbtn{
-  width:34px;height:34px;border-radius:7px;
+  width:32px;height:32px;border-radius:7px;
   border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);
   color:rgba(255,255,255,.85);cursor:pointer;
   display:flex;align-items:center;justify-content:center;font-size:12px;
@@ -100,7 +105,7 @@ body{
   flex:1;border:none;background:none;color:rgba(255,255,255,.55);
   border-radius:6px;padding:7px 8px;font-size:12px;font-weight:500;
   cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
-  min-height:36px;touch-action:manipulation;-webkit-appearance:none;
+  min-height:34px;touch-action:manipulation;-webkit-appearance:none;
   transition:all .15s;white-space:nowrap;
 }
 .vtab.on{background:rgba(255,255,255,.92);color:var(--p)}
@@ -524,16 +529,41 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   .main{max-width:1200px;margin:0 auto;padding:20px 24px calc(70px + var(--safe-bot))}
   .cal-grid{grid-template-columns:repeat(7,1fr);gap:10px}
   #toast-stack{bottom:calc(40px + var(--safe-bot))}
+  .logo-sub{font-size:10.5px}
+  .week-info .wt{font-size:14px}
+  .week-info .wr{font-size:11px}
 }
+
+/* ── SMALL SCREENS (≤400px): KHÔNG ẨN logo-sub và .wr nữa, chỉ thu nhỏ ── */
 @media(max-width:400px){
-  .logo-sub{display:none}
+  /* logo-sub: giảm font, vẫn hiện */
+  .logo-sub{font-size:9px;opacity:.65}
+  /* .wr: giữ nguyên display:block (đã force !important ở trên) */
+  .week-info .wr{font-size:10px}
+  /* thu nhỏ action buttons để nhường chỗ cho logo */
   .hbtn span{display:none}
-  .week-info .wr{display:none}
+  .hbtn{padding:6px 7px;min-width:32px}
+  /* thu nhỏ badge */
+  .ubadge{max-width:72px;padding:3px 6px;font-size:10.5px}
 }
-@media(max-width:320px){
+
+/* ── VERY SMALL (≤360px) ── */
+@media(max-width:360px){
+  .logo-text{font-size:12px}
+  .logo-sub{font-size:8.5px}
+  .week-info .wt{font-size:12px}
+  .week-info .wr{font-size:9.5px}
   .fr{grid-template-columns:1fr}
   .pin-i{width:44px;height:54px;font-size:20px}
 }
+
+/* ── EXTRA SMALL (≤320px) ── */
+@media(max-width:320px){
+  .logo-sub{display:none!important}
+  .fr{grid-template-columns:1fr}
+  .pin-i{width:40px;height:50px;font-size:18px}
+}
+
 @supports(height:100dvh){
   .sheet{max-height:calc(88dvh - var(--safe-top))}
 }
@@ -542,7 +572,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 <body>
 
 <!-- HEADER -->
-<div class="hdr">
+<div class="hdr" id="mainHdr">
   <div class="hdr-top">
     <div class="logo-wrap">
       <div class="logo-icon">📋</div>
@@ -561,7 +591,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 </div>
 
 <!-- WEEK TAB BAR -->
-<div class="week-tabbar">
+<div class="week-tabbar" id="weekTabbar">
   <div class="wtb-row1">
     <div class="week-info">
       <div class="wt" id="wt">--</div>
@@ -771,19 +801,12 @@ const RATE_LIMIT = 800;
 // ════════════════════════════════════════════════════════
 //  GMT+7 CORE HELPERS
 // ════════════════════════════════════════════════════════
-// nowVN(): trả về Date object mà getUTC*() = giờ VN hiện tại
 function nowVN(){return new Date(Date.now()+7*3600*1000)}
-
-// fmtVN(d): chuyển bất kỳ Date nào về chuỗi YYYY-MM-DD theo GMT+7
 function fmtVN(d){
   const vn=new Date(d.getTime()+7*3600*1000);
   return`${vn.getUTCFullYear()}-${String(vn.getUTCMonth()+1).padStart(2,'0')}-${String(vn.getUTCDate()).padStart(2,'0')}`;
 }
-
-// todayVN(): chuỗi YYYY-MM-DD hôm nay theo GMT+7
 function todayVN(){return fmtVN(new Date())}
-
-// Greeting helpers
 function getGreeting(){
   const h=nowVN().getUTCHours();
   if(h>=5&&h<12)return'Chào buổi sáng';
@@ -792,6 +815,25 @@ function getGreeting(){
 }
 function getRoleMsg(isAdmin){
   return isAdmin?'Bạn đang đăng nhập với quyền Admin.':'Đăng nhập thành công.';
+}
+
+// ════════════════════════════════════════════════════════
+//  STICKY TOP: tự tính chiều cao header → set top cho week-tabbar
+// ════════════════════════════════════════════════════════
+function updateStickyTop(){
+  const hdr=document.getElementById('mainHdr');
+  const tb=document.getElementById('weekTabbar');
+  if(hdr&&tb){
+    tb.style.top=hdr.offsetHeight+'px';
+  }
+}
+// Gọi ngay và sau khi font/layout load xong
+window.addEventListener('load',updateStickyTop);
+window.addEventListener('resize',updateStickyTop);
+// ResizeObserver cho header (safe-area thay đổi khi xoay màn hình)
+if(window.ResizeObserver){
+  const ro=new ResizeObserver(updateStickyTop);
+  ro.observe(document.getElementById('mainHdr'));
 }
 
 // ════════════════════════════════════════════════════════
@@ -871,23 +913,15 @@ async function apiFetch(params,retries=MAX_RETRY){
 }
 
 // ════════════════════════════════════════════════════════
-//  WEEK HELPERS — Mon to Sun, luôn theo GMT+7
+//  WEEK HELPERS
 // ════════════════════════════════════════════════════════
-
-// fmt(d): chuỗi YYYY-MM-DD từ Date tạo bởi Date.UTC (dùng UTC getters)
 function fmt(d){
   return`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
 }
-
-// wkDays(off): trả về mảng 7 Date (Mon→Sun) theo tuần GMT+7
-// Dùng nowVN() để xác định "hôm nay" theo múi giờ VN,
-// sau đó tạo Date bằng Date.UTC để tránh phụ thuộc local timezone của browser
 function wkDays(off=0){
-  const n=nowVN(); // getUTC*() của n = giờ VN
-  const dow=n.getUTCDay(); // 0=CN, 1=T2, ..., 6=T7
-  // Tính offset về Thứ Hai: nếu CN (0) thì lùi 6, các ngày khác lùi (dow-1)
+  const n=nowVN();
+  const dow=n.getUTCDay();
   const offsetToMon=dow===0?6:dow-1;
-  // Timestamp UTC của Thứ Hai tuần này (00:00:00 UTC = 07:00 VN — không quan trọng vì chỉ dùng ngày)
   const monMs=Date.UTC(
     n.getUTCFullYear(),
     n.getUTCMonth(),
@@ -895,27 +929,23 @@ function wkDays(off=0){
   );
   return Array.from({length:7},(_,i)=>new Date(monMs+i*86400000));
 }
-
 function dsp(s){
   if(!s)return'';
   const[y,m,d]=s.split('-');
   return`${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}`;
 }
-
 function isoWeek(d){
-  // d từ wkDays: dùng UTC getters
   const tmp=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
   tmp.setUTCDate(tmp.getUTCDate()+4-(tmp.getUTCDay()||7));
   const y1=new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
   return Math.ceil(((tmp-y1)/86400000+1)/7);
 }
-
 function updHdr(){
   const days=wkDays(wOff),s=days[0],e=days[6];
   D.wt.textContent=`Tuần ${isoWeek(s)} — Năm ${s.getUTCFullYear()}`;
+  // Hiển thị đầy đủ: từ DD/MM đến DD/MM/YYYY
   D.wr.textContent=`${dsp(fmt(s))} — ${dsp(fmt(e))}/${e.getUTCFullYear()}`;
 }
-
 function chW(d){wOff=d===0?0:wOff+d;invalidateWkCache();updHdr();render()}
 
 // ════════════════════════════════════════════════════════
@@ -926,10 +956,8 @@ function nowLocal(){
   const p=n=>String(n).padStart(2,'0');
   return`${p(vn.getUTCDate())}/${p(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${p(vn.getUTCHours())}:${p(vn.getUTCMinutes())}`;
 }
-
 function cleanRow(r){
   if(r.ngay?.includes('T')){
-    // Chuyển ISO timestamp về ngày theo GMT+7
     r.ngay=fmtVN(new Date(r.ngay));
   }
   if(r.thoigian?.includes('T'))r.thoigian='';
@@ -941,7 +969,6 @@ function cleanRow(r){
   });
   return r;
 }
-
 async function load(force=false){
   if(!force&&allD.length&&(Date.now()-cacheTime)<CACHE_TTL){render();return}
   if(isLoading)return;
@@ -956,7 +983,6 @@ async function load(force=false){
   finally{isLoading=false}
   render();
 }
-
 function showLoading(){
   if(D.tbody)D.tbody.innerHTML='<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Đang tải...</td></tr>';
 }
@@ -992,7 +1018,6 @@ function render(){
   if(cv==='table')renderT();
   else renderC();
 }
-
 function setView(v){
   cv=v;
   document.querySelectorAll('.vtab').forEach((t,i)=>{
@@ -1215,8 +1240,6 @@ function openEdit(id){
   D.lichOv.classList.add('open');
   setTimeout(()=>{const s=D.lichOv.querySelector('.sheet');if(s)s.scrollTop=0},100);
 }
-
-// autoThu(): tự điền thứ khi chọn ngày — dùng UTC để tránh lệch múi giờ
 function autoThu(){
   const v=D.fNgay.value;
   if(v&&isValidDate(v)){
@@ -1225,7 +1248,6 @@ function autoThu(){
     D.fThu.value=THU[dow];
   }
 }
-
 function closeLich(skipFormClosed){
   D.lichOv.classList.remove('open');
   if(!skipFormClosed)onFormClosed();
@@ -1533,7 +1555,7 @@ function onFormClosed(){
 // ════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════
-initDOM();updHdr();
+initDOM();updHdr();updateStickyTop();
 (async()=>{
   await load();
   _lastHash=hashData(allD);
