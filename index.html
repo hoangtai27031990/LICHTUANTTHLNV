@@ -21,14 +21,7 @@
   --safe-l:env(safe-area-inset-left,0px);
   --safe-r:env(safe-area-inset-right,0px);
 }
-@media(prefers-color-scheme:dark){
-  :root{
-    --p:#4a8ec2;--p-light:#5fa0d4;--p-pale:#1a2d40;
-    --acc:#f06470;--suc:#3bbf84;--warn:#fbbf24;--bg:#0f1923;
-    --card:#172130;--txt:#e8edf4;--muted:#7a8fa8;
-    --bdr:#253447;--bdr2:#2e4060;
-  }
-}
+/* dark mode handled by JS time-based logic */
 html{height:100%;overflow-x:hidden}
 body{
   font-family:'Be Vietnam Pro',sans-serif;
@@ -302,7 +295,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
   padding:5px 9px;min-width:44px;flex-shrink:0;text-align:center;
   line-height:1;
 }
-@media(prefers-color-scheme:dark){.mcard-datebox{color:#fff}}
+
 .mcard-datebox-d{font-size:22px;font-weight:700}
 .mcard-datebox-m{font-size:9.5px;opacity:.8;margin-top:2px}
 .mcard-hdr-mid{flex:1;min-width:0}
@@ -331,7 +324,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
   font-size:16px;font-weight:600;color:#1a4f7a;
   line-height:1.45;margin-bottom:9px;
 }
-@media(prefers-color-scheme:dark){.mcard-title{color:#7ab8e8}}
+
 .mcard-meta{display:flex;flex-direction:column;gap:6px}
 .mcard-row{
   display:flex;align-items:flex-start;gap:8px;
@@ -1858,12 +1851,13 @@ function applyDark(){
   if(btn)btn.textContent=_darkMode==='on'?'☀️':'🌙';
 }
 function toggleDark(){
-  const sys=window.matchMedia('(prefers-color-scheme:dark)').matches;
   if(_darkMode===null||_darkMode===undefined){
-    _darkMode=sys?'off':'on';
+    // Đang auto theo giờ → buộc ngược lại
+    _darkMode=isNightTime()?'off':'on';
   }else if(_darkMode==='on'){
     _darkMode='off';
   }else{
+    // 'off' → về auto
     _darkMode=null;
     localStorage.removeItem('darkMode');
     applyDark();return;
