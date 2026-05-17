@@ -1656,8 +1656,7 @@ function autoThu(){
 function closeLich(skipFormClosed){
   if(!skipFormClosed && formHasData()){
     showDiscardDialog(()=>{
-      D.lichOv.classList.remove('open');
-      onFormClosed();
+      resetForm();
     });
     return;
   }
