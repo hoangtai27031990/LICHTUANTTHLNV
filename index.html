@@ -303,7 +303,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .mcard-time-pill{
   display:inline-flex;align-items:center;
   background:var(--p-pale);color:var(--p);
-  border-radius:6px;padding:3px 10px;font-size:14px;font-weight:600;
+  border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;
 }
 .mcard-time-pill.all{background:#fef3c7;color:#92400e}
 .mcard-hdr-acts{display:flex;gap:5px;flex-shrink:0}
@@ -746,15 +746,12 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 @supports(height:100dvh){
   .sheet{max-height:calc(88dvh - var(--safe-top))}
 }
-/* ── QUICK CHIPS (form suggestions) ── */
-.qchips{
-  display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;
-}
+/* ── QUICK CHIPS (gợi ý nhập liệu) ── */
+.qchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .qchip{
-  border:1px solid var(--bdr2);background:var(--bg);
-  color:var(--p);border-radius:20px;padding:3px 10px;
-  font-size:11.5px;font-weight:500;cursor:pointer;
-  font-family:'Be Vietnam Pro',sans-serif;
+  border:1px solid var(--bdr2);background:var(--bg);color:var(--p);
+  border-radius:20px;padding:3px 10px;font-size:11.5px;font-weight:500;
+  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
   touch-action:manipulation;-webkit-appearance:none;
   transition:all .12s;white-space:nowrap;
 }
@@ -932,6 +929,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
         <div class="qchips">
           <button type="button" class="qchip" onclick="setQuickDate(0)">Hôm nay</button>
           <button type="button" class="qchip" onclick="setQuickDate(1)">Ngày mai</button>
+          <button type="button" class="qchip" onclick="setQuickDate(3)">Thứ Tư</button>
           <button type="button" class="qchip" onclick="setQuickDate(7)">Tuần sau</button>
         </div>
       </div>
@@ -939,8 +937,8 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
     </div>
     <div class="fg">
       <label class="fl">Thời gian</label>
-      <input class="fi" type="text" id="fTg" placeholder="VD: 9:00 - 11:00 hoặc Cả ngày" maxlength="50">
-      <div class="qchips">
+      <input class="fi" type="text" id="fTg" placeholder="VD: 9:00 - 11:00 hoặc Cả ngày" maxlength="50" oninput="syncTgChips()">
+      <div class="qchips" id="tgChips">
         <button type="button" class="qchip" onclick="setTg('Cả ngày')">Cả ngày</button>
         <button type="button" class="qchip" onclick="setTg('08:00 - 12:00')">08:00–12:00</button>
         <button type="button" class="qchip" onclick="setTg('09:00 - 10:00')">09:00–10:00</button>
@@ -951,10 +949,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
     <div class="fg"><label class="fl">Nội dung công việc</label><input class="fi" type="text" id="fNd" placeholder="Mô tả nội dung công việc" maxlength="200"></div>
     <div class="fg"><label class="fl">Địa điểm</label><input class="fi" type="text" id="fDd" placeholder="VD: Hội trường A, Văn phòng..." maxlength="100"></div>
     <div class="fr">
-      <div class="fg">
-        <label class="fl">Chủ trì</label>
-        <input class="fi" type="text" id="fCt" placeholder="Tên người chủ trì" maxlength="100">
-      </div>
+      <div class="fg"><label class="fl">Chủ trì</label><input class="fi" type="text" id="fCt" placeholder="Tên người chủ trì" maxlength="100"></div>
       <div class="fg"><label class="fl">Thành phần dự</label><input class="fi" type="text" id="fTp" placeholder="Danh sách tham dự" maxlength="200"></div>
     </div>
     <div class="mf">
@@ -1567,50 +1562,11 @@ function resetForm(){
   D.saveBtn.disabled=false;D.saveBtn.textContent='💾 Lưu lịch';
   syncTgChips();
 }
-
-// ── QUICK DATE CHIPS ──
-function setQuickDate(daysOffset){
-  const d=new Date(Date.now()+7*3600*1000+(daysOffset)*86400000);
-  const y=d.getUTCFullYear();
-  const m=String(d.getUTCMonth()+1).padStart(2,'0');
-  const day=String(d.getUTCDate()).padStart(2,'0');
-  D.fNgay.value=`${y}-${m}-${day}`;
-  autoThu();
-}
-
-// ── QUICK TIME CHIPS ──
-function setTg(val){
-  D.fTg.value=val;
-  syncTgChips();
-}
-function syncTgChips(){
-  const v=D.fTg.value;
-  document.querySelectorAll('#lichOv .fg:nth-child(3) .qchip').forEach(c=>{
-    const target=c.getAttribute('onclick').match(/setTg\('(.+?)'\)/);
-    c.classList.toggle('on', target&&target[1]===v);
-  });
-}
-
-// ── SUGGESTIONS (chủ trì từ lịch sử) ──
-function buildSuggestions(){
-  const ctCount={};
-  allD.forEach(r=>{
-    if(r.chutri){ctCount[r.chutri]=(ctCount[r.chutri]||0)+1}
-  });
-  const ctList=document.getElementById('ctList');
-  if(ctList){
-    const topCt=Object.entries(ctCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
-    ctList.innerHTML=topCt.map(([v])=>`<option value="${esc(v)}">`).join('');
-  }
-}
-
-
 function openAdd(){
   if(!cu)return;
   edId=null;_editOpenedAt=0;
   D.mtitle.textContent='➕ Thêm lịch mới';
   resetForm();
-  buildSuggestions();
   D.lichOv.classList.add('open');
   setTimeout(()=>{const s=D.lichOv.querySelector('.sheet');if(s)s.scrollTop=0},100);
 }
@@ -1625,7 +1581,7 @@ function openEdit(id){
   D.fDd.value=r.diadiem||'';D.fCt.value=r.chutri||'';
   D.fTp.value=r.thanhphan||'';
   D.saveBtn.disabled=false;D.saveBtn.textContent='💾 Lưu lịch';
-  buildSuggestions();syncTgChips();
+  syncTgChips();
   D.lichOv.classList.add('open');
   setTimeout(()=>{const s=D.lichOv.querySelector('.sheet');if(s)s.scrollTop=0},100);
 }
@@ -2128,6 +2084,34 @@ chW=function(d){
 // ════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════
+
+// ── QUICK DATE CHIPS ──
+function setQuickDate(daysOffset){
+  // Chip "Thứ Tư": tìm thứ 4 gần nhất trong tuần hiện tại hoặc tuần sau
+  if(daysOffset===3){
+    const now=nowVN();
+    const dow=now.getUTCDay();// 0=CN,1=T2,...,3=T4
+    const diff=dow<=3?(3-dow):(10-dow);// ngày còn đến thứ 4 tiếp
+    daysOffset=diff===0?7:diff;// nếu hôm nay đúng thứ 4, lấy tuần sau
+  }
+  const ms=Date.now()+7*3600*1000+daysOffset*86400000;
+  const d=new Date(ms);
+  D.fNgay.value=`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+  autoThu();
+}
+
+// ── QUICK TIME CHIPS ──
+function setTg(val){
+  D.fTg.value=val;
+  syncTgChips();
+}
+function syncTgChips(){
+  const v=D.fTg.value;
+  document.querySelectorAll('#tgChips .qchip').forEach(c=>{
+    const m=c.getAttribute('onclick').match(/setTg\('(.+?)'\)/);
+    c.classList.toggle('on',!!m&&m[1]===v);
+  });
+}
 initDOM();applyDark();updHdr();updateStickyTop();
 if(!navigator.onLine)setOfflineBanner(true);
 (async()=>{
