@@ -1593,23 +1593,16 @@ async function parseAI(){
   _aiParsed=null;
 
   try{
-    const response=await fetch(CLAUDE_API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:buildAIPrompt(text)}]
-      })
+    const data=await apiFetch({
+      action:'aiParse',
+      prompt:buildAIPrompt(text)
     });
 
-    if(!response.ok){
-      const errData=await response.json().catch(()=>({}));
-      throw new Error(errData.error?.message||`HTTP ${response.status}`);
+    if(data.error){
+      throw new Error(data.error);
     }
 
-    const data=await response.json();
-    const rawText=data.content?.map(c=>c.text||'').join('')||'';
+    const rawText=data.result||'';
 
     // Parse JSON từ response
     let parsed;
