@@ -1086,6 +1086,26 @@ async function apiFetch(params,retries=MAX_RETRY){
     }
   }
 }
+async function apiFetchPost(params,retries=MAX_RETRY){
+  for(let i=0;i<=retries;i++){
+    try{
+      const ctrl=new AbortController();
+      const tid=setTimeout(()=>ctrl.abort(),30_000);
+      const res=await fetch(API,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(params),
+        signal:ctrl.signal
+      });
+      clearTimeout(tid);
+      if(!res.ok)throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }catch(e){
+      if(i===retries)throw e;
+      await new Promise(r=>setTimeout(r,1000*(i+1)));
+    }
+  }
+}
 
 // ════════════════════════════════════════════════════════
 //  WEEK HELPERS
@@ -1593,13 +1613,16 @@ async function parseAI(){
   _aiParsed=null;
 
   try{
-    const data=await apiFetch({
+    const data=await apiFetchPost({
       action:'aiParse',
       prompt:buildAIPrompt(text)
     });
 
     if(data.error){
-      throw new Error(data.error);
+      throw new Error('Lỗi server: '+data.error);
+    }
+    if(!data.result && data.result!==''){
+      throw new Error('Apps Script chưa có action aiParse — vui lòng cập nhật code Apps Script.');
     }
 
     const rawText=data.result||'';
