@@ -343,18 +343,47 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 
 /* ── PIN ── */
 .pin-row{display:flex;gap:10px;justify-content:center;margin:14px 0 6px}
-.pin-i{
-  width:60px;height:64px;
-  border:1.5px solid var(--bdr);border-radius:10px;
-  text-align:center;font-size:22px;font-weight:600;
-  outline:none;font-family:'Be Vietnam Pro',sans-serif;
-  color:var(--txt);background:#f8fafd;
-  -webkit-appearance:none;appearance:none;
-  touch-action:manipulation;
-  transition:border-color .2s;
+/* Wrapper mỗi ô PIN */
+.pin-cell{
+  position:relative;width:60px;height:64px;flex-shrink:0;
 }
-.pin-i:focus{border-color:var(--p);background:#fff}
-.pin-i:disabled{background:#f0f2f6;opacity:.5;cursor:not-allowed}
+/* Input thực: trong suốt hoàn toàn, phủ toàn ô để bắt touch/keyboard */
+.pin-i{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;z-index:2;
+  border:none;outline:none;background:none;
+  font-size:16px;
+  -webkit-appearance:none;appearance:none;
+  touch-action:manipulation;cursor:pointer;
+  caret-color:transparent;
+  /* QUAN TRỌNG: type=tel tránh "peek" của OS, không dùng type=password */
+}
+/* Ô hiển thị (border + dot/dash) */
+.pin-display{
+  position:absolute;inset:0;
+  border:1.5px solid var(--bdr);border-radius:10px;
+  background:#f8fafd;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .15s,background .15s;
+  pointer-events:none;
+}
+.pin-cell:focus-within .pin-display{border-color:var(--p);background:#fff}
+.pin-cell.disabled .pin-display{background:#f0f2f6;opacity:.5}
+/* Chấm tròn — hiện NGAY khi filled, không delay */
+.pin-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--p);
+  display:none;
+  transform:scale(0);
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1);
+}
+.pin-cell.filled .pin-dot{display:block;transform:scale(1)}
+/* Gạch ngang khi chưa nhập */
+.pin-dash{
+  width:20px;height:2px;background:var(--bdr2);border-radius:1px;
+  display:block;
+}
+.pin-cell.filled .pin-dash{display:none}
 .pin-err{color:var(--acc);font-size:12px;text-align:center;min-height:18px;margin-bottom:6px}
 .locked-box{
   background:#feecec;border:1px solid #fca5a5;border-radius:10px;
@@ -675,10 +704,26 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
     <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:4px;">Nhập PIN 4 chữ số để đăng nhập chỉnh sửa</p>
     <div id="pinInputArea">
       <div class="pin-row">
-        <input class="pin-i" maxlength="1" type="password" id="p1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" oninput="pnxt(this,'p2')" onkeydown="pinKey(event,null,'p1')">
-        <input class="pin-i" maxlength="1" type="password" id="p2" inputmode="numeric" pattern="[0-9]*" oninput="pnxt(this,'p3')" onkeydown="pinKey(event,'p1','p2')">
-        <input class="pin-i" maxlength="1" type="password" id="p3" inputmode="numeric" pattern="[0-9]*" oninput="pnxt(this,'p4')" onkeydown="pinKey(event,'p2','p3')">
-        <input class="pin-i" maxlength="1" type="password" id="p4" inputmode="numeric" pattern="[0-9]*" oninput="pnxt(this,null)" onkeydown="pinKey(event,'p3','p4')">
+        <div class="pin-cell" id="pc1">
+          <input class="pin-i" id="p1" type="tel" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+            oninput="pnxt(this,'p2')" onkeydown="pinKey(event,null,'p1')" onfocus="pcFocus(1)">
+          <div class="pin-display"><span class="pin-dot"></span><span class="pin-dash"></span></div>
+        </div>
+        <div class="pin-cell" id="pc2">
+          <input class="pin-i" id="p2" type="tel" inputmode="numeric" maxlength="1"
+            oninput="pnxt(this,'p3')" onkeydown="pinKey(event,'p1','p2')" onfocus="pcFocus(2)">
+          <div class="pin-display"><span class="pin-dot"></span><span class="pin-dash"></span></div>
+        </div>
+        <div class="pin-cell" id="pc3">
+          <input class="pin-i" id="p3" type="tel" inputmode="numeric" maxlength="1"
+            oninput="pnxt(this,'p4')" onkeydown="pinKey(event,'p2','p3')" onfocus="pcFocus(3)">
+          <div class="pin-display"><span class="pin-dot"></span><span class="pin-dash"></span></div>
+        </div>
+        <div class="pin-cell" id="pc4">
+          <input class="pin-i" id="p4" type="tel" inputmode="numeric" maxlength="1"
+            oninput="pnxt(this,null)" onkeydown="pinKey(event,'p3','p4')" onfocus="pcFocus(4)">
+          <div class="pin-display"><span class="pin-dot"></span><span class="pin-dash"></span></div>
+        </div>
       </div>
       <div class="pin-err" id="perr"></div>
     </div>
@@ -1133,7 +1178,36 @@ async function conflictReload(){
 
 // ════════════════════════════════════════════════════════
 //  PIN / LOGIN
+//  Kỹ thuật: input type="tel" opacity:0 phủ lên ô hiển thị
+//  → OS không bao giờ "peek" số vì không render ký tự nào
+//  → Dot hiện NGAY trong oninput, không có delay
 // ════════════════════════════════════════════════════════
+function _pcEl(n){return document.getElementById('pc'+n)}
+function _pinSetFilled(idx,filled){
+  const cell=_pcEl(idx);
+  if(cell)cell.classList.toggle('filled',filled);
+}
+function _pinClearAll(){
+  [1,2,3,4].forEach(i=>{
+    const el=D['p'+i];if(el)el.value='';
+    _pinSetFilled(i,false);
+  });
+}
+function _pinSetDisabled(disabled){
+  [1,2,3,4].forEach(i=>{
+    const el=D['p'+i];if(!el)return;
+    el.disabled=disabled;
+    const cell=_pcEl(i);
+    if(cell)cell.classList.toggle('disabled',disabled);
+  });
+}
+function pcFocus(idx){
+  // Khi focus ô nào đó, đảm bảo chỉ focus ô hiện tại hợp lệ
+  // (tránh nhảy cóc khi tap ô sau khi chưa điền ô trước)
+  for(let i=1;i<=4;i++){
+    if(!D['p'+i].value&&i<idx){D['p'+i].focus();return}
+  }
+}
 function openPin(){
   resetPinUI();
   D.pinOv.classList.add('open');
@@ -1141,14 +1215,15 @@ function openPin(){
 }
 function closePin(){D.pinOv.classList.remove('open')}
 function resetPinUI(){
-  [D.p1,D.p2,D.p3,D.p4].forEach(el=>{el.value='';el.disabled=false});
+  _pinClearAll();
+  _pinSetDisabled(false);
   D.perr.textContent='';
   D.pinInputArea.classList.remove('hidden');
   D.lockedBox.classList.add('hidden');
   D.pinBtn.disabled=false;D.pinBtn.textContent='Xác nhận';
 }
 function showLockedUI(msg){
-  [D.p1,D.p2,D.p3,D.p4].forEach(el=>el.disabled=true);
+  _pinSetDisabled(true);
   D.perr.textContent='';
   D.pinInputArea.classList.add('hidden');
   D.lockedMsg.innerHTML=esc(msg)||'Bạn đã nhập sai PIN quá nhiều lần.<br>Vui lòng liên hệ Admin để được mở khóa.';
@@ -1156,12 +1231,28 @@ function showLockedUI(msg){
   D.pinBtn.disabled=true;D.pinBtn.textContent='Bị khóa';
 }
 function pnxt(el,nxt){
-  el.value=el.value.replace(/\D/g,'');
-  if(el.value.length>=1&&nxt)D[nxt].focus();
+  // Chỉ giữ chữ số, loại bỏ mọi ký tự khác
+  el.value=el.value.replace(/\D/g,'').slice(0,1);
+  // Cập nhật dot NGAY LẬP TỨC — không có delay
+  const idx=parseInt(el.id.replace('p',''));
+  _pinSetFilled(idx, el.value.length>0);
+  if(el.value.length>=1&&nxt){D[nxt].focus()}
   if(!nxt&&el.value.length>=1){clearTimeout(pinTimer);pinTimer=setTimeout(verPin,150)}
 }
 function pinKey(e,prevId,curId){
-  if(e.key==='Backspace'&&e.target.value===''&&prevId)D[prevId].focus();
+  if(e.key==='Backspace'){
+    const el=e.target;
+    if(el.value!==''){
+      // Xóa ký tự hiện tại → ẩn dot ngay
+      el.value='';
+      const idx=parseInt(el.id.replace('p',''));
+      _pinSetFilled(idx,false);
+      e.preventDefault();
+    }else if(prevId){
+      // Ô trống → lùi về ô trước
+      D[prevId].focus();
+    }
+  }
 }
 async function verPin(){
   if(D.pinBtn.disabled)return;
@@ -1185,7 +1276,7 @@ async function verPin(){
     }else{
       const remain=d.remaining??'?';
       D.perr.textContent=`❌ PIN không đúng. Còn ${remain} lần thử.`;
-      [D.p1,D.p2,D.p3,D.p4].forEach(el=>el.value='');
+      _pinClearAll();
       D.p1.focus();
       D.pinBtn.disabled=false;D.pinBtn.textContent='Xác nhận';
     }
