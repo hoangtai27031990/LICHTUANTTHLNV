@@ -1837,25 +1837,43 @@ function onFormClosed(){
 }
 
 // ════════════════════════════════════════════════════════
-//  1. DARK MODE
+//  1. DARK MODE (tự động theo giờ: 18:00–06:00 = tối)
 // ════════════════════════════════════════════════════════
-let _darkMode=localStorage.getItem('darkMode');
-// null = follow system, 'on' = force dark, 'off' = force light
+// _darkMode: null = tự động theo giờ, 'on' = buộc tối, 'off' = buộc sáng
+let _darkMode=localStorage.getItem('darkMode');// null nếu chưa có
+
+function isNightTime(){
+  // Dùng giờ VN (UTC+7)
+  const vn=nowVN();
+  const h=vn.getUTCHours();
+  return h>=18||h<6;// 18:00–05:59 là ban đêm
+}
+
 function applyDark(){
   const html=document.documentElement;
-  if(_darkMode==='on')html.setAttribute('data-theme','dark');
-  else if(_darkMode==='off')html.removeAttribute('data-theme');
+  let isDark;
+  if(_darkMode==='on')isDark=true;
+  else if(_darkMode==='off')isDark=false;
+  else isDark=isNightTime();// auto theo giờ
+  if(isDark)html.setAttribute('data-theme','dark');
   else html.removeAttribute('data-theme');
   const btn=$('btnDark');
-  if(btn)btn.textContent=_darkMode==='on'?'☀️':'🌙';
+  if(btn){
+    if(_darkMode===null||_darkMode===undefined)
+      btn.textContent=isDark?'🌙':'☀️';// icon hiện tại, click sẽ buộc ngược lại
+    else
+      btn.textContent=_darkMode==='on'?'☀️':'🌙';
+  }
 }
+
 function toggleDark(){
-  const sys=window.matchMedia('(prefers-color-scheme:dark)').matches;
   if(_darkMode===null||_darkMode===undefined){
-    _darkMode=sys?'off':'on';
+    // Đang auto → buộc ngược với trạng thái hiện tại
+    _darkMode=isNightTime()?'off':'on';
   }else if(_darkMode==='on'){
     _darkMode='off';
   }else{
+    // 'off' → về lại auto
     _darkMode=null;
     localStorage.removeItem('darkMode');
     applyDark();return;
@@ -1863,6 +1881,11 @@ function toggleDark(){
   localStorage.setItem('darkMode',_darkMode);
   applyDark();
 }
+
+// Kiểm tra mỗi phút để tự chuyển khi đến giờ (chỉ khi đang ở chế độ auto)
+let _darkTimer=setInterval(()=>{
+  if(_darkMode===null||_darkMode===undefined)applyDark();
+},60000);
 // Inject forced dark/light via data-theme attribute
 const _dmStyle=document.createElement('style');
 _dmStyle.textContent=`
