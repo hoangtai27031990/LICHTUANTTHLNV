@@ -21,6 +21,14 @@
   --safe-l:env(safe-area-inset-left,0px);
   --safe-r:env(safe-area-inset-right,0px);
 }
+@media(prefers-color-scheme:dark){
+  :root{
+    --p:#4a8ec2;--p-light:#5fa0d4;--p-pale:#1a2d40;
+    --acc:#f06470;--suc:#3bbf84;--warn:#fbbf24;--bg:#0f1923;
+    --card:#172130;--txt:#e8edf4;--muted:#7a8fa8;
+    --bdr:#253447;--bdr2:#2e4060;
+  }
+}
 html{height:100%;overflow-x:hidden}
 body{
   font-family:'Be Vietnam Pro',sans-serif;
@@ -109,6 +117,27 @@ body{
   transition:all .15s;white-space:nowrap;
 }
 .vtab.on{background:rgba(255,255,255,.92);color:var(--p)}
+/* ── DAY FILTER CHIPS ── */
+.day-chips{
+  display:none;/* ẩn trên desktop */
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;gap:6px;padding:6px 0 2px;
+  -ms-overflow-style:none;
+}
+.day-chips::-webkit-scrollbar{display:none}
+.day-chip{
+  flex-shrink:0;border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);
+  border-radius:20px;padding:4px 11px;font-size:11.5px;font-weight:500;
+  cursor:pointer;touch-action:manipulation;-webkit-appearance:none;
+  font-family:'Be Vietnam Pro',sans-serif;white-space:nowrap;
+  transition:all .15s;
+}
+.day-chip.on{background:rgba(255,255,255,.92);color:var(--p);border-color:transparent}
+.day-chip.has-event::after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#4ade80;margin-left:5px;vertical-align:2px}
+@media(max-width:768px){
+  .day-chips{display:flex}
+}
 
 /* ── MAIN ── */
 .main{
@@ -227,8 +256,8 @@ thead th{
 }
 tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
-tbody tr:nth-child(even){background:#f6f8fc}
-@media(hover:hover){tbody tr:hover{background:#edf3fc}}
+tbody tr:nth-child(even){background:var(--bg)}
+@media(hover:hover){tbody tr:hover{background:var(--p-pale)}}
 tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .td-date{font-weight:600;color:var(--p);white-space:nowrap}
 .td-day{font-size:11px;color:var(--muted);white-space:nowrap}
@@ -264,7 +293,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .mcard-hdr{
   display:flex;align-items:center;gap:10px;
   padding:10px 12px;
-  background:#f4f7fb;
+  background:var(--bg);
   border-bottom:1px solid var(--bdr);
 }
 .mcard-datebox{
@@ -273,10 +302,11 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
   padding:5px 9px;min-width:44px;flex-shrink:0;text-align:center;
   line-height:1;
 }
+@media(prefers-color-scheme:dark){.mcard-datebox{color:#fff}}
 .mcard-datebox-d{font-size:22px;font-weight:700}
 .mcard-datebox-m{font-size:9.5px;opacity:.8;margin-top:2px}
 .mcard-hdr-mid{flex:1;min-width:0}
-.mcard-thu{font-size:12.5px;font-weight:700;color:var(--p);margin-bottom:4px}
+.mcard-thu{font-size:12.5px;font-weight:700;color:var(--p-light);margin-bottom:4px}
 .mcard-time-pill{
   display:inline-flex;align-items:center;
   background:var(--p-pale);color:var(--p);
@@ -301,6 +331,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
   font-size:16px;font-weight:600;color:#1a4f7a;
   line-height:1.45;margin-bottom:9px;
 }
+@media(prefers-color-scheme:dark){.mcard-title{color:#7ab8e8}}
 .mcard-meta{display:flex;flex-direction:column;gap:6px}
 .mcard-row{
   display:flex;align-items:flex-start;gap:8px;
@@ -542,7 +573,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 }
 .toast-item{
   width:100%;display:flex;align-items:flex-start;gap:10px;
-  background:#fff;border-radius:12px;padding:12px 14px;
+  background:var(--card);border-radius:12px;padding:12px 14px;
   box-shadow:0 4px 20px rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.06);
   pointer-events:all;position:relative;overflow:hidden;
   animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
@@ -562,10 +593,10 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   flex-shrink:0;width:32px;height:32px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;font-size:15px;
 }
-.toast-item.ok .t-icon{background:#e8f5ee}
-.toast-item.err .t-icon{background:#feecec}
-.toast-item.warn .t-icon{background:#fef3c7}
-.toast-item.info .t-icon{background:var(--p-pale)}
+.toast-item.ok .t-icon{background:var(--card);border:1px solid var(--bdr)}
+.toast-item.err .t-icon{background:var(--card);border:1px solid var(--bdr)}
+.toast-item.warn .t-icon{background:var(--card);border:1px solid var(--bdr)}
+.toast-item.info .t-icon{background:var(--card);border:1px solid var(--bdr)}
 .t-body{flex:1;min-width:0}
 .t-title{font-size:13px;font-weight:600;color:var(--txt);line-height:1.3}
 .t-msg{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
@@ -616,6 +647,24 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   padding:8px 12px;font-size:12px;color:#92400e;margin-bottom:8px;display:none;
 }
 .rl-warn.show{display:block}
+/* ── PULL TO REFRESH ── */
+.ptr-bar{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  height:0;overflow:hidden;
+  background:var(--p-pale);color:var(--p);font-size:12px;font-weight:500;
+  transition:height .2s ease;
+  border-radius:0 0 10px 10px;
+  position:sticky;top:0;z-index:48;
+}
+.ptr-bar.show{height:44px}
+.ptr-spin{
+  width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--p);
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+.ptr-arrow{
+  font-size:18px;transition:transform .2s ease;display:inline-block;
+}
+.ptr-arrow.flip{transform:rotate(180deg)}
 
 .hidden{display:none!important}
 
@@ -694,6 +743,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
       <button id="btnAdm" class="hbtn hidden" onclick="openUsers()">👥 <span>Người dùng</span></button>
       <button id="btnLogin" class="hbtn" onclick="openPin()">🔐 <span>Đăng nhập</span></button>
       <button id="btnOut" class="hbtn hidden" onclick="logout()" title="Đăng xuất">🚪</button>
+      <button id="btnDark" class="hbtn" onclick="toggleDark()" title="Chế độ tối">🌙</button>
     </div>
   </div>
 </div>
@@ -717,10 +767,21 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
       <button class="vtab" onclick="setView('cal')">📅 Lịch</button>
     </div>
   </div>
+  <!-- DAY FILTER CHIPS (mobile only) -->
+  <div id="dayChips" class="day-chips"></div>
 </div>
 
+<!-- PTR BAR -->
+<div class="ptr-bar" id="ptrBar"><span class="ptr-arrow" id="ptrArrow">↓</span><span id="ptrTxt">Kéo xuống để làm mới</span></div>
+
 <!-- MAIN -->
-<div class="main">
+<div class="main" id="mainArea">
+  <!-- OFFLINE BANNER -->
+  <div id="offlineBanner" style="display:none;align-items:center;gap:8px;background:#1e293b;color:#e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12.5px;font-weight:500;">
+    <span>📡</span>
+    <span style="flex:1">Đang offline — hiển thị dữ liệu đã lưu</span>
+    <span id="offlineTime" style="opacity:.6;font-size:11px;white-space:nowrap"></span>
+  </div>
   <div class="rl-warn" id="rlWarn">⚠️ Bạn thao tác quá nhanh, vui lòng chờ một chút...</div>
 
   <!-- TABLE VIEW -->
@@ -1776,14 +1837,184 @@ function onFormClosed(){
 }
 
 // ════════════════════════════════════════════════════════
+//  1. DARK MODE
+// ════════════════════════════════════════════════════════
+let _darkMode=localStorage.getItem('darkMode');
+// null = follow system, 'on' = force dark, 'off' = force light
+function applyDark(){
+  const html=document.documentElement;
+  if(_darkMode==='on')html.setAttribute('data-theme','dark');
+  else if(_darkMode==='off')html.removeAttribute('data-theme');
+  else html.removeAttribute('data-theme');
+  const btn=$('btnDark');
+  if(btn)btn.textContent=_darkMode==='on'?'☀️':'🌙';
+}
+function toggleDark(){
+  const sys=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  if(_darkMode===null||_darkMode===undefined){
+    _darkMode=sys?'off':'on';
+  }else if(_darkMode==='on'){
+    _darkMode='off';
+  }else{
+    _darkMode=null;
+    localStorage.removeItem('darkMode');
+    applyDark();return;
+  }
+  localStorage.setItem('darkMode',_darkMode);
+  applyDark();
+}
+// Inject forced dark/light via data-theme attribute
+const _dmStyle=document.createElement('style');
+_dmStyle.textContent=`
+[data-theme="dark"]{
+  --p:#4a8ec2!important;--p-light:#5fa0d4!important;--p-pale:#1a2d40!important;
+  --acc:#f06470!important;--suc:#3bbf84!important;--warn:#fbbf24!important;--bg:#0f1923!important;
+  --card:#172130!important;--txt:#e8edf4!important;--muted:#7a8fa8!important;
+  --bdr:#253447!important;--bdr2:#2e4060!important;
+}
+[data-theme="dark"] .mcard-title{color:#7ab8e8!important}
+[data-theme="dark"] .mcard-hdr{background:#0f1923!important}
+[data-theme="dark"] .hdr,[data-theme="dark"] .week-tabbar{background:#0d2035!important}
+[data-theme="dark"] .bottom-bar{background:#172130!important;border-top-color:#253447!important}
+[data-theme="dark"] .t-title{color:#e8edf4!important}
+[data-theme="dark"] tbody tr:nth-child(even){background:#131f2e!important}
+`;
+document.head.appendChild(_dmStyle);
+
+// ════════════════════════════════════════════════════════
+//  2. PULL TO REFRESH
+// ════════════════════════════════════════════════════════
+(function(){
+  const THRESHOLD=65,main=$('mainArea');
+  if(!main||!('ontouchstart' in window))return;
+  let startY=0,curY=0,pulling=false,refreshing=false;
+  const bar=$('ptrBar'),arrow=$('ptrArrow'),txt=$('ptrTxt');
+  main.addEventListener('touchstart',e=>{
+    if(main.scrollTop>0||refreshing)return;
+    startY=e.touches[0].clientY;pulling=true;
+  },{passive:true});
+  main.addEventListener('touchmove',e=>{
+    if(!pulling||refreshing)return;
+    curY=e.touches[0].clientY;
+    const dy=curY-startY;
+    if(dy<0){pulling=false;return}
+    const ratio=Math.min(dy/THRESHOLD,1);
+    bar.classList.toggle('show',dy>20);
+    if(arrow)arrow.classList.toggle('flip',dy>=THRESHOLD);
+    if(txt)txt.textContent=dy>=THRESHOLD?'Thả để làm mới':'Kéo xuống để làm mới';
+  },{passive:true});
+  main.addEventListener('touchend',async()=>{
+    if(!pulling||refreshing)return;
+    pulling=false;
+    const dy=curY-startY;
+    if(dy>=THRESHOLD){
+      refreshing=true;
+      bar.classList.add('show');
+      if(arrow)arrow.className='ptr-bar';
+      const sp=document.createElement('span');sp.className='ptr-spin';
+      if(bar.firstChild)bar.insertBefore(sp,bar.firstChild);
+      if(txt)txt.textContent='Đang làm mới...';
+      await syncNow();
+      refreshing=false;sp.remove();
+    }
+    bar.classList.remove('show');
+    if(arrow){arrow.className='ptr-arrow';arrow.classList.remove('flip');}
+    if(txt)txt.textContent='Kéo xuống để làm mới';
+    startY=0;curY=0;
+  },{passive:true});
+})();
+
+// ════════════════════════════════════════════════════════
+//  3. OFFLINE DETECTION
+// ════════════════════════════════════════════════════════
+let _offlineSince=null;
+function setOfflineBanner(offline){
+  const b=$('offlineBanner'),t=$('offlineTime');
+  if(!b)return;
+  if(offline){
+    if(!_offlineSince)_offlineSince=nowLocal();
+    b.style.display='flex';
+    if(t)t.textContent='Từ '+_offlineSince;
+  }else{
+    b.style.display='none';
+    _offlineSince=null;
+  }
+}
+window.addEventListener('online',()=>setOfflineBanner(false));
+window.addEventListener('offline',()=>setOfflineBanner(true));
+// Cập nhật offline state khi pollData thất bại liên tục
+const _origSetSyncState=setSyncState;
+setSyncState=function(state,label){
+  _origSetSyncState(state,label);
+  if(state==='err')setOfflineBanner(true);
+  else if(state==='ok')setOfflineBanner(false);
+};
+
+// ════════════════════════════════════════════════════════
+//  4. DAY FILTER CHIPS
+// ════════════════════════════════════════════════════════
+const THU_SHORT=['CN','T2','T3','T4','T5','T6','T7'];
+let _dayFilter=null;// null = hiện tất cả
+
+function buildDayChips(){
+  const el=$('dayChips');if(!el)return;
+  const days=wkDays(wOff);
+  const today=todayVN();
+  // Đếm sự kiện theo ngày
+  const wdata=wkData();
+  const cntMap={};
+  wdata.forEach(r=>{if(r.ngay)cntMap[r.ngay]=(cntMap[r.ngay]||0)+1;});
+  // Chip "Tất cả"
+  let html=`<button class="day-chip${_dayFilter===null?' on':''}" data-day="all">Tất cả</button>`;
+  days.forEach(d=>{
+    const ds=fmt(d);
+    const dow=d.getUTCDay();
+    const isToday=ds===today;
+    const hasCnt=cntMap[ds]>0;
+    const label=`${THU_SHORT[dow]} ${d.getUTCDate()}`;
+    html+=`<button class="day-chip${_dayFilter===ds?' on':''}${hasCnt?' has-event':''}" data-day="${ds}"${isToday?' style="border-color:#4ade80"':''} title="${isToday?'Hôm nay':''}">${label}</button>`;
+  });
+  el.innerHTML=html;
+  el.onclick=e=>{
+    const b=e.target.closest('.day-chip');if(!b)return;
+    _dayFilter=b.dataset.day==='all'?null:b.dataset.day;
+    buildDayChips();renderT();
+  };
+}
+
+// Patch wkData để áp dụng filter
+const _origWkData=wkData;
+wkData=function(){
+  const data=_origWkData();
+  if(!_dayFilter)return data;
+  return data.filter(r=>r.ngay===_dayFilter);
+};
+
+// Patch render để rebuild chips khi đổi tuần / data
+const _origRender=render;
+render=function(){
+  _origRender();
+  buildDayChips();
+};
+
+// Patch chW để reset filter khi đổi tuần
+const _origChW=chW;
+chW=function(d){
+  _dayFilter=null;
+  _origChW(d);
+};
+
+// ════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════
-initDOM();updHdr();updateStickyTop();
+initDOM();applyDark();updHdr();updateStickyTop();
+if(!navigator.onLine)setOfflineBanner(true);
 (async()=>{
   await load();
   _lastHash=hashData(allD);
   setSyncState('ok',fmtSyncTime());
   schedulePoll();
+  buildDayChips();
 })();
 </script>
 </body>
