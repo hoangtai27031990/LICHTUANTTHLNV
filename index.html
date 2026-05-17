@@ -860,7 +860,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 </div>
 
 <!-- DISCARD CONFIRM DIALOG -->
-<div class="cdlg-ov" id="discardOv">
+<div class="cdlg-ov" id="discardOv" onclick="event.stopPropagation()">
   <div class="cdlg" style="max-width:320px;text-align:center;">
     <div class="cdlg-icon">✏️</div>
     <div class="cdlg-title">Bỏ thay đổi?</div>
@@ -1681,7 +1681,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     closeDiscardDialog();
     if(_discardCallback)_discardCallback();
   };
-  ov.addEventListener('click',e=>{if(e.target===ov)closeDiscardDialog()});
+  ov.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(e.target===ov)closeDiscardDialog();
+  });
 });
 async function saveLich(){
   if(!cu||!cu_pin||D.saveBtn.disabled)return;
