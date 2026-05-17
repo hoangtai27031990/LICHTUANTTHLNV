@@ -859,6 +859,19 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   <button id="fabBtn" class="fab hidden" onclick="openAdd()">＋ Thêm lịch</button>
 </div>
 
+<!-- DISCARD CONFIRM DIALOG -->
+<div class="cdlg-ov" id="discardOv">
+  <div class="cdlg" style="max-width:320px;text-align:center;">
+    <div class="cdlg-icon">✏️</div>
+    <div class="cdlg-title">Bỏ thay đổi?</div>
+    <div class="cdlg-msg">Form đang có dữ liệu chưa lưu.<br>Bỏ qua sẽ mất toàn bộ thông tin đã nhập.</div>
+    <div class="cdlg-btns" style="margin-top:20px;">
+      <button class="mbtn cancel" id="discardCancel">Tiếp tục nhập</button>
+      <button class="mbtn danger" id="discardOk">Bỏ thay đổi</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast-stack"></div>
 
@@ -949,17 +962,11 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
       </div>
     </div>
     <div class="fg"><label class="fl">Nội dung công việc</label><input class="fi" type="text" id="fNd" placeholder="Mô tả nội dung công việc" maxlength="200"></div>
-    <div class="fg">
-      <label class="fl">Địa điểm</label>
-      <input class="fi" type="text" id="fDd" placeholder="VD: Hội trường A, Văn phòng..." maxlength="100" list="ddList" autocomplete="off">
-      <datalist id="ddList"></datalist>
-      <div class="qchips" id="ddChips"></div>
-    </div>
+    <div class="fg"><label class="fl">Địa điểm</label><input class="fi" type="text" id="fDd" placeholder="VD: Hội trường A, Văn phòng..." maxlength="100"></div>
     <div class="fr">
       <div class="fg">
         <label class="fl">Chủ trì</label>
-        <input class="fi" type="text" id="fCt" placeholder="Tên người chủ trì" maxlength="100" list="ctList" autocomplete="off">
-        <datalist id="ctList"></datalist>
+        <input class="fi" type="text" id="fCt" placeholder="Tên người chủ trì" maxlength="100">
       </div>
       <div class="fg"><label class="fl">Thành phần dự</label><input class="fi" type="text" id="fTp" placeholder="Danh sách tham dự" maxlength="200"></div>
     </div>
@@ -1597,41 +1604,17 @@ function syncTgChips(){
   });
 }
 
-// ── LOCATION + CHUTRI SUGGESTIONS từ lịch sử ──
+// ── SUGGESTIONS (chủ trì từ lịch sử) ──
 function buildSuggestions(){
-  // Địa điểm: lấy top 5 hay dùng nhất
-  const ddCount={};
   const ctCount={};
   allD.forEach(r=>{
-    if(r.diadiem){ddCount[r.diadiem]=(ddCount[r.diadiem]||0)+1}
     if(r.chutri){ctCount[r.chutri]=(ctCount[r.chutri]||0)+1}
   });
-  // Datalist cho địa điểm
-  const ddList=document.getElementById('ddList');
-  if(ddList){
-    const topDd=Object.entries(ddCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
-    ddList.innerHTML=topDd.map(([v])=>`<option value="${esc(v)}">`).join('');
-  }
-  // Datalist cho chủ trì
   const ctList=document.getElementById('ctList');
   if(ctList){
     const topCt=Object.entries(ctCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
     ctList.innerHTML=topCt.map(([v])=>`<option value="${esc(v)}">`).join('');
   }
-  // Quick chips địa điểm: top 4
-  const ddChips=document.getElementById('ddChips');
-  if(ddChips){
-    const topDd=Object.entries(ddCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
-    ddChips.innerHTML=topDd.map(([v])=>
-      `<button type="button" class="qchip" onclick="setDd(${JSON.stringify(v)})">${esc(v)}</button>`
-    ).join('');
-  }
-}
-function setDd(val){
-  D.fDd.value=val;
-  document.querySelectorAll('#ddChips .qchip').forEach(c=>{
-    c.classList.toggle('on', c.textContent===val);
-  });
 }
 
 // ── XÁC NHẬN ĐÓNG FORM ──
@@ -1659,12 +1642,6 @@ function openEdit(id){
   D.fTp.value=r.thanhphan||'';
   D.saveBtn.disabled=false;D.saveBtn.textContent='💾 Lưu lịch';
   buildSuggestions();syncTgChips();
-  const curDd=r.diadiem||'';
-  setTimeout(()=>{
-    document.querySelectorAll('#ddChips .qchip').forEach(c=>{
-      c.classList.toggle('on',c.textContent===curDd);
-    });
-  },50);
   D.lichOv.classList.add('open');
   setTimeout(()=>{const s=D.lichOv.querySelector('.sheet');if(s)s.scrollTop=0},100);
 }
@@ -1678,11 +1655,35 @@ function autoThu(){
 }
 function closeLich(skipFormClosed){
   if(!skipFormClosed && formHasData()){
-    if(!confirm('Bỏ các thay đổi chưa lưu?'))return;
+    showDiscardDialog(()=>{
+      D.lichOv.classList.remove('open');
+      onFormClosed();
+    });
+    return;
   }
   D.lichOv.classList.remove('open');
   if(!skipFormClosed)onFormClosed();
 }
+
+// ── DISCARD CONFIRM DIALOG ──
+let _discardCallback=null;
+function showDiscardDialog(onConfirm){
+  _discardCallback=onConfirm;
+  document.getElementById('discardOv').classList.add('open');
+}
+function closeDiscardDialog(){
+  document.getElementById('discardOv').classList.remove('open');
+  _discardCallback=null;
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const ov=document.getElementById('discardOv');
+  document.getElementById('discardCancel').onclick=closeDiscardDialog;
+  document.getElementById('discardOk').onclick=()=>{
+    closeDiscardDialog();
+    if(_discardCallback)_discardCallback();
+  };
+  ov.addEventListener('click',e=>{if(e.target===ov)closeDiscardDialog()});
+});
 async function saveLich(){
   if(!cu||!cu_pin||D.saveBtn.disabled)return;
   if(isRateLimited())return;
