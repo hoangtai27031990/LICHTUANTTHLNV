@@ -680,16 +680,42 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 @media(min-width:769px){
   .tcard{display:block}
   #cardList{display:none}
-  .hdr{padding:12px 32px calc(12px + var(--safe-top))}
-  .week-tabbar{padding:0 32px 12px}
-  .main{max-width:1200px;margin:0 auto;padding:20px 24px calc(70px + var(--safe-bot))}
+  /* Layout */
+  .hdr{padding:14px 40px}
+  .week-tabbar{padding:0 40px 14px}
+  .main{max-width:1280px;margin:0 auto;padding:24px 40px calc(80px + var(--safe-bot))}
   .cal-grid{flex-direction:row!important;gap:10px}
   .cal-row{display:contents}
   #toast-stack{bottom:calc(40px + var(--safe-bot))}
-  .logo-sub{font-size:10.5px}
-  .week-info .wt{font-size:14px}
-  .week-info .wr{font-size:11px}
   .fr{grid-template-columns:1fr 1fr!important;gap:10px!important}
+  /* Header chữ to hơn */
+  body{font-size:15px}
+  .logo-icon{width:38px;height:38px;font-size:20px}
+  .logo-text{font-size:16px}
+  .logo-sub{font-size:12px}
+  .hbtn{font-size:13px;padding:8px 12px;min-height:38px}
+  /* Week bar */
+  .week-info .wt{font-size:16px}
+  .week-info .wr{font-size:12px}
+  .vtab{font-size:14px;padding:9px 16px}
+  .navbtn{width:36px;height:36px;font-size:14px}
+  /* Table */
+  thead th{font-size:13px;padding:13px 16px}
+  tbody td{font-size:14px;padding:13px 16px}
+  .td-day{font-size:13px}
+  .td-muted{font-size:13px}
+  .pill{font-size:12px;padding:3px 10px}
+  .td-noidung{font-size:14px}
+  .audit-line{font-size:11px}
+  /* Bottom bar */
+  .bottom-bar{padding:10px 40px calc(10px + var(--safe-bot));min-height:60px}
+  .sync-txt{font-size:13px}
+  .fab{font-size:14px;padding:11px 18px;min-height:44px;border-radius:12px}
+  /* Calendar */
+  .cal-thu{font-size:12px}
+  .cal-dt{font-size:20px}
+  .cevent-time{font-size:11px}
+  .cevent-title{font-size:13px}
 }
 
 /* ── SMALL (≤400px) ── */
@@ -1838,26 +1864,32 @@ function onFormClosed(){
 }
 
 // ════════════════════════════════════════════════════════
-//  1. DARK MODE
+//  1. DARK MODE — tự động theo giờ VN (18:00–06:00 = tối)
 // ════════════════════════════════════════════════════════
+//  null = auto theo giờ | 'on' = buộc tối | 'off' = buộc sáng
 let _darkMode=localStorage.getItem('darkMode');
-// null = follow system, 'on' = force dark, 'off' = force light
+
+function isNightTime(){
+  const h=nowVN().getUTCHours();
+  return h>=18||h<6;
+}
 function applyDark(){
   const html=document.documentElement;
-  if(_darkMode==='on')html.setAttribute('data-theme','dark');
-  else if(_darkMode==='off')html.removeAttribute('data-theme');
+  let isDark;
+  if(_darkMode==='on')isDark=true;
+  else if(_darkMode==='off')isDark=false;
+  else isDark=isNightTime();
+  if(isDark)html.setAttribute('data-theme','dark');
   else html.removeAttribute('data-theme');
   const btn=$('btnDark');
-  if(btn)btn.textContent=_darkMode==='on'?'☀️':'🌙';
+  if(btn)btn.textContent=isDark?'☀️':'🌙';
 }
 function toggleDark(){
   if(_darkMode===null||_darkMode===undefined){
-    // Đang auto theo giờ → buộc ngược lại
     _darkMode=isNightTime()?'off':'on';
   }else if(_darkMode==='on'){
     _darkMode='off';
   }else{
-    // 'off' → về auto
     _darkMode=null;
     localStorage.removeItem('darkMode');
     applyDark();return;
@@ -1865,24 +1897,33 @@ function toggleDark(){
   localStorage.setItem('darkMode',_darkMode);
   applyDark();
 }
-// Inject forced dark/light via data-theme attribute
+setInterval(()=>{if(!_darkMode)applyDark();},60000);
 const _dmStyle=document.createElement('style');
-_dmStyle.textContent=`
-[data-theme="dark"]{
-  --p:#4a8ec2!important;--p-light:#5fa0d4!important;--p-pale:#1a2d40!important;
-  --acc:#f06470!important;--suc:#3bbf84!important;--warn:#fbbf24!important;--bg:#0f1923!important;
-  --card:#172130!important;--txt:#e8edf4!important;--muted:#7a8fa8!important;
-  --bdr:#253447!important;--bdr2:#2e4060!important;
-}
-[data-theme="dark"] .mcard-title{color:#7ab8e8!important}
-[data-theme="dark"] .mcard-hdr{background:#0f1923!important}
-[data-theme="dark"] .hdr,[data-theme="dark"] .week-tabbar{background:#0d2035!important}
-[data-theme="dark"] .bottom-bar{background:#172130!important;border-top-color:#253447!important}
-[data-theme="dark"] .t-title{color:#e8edf4!important}
-[data-theme="dark"] tbody tr:nth-child(even){background:#131f2e!important}
-`;
+_dmStyle.textContent=[
+  '[data-theme="dark"]{',
+  '  --p:#4a8ec2!important;--p-light:#5fa0d4!important;--p-pale:#1a2d40!important;',
+  '  --acc:#f06470!important;--suc:#3bbf84!important;--warn:#fbbf24!important;--bg:#0f1923!important;',
+  '  --card:#172130!important;--txt:#e8edf4!important;--muted:#7a8fa8!important;',
+  '  --bdr:#253447!important;--bdr2:#2e4060!important;',
+  '}',
+  '[data-theme="dark"] .mcard-datebox{color:#fff!important}',
+  '[data-theme="dark"] .mcard-title{color:#7ab8e8!important}',
+  '[data-theme="dark"] .mcard-hdr{background:#0f1923!important}',
+  '[data-theme="dark"] .hdr,[data-theme="dark"] .week-tabbar{background:#0d2035!important}',
+  '[data-theme="dark"] .bottom-bar{background:#172130!important;border-top-color:#253447!important}',
+  '[data-theme="dark"] .t-title{color:#e8edf4!important}',
+  '[data-theme="dark"] tbody tr:nth-child(even){background:#131f2e!important}',
+  '[data-theme="dark"] .fi{background:#1a2d40!important;color:#e8edf4!important;border-color:#253447!important}',
+  '[data-theme="dark"] .fi:focus{background:#1e3450!important;border-color:#4a8ec2!important}',
+  '[data-theme="dark"] .sheet{background:#172130!important}',
+  '[data-theme="dark"] .xcls{background:#253447!important;color:#7a8fa8!important}',
+  '[data-theme="dark"] .mbtn.cancel{background:#253447!important;color:#7a8fa8!important}',
+  '[data-theme="dark"] .del-preview{background:#1a2d40!important;border-color:#253447!important}',
+  '[data-theme="dark"] .cdlg{background:#172130!important}',
+  '[data-theme="dark"] .usr-tabs{background:#1a2d40!important}',
+  '[data-theme="dark"] .usr-tab.on{background:#253447!important;color:#4a8ec2!important}',
+].join('\n');
 document.head.appendChild(_dmStyle);
-
 // ════════════════════════════════════════════════════════
 //  2. PULL TO REFRESH
 // ════════════════════════════════════════════════════════
