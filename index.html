@@ -309,7 +309,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .mcard-row-lbl{
   font-size:10.5px;font-weight:600;color:var(--muted);
   text-transform:uppercase;letter-spacing:.4px;
-  min-width:62px;flex-shrink:0;margin-top:1px;
+  min-width:70px;flex-shrink:0;margin-top:1px;
 }
 .mcard-row-val{color:var(--txt);flex:1;min-width:0;word-break:break-word}
 .mcard-audit{
@@ -1203,7 +1203,7 @@ function renderT(){
     if(r.nguoiTao)auditMobile.push(`<span class="audit-line">✏️ <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span>`);
     if(r.nguoiSua)auditMobile.push(`<span class="audit-line">🔄 <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span>`);
     const metaRows=[];
-    if(r.diadiem)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">📍 Nơi</span><span class="mcard-row-val">${esc(r.diadiem)}</span></div>`);
+    if(r.diadiem)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">📍 Địa điểm</span><span class="mcard-row-val">${esc(r.diadiem)}</span></div>`);
     if(r.chutri)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👤 Chủ trì</span><span class="mcard-row-val">${esc(r.chutri)}</span></div>`);
     if(r.thanhphan)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👥 T.phần</span><span class="mcard-row-val">${esc(r.thanhphan)}</span></div>`);
     return`<div class="mcard${_newIds.has(r.id)?' row-new':''}">
