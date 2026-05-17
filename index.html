@@ -298,7 +298,7 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 /* Body card */
 .mcard-body{padding:11px 13px 12px}
 .mcard-title{
-  font-size:14px;font-weight:600;color:var(--txt);
+  font-size:14px;font-weight:600;color:#1a4f7a;
   line-height:1.45;margin-bottom:9px;
 }
 .mcard-meta{display:flex;flex-direction:column;gap:6px}
@@ -1203,9 +1203,9 @@ function renderT(){
     if(r.nguoiTao)auditMobile.push(`<span class="audit-line">✏️ <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span>`);
     if(r.nguoiSua)auditMobile.push(`<span class="audit-line">🔄 <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span>`);
     const metaRows=[];
-    if(r.diadiem)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">📍 Địa điểm</span><span class="mcard-row-val">${esc(r.diadiem)}</span></div>`);
-    if(r.chutri)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👤 Chủ trì</span><span class="mcard-row-val">${esc(r.chutri)}</span></div>`);
-    if(r.thanhphan)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👥 T.phần</span><span class="mcard-row-val">${esc(r.thanhphan)}</span></div>`);
+    if(r.diadiem)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">📍 Địa điểm:</span><span class="mcard-row-val">${esc(r.diadiem)}</span></div>`);
+    if(r.chutri)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👤 Chủ trì:</span><span class="mcard-row-val">${esc(r.chutri)}</span></div>`);
+    if(r.thanhphan)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👥 T.phần:</span><span class="mcard-row-val">${esc(r.thanhphan)}</span></div>`);
     return`<div class="mcard${_newIds.has(r.id)?' row-new':''}">
       <div class="mcard-hdr">
         <div class="mcard-datebox">
