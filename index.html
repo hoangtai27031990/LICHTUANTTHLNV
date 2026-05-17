@@ -354,8 +354,10 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 }
 
 /* ── CALENDAR ── */
-.cal-grid{display:grid;grid-template-columns:1fr;gap:8px}
-@media(min-width:480px){.cal-grid{grid-template-columns:1fr 1fr}}
+.cal-grid{display:flex;flex-direction:column;gap:6px}
+.cal-row{display:grid;gap:6px}
+.cal-row.row-top{grid-template-columns:repeat(4,1fr)}
+.cal-row.row-bot{grid-template-columns:repeat(3,1fr)}
 .cal-day{background:var(--card);border-radius:10px;border:1px solid var(--bdr);overflow:hidden}
 .cal-hdr{background:var(--p);color:#fff;padding:9px 10px;text-align:center}
 .cal-hdr.today{background:var(--acc)}
@@ -688,7 +690,8 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   .hdr{padding:12px 32px calc(12px + var(--safe-top))}
   .week-tabbar{padding:0 32px 12px}
   .main{max-width:1200px;margin:0 auto;padding:20px 24px calc(70px + var(--safe-bot))}
-  .cal-grid{grid-template-columns:repeat(7,1fr)!important;gap:10px}
+  .cal-grid{flex-direction:row!important;gap:10px}
+  .cal-row{display:contents}
   #toast-stack{bottom:calc(40px + var(--safe-bot))}
   .logo-sub{font-size:10.5px}
   .week-info .wt{font-size:14px}
@@ -1300,7 +1303,8 @@ function renderT(){
 // ── CALENDAR VIEW ──
 function renderC(){
   const g=D.cgrid,today=todayVN();
-  g.innerHTML=wkDays(wOff).map(day=>{
+  const days=wkDays(wOff);// T2..CN (index 0..6)
+  function dayHtml(day){
     const ds=fmt(day);
     const dd=allD.filter(r=>r.ngay===ds)
       .sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
@@ -1318,7 +1322,11 @@ function renderC(){
         }).join(''):'<div style="font-size:11px;color:var(--muted);padding:4px 0;">Không có lịch</div>'}
       </div>
     </div>`;
-  }).join('');
+  }
+  // Mobile: hàng trên T2-T5 (days[0..3]), hàng dưới T6-T7-CN (days[4..6])
+  const row1=days.slice(0,4).map(dayHtml).join('');
+  const row2=days.slice(4,7).map(dayHtml).join('');
+  g.innerHTML=`<div class="cal-row row-top">${row1}</div><div class="cal-row row-bot">${row2}</div>`;
 }
 
 // ════════════════════════════════════════════════════════
@@ -1837,43 +1845,25 @@ function onFormClosed(){
 }
 
 // ════════════════════════════════════════════════════════
-//  1. DARK MODE (tự động theo giờ: 18:00–06:00 = tối)
+//  1. DARK MODE
 // ════════════════════════════════════════════════════════
-// _darkMode: null = tự động theo giờ, 'on' = buộc tối, 'off' = buộc sáng
-let _darkMode=localStorage.getItem('darkMode');// null nếu chưa có
-
-function isNightTime(){
-  // Dùng giờ VN (UTC+7)
-  const vn=nowVN();
-  const h=vn.getUTCHours();
-  return h>=18||h<6;// 18:00–05:59 là ban đêm
-}
-
+let _darkMode=localStorage.getItem('darkMode');
+// null = follow system, 'on' = force dark, 'off' = force light
 function applyDark(){
   const html=document.documentElement;
-  let isDark;
-  if(_darkMode==='on')isDark=true;
-  else if(_darkMode==='off')isDark=false;
-  else isDark=isNightTime();// auto theo giờ
-  if(isDark)html.setAttribute('data-theme','dark');
+  if(_darkMode==='on')html.setAttribute('data-theme','dark');
+  else if(_darkMode==='off')html.removeAttribute('data-theme');
   else html.removeAttribute('data-theme');
   const btn=$('btnDark');
-  if(btn){
-    if(_darkMode===null||_darkMode===undefined)
-      btn.textContent=isDark?'🌙':'☀️';// icon hiện tại, click sẽ buộc ngược lại
-    else
-      btn.textContent=_darkMode==='on'?'☀️':'🌙';
-  }
+  if(btn)btn.textContent=_darkMode==='on'?'☀️':'🌙';
 }
-
 function toggleDark(){
+  const sys=window.matchMedia('(prefers-color-scheme:dark)').matches;
   if(_darkMode===null||_darkMode===undefined){
-    // Đang auto → buộc ngược với trạng thái hiện tại
-    _darkMode=isNightTime()?'off':'on';
+    _darkMode=sys?'off':'on';
   }else if(_darkMode==='on'){
     _darkMode='off';
   }else{
-    // 'off' → về lại auto
     _darkMode=null;
     localStorage.removeItem('darkMode');
     applyDark();return;
@@ -1881,11 +1871,6 @@ function toggleDark(){
   localStorage.setItem('darkMode',_darkMode);
   applyDark();
 }
-
-// Kiểm tra mỗi phút để tự chuyển khi đến giờ (chỉ khi đang ở chế độ auto)
-let _darkTimer=setInterval(()=>{
-  if(_darkMode===null||_darkMode===undefined)applyDark();
-},60000);
 // Inject forced dark/light via data-theme attribute
 const _dmStyle=document.createElement('style');
 _dmStyle.textContent=`
