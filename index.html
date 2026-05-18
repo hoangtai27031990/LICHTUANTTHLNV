@@ -187,13 +187,40 @@ body{
   white-space:nowrap;
 }
 .fab:active{background:var(--p-light);transform:scale(.97) translateZ(0)}
-.audit{display:flex;flex-direction:column;gap:2px;margin-top:3px}
+
+/* ── AUDIT STYLES ────────────────────────────────────────
+   Mobile: compact (10–11px)
+   Desktop (≥769px): slightly larger, more breathing room
+   ────────────────────────────────────────────────────── */
+.audit{
+  display:flex;flex-direction:column;gap:3px;
+  margin-top:5px;
+}
 .audit-line{
   display:inline-flex;align-items:center;gap:4px;
-  font-size:10px;color:var(--muted);line-height:1.3;
+  font-size:10.5px;color:var(--muted);line-height:1.35;
+  flex-wrap:wrap;
 }
-.audit-line .a-name{color:var(--p);font-weight:600}
-.audit-line .a-time{color:#8a96aa}
+.audit-line .a-label{
+  font-size:10px;font-weight:600;
+  color:#6b7a90;
+  letter-spacing:.2px;
+  white-space:nowrap;
+}
+.audit-line .a-name{
+  color:var(--p);font-weight:600;
+  white-space:nowrap;
+}
+.audit-line .a-sep{
+  color:#b0bac9;font-size:9px;
+  margin:0 1px;
+}
+.audit-line .a-time{
+  color:#8a96aa;font-size:10px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
 .ibtn{
   border:none;border-radius:6px;padding:6px 10px;
   cursor:pointer;font-size:12px;font-weight:500;
@@ -587,6 +614,7 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
 .tcard{display:none}
 #cardList{display:flex;flex-direction:column;gap:10px}
 
+/* ── DESKTOP OVERRIDES ───────────────────────────────── */
 @media(min-width:769px){
   .tcard{display:block}
   #cardList{display:none}
@@ -612,7 +640,14 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   .td-muted{font-size:14px}
   .pill{font-size:13px;padding:3px 11px}
   .td-noidung{font-size:15px}
-  .audit-line{font-size:12px}
+
+  /* ── Audit — Desktop sizing ── */
+  .audit{gap:4px;margin-top:6px}
+  .audit-line{font-size:12px;gap:5px}
+  .audit-line .a-label{font-size:11px}
+  .audit-line .a-name{font-size:12px}
+  .audit-line .a-time{font-size:11px}
+
   .bottom-bar{padding:10px 40px calc(10px + var(--safe-bot));min-height:62px}
   .sync-txt{font-size:14px}
   .fab{font-size:15px;padding:12px 20px;min-height:46px;border-radius:12px}
@@ -1014,11 +1049,18 @@ function updHdr(){
 // ════════════════════════════════════════════════════════
 //  DATA HELPERS
 // ════════════════════════════════════════════════════════
+
+/**
+ * nowLocal() — Trả về chuỗi thời gian GMT+7 (Giờ Đông Dương)
+ * Format: HH:MM:SS DD/MM/YYYY
+ * Ví dụ: 09:05:32 18/05/2025
+ */
 function nowLocal(){
-  const vn=nowVN();
+  const vn=nowVN(); // đã cộng +7h vào UTC
   const p=n=>String(n).padStart(2,'0');
-  return`${p(vn.getUTCDate())}/${p(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${p(vn.getUTCHours())}:${p(vn.getUTCMinutes())}`;
+  return`${p(vn.getUTCHours())}:${p(vn.getUTCMinutes())}:${p(vn.getUTCSeconds())} ${p(vn.getUTCDate())}/${p(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()}`;
 }
+
 function cleanRow(r){
   if(r.ngay?.includes('T'))r.ngay=fmtVN(new Date(r.ngay));
   if(r.thoigian?.includes('T'))r.thoigian='';
@@ -1036,7 +1078,6 @@ function cleanRow(r){
 // ════════════════════════════════════════════════════════
 function invalidateWkCache(){_allDVer++}
 
-// Trả về dữ liệu tuần hiện tại, có áp dụng dayFilter nếu có
 function getWkData(){
   if(!(_wkCache&&_wkOff===wOff&&_wkVer===_allDVer)){
     const dates=new Set(wkDays(wOff).map(d=>fmt(d)));
@@ -1076,10 +1117,35 @@ function showLoading(){
 // ════════════════════════════════════════════════════════
 //  AUDIT
 // ════════════════════════════════════════════════════════
+/**
+ * auditHtml() — Render thông tin người tạo/sửa
+ * Hiển thị: ✏️ Thêm bởi [Tên] · HH:MM:SS DD/MM/YYYY
+ *           🔄 Sửa bởi  [Tên] · HH:MM:SS DD/MM/YYYY
+ */
 function auditHtml(r){
   const lines=[];
-  if(r.nguoiTao)lines.push(`<span class="audit-line">✏️ <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span>`);
-  if(r.nguoiSua)lines.push(`<span class="audit-line">🔄 <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span>`);
+  if(r.nguoiTao){
+    lines.push(
+      `<span class="audit-line">`+
+      `<span class="a-label">✏️ Thêm bởi</span>`+
+      `<span class="a-name">${esc(r.nguoiTao)}</span>`+
+      (r.thoiGianTao
+        ?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianTao)}</span>`
+        :'')+
+      `</span>`
+    );
+  }
+  if(r.nguoiSua){
+    lines.push(
+      `<span class="audit-line">`+
+      `<span class="a-label">🔄 Sửa bởi</span>`+
+      `<span class="a-name">${esc(r.nguoiSua)}</span>`+
+      (r.thoiGianSua
+        ?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianSua)}</span>`
+        :'')+
+      `</span>`
+    );
+  }
   if(!lines.length)return'';
   return`<div class="audit">${lines.join('')}</div>`;
 }
@@ -1156,9 +1222,26 @@ function renderT(){
   cl.innerHTML=sorted.map(r=>{
     const parts=r.ngay?r.ngay.split('-'):[];
     const dd=parts[2]||'';const mm=parts[1]||'';
+    // Audit mobile — cũng dùng cùng format label rõ ràng
     const auditMobile=[];
-    if(r.nguoiTao)auditMobile.push(`<span class="audit-line">✏️ <span class="a-name">${esc(r.nguoiTao)}</span>${r.thoiGianTao?`<span class="a-time"> — ${esc(r.thoiGianTao)}</span>`:''}</span>`);
-    if(r.nguoiSua)auditMobile.push(`<span class="audit-line">🔄 <span class="a-name">${esc(r.nguoiSua)}</span>${r.thoiGianSua?`<span class="a-time"> — ${esc(r.thoiGianSua)}</span>`:''}</span>`);
+    if(r.nguoiTao){
+      auditMobile.push(
+        `<span class="audit-line">`+
+        `<span class="a-label">✏️ Thêm bởi</span>`+
+        `<span class="a-name">${esc(r.nguoiTao)}</span>`+
+        (r.thoiGianTao?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianTao)}</span>`:'')+
+        `</span>`
+      );
+    }
+    if(r.nguoiSua){
+      auditMobile.push(
+        `<span class="audit-line">`+
+        `<span class="a-label">🔄 Sửa bởi</span>`+
+        `<span class="a-name">${esc(r.nguoiSua)}</span>`+
+        (r.thoiGianSua?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianSua)}</span>`:'')+
+        `</span>`
+      );
+    }
     const metaRows=[];
     if(r.diadiem)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">📍 Địa điểm:</span><span class="mcard-row-val">${esc(r.diadiem)}</span></div>`);
     if(r.chutri)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👤 Chủ trì:</span><span class="mcard-row-val">${esc(r.chutri)}</span></div>`);
@@ -1208,7 +1291,11 @@ function renderC(){
       </div>
       <div class="cal-body">
         ${dd.length?dd.map(r=>{
-          const ac=r.nguoiSua?`<div class="cevent-audit">🔄 ${esc(r.nguoiSua)}</div>`:r.nguoiTao?`<div class="cevent-audit">✏️ ${esc(r.nguoiTao)}</div>`:'';
+          const ac=r.nguoiSua
+            ?`<div class="cevent-audit">🔄 Sửa bởi ${esc(r.nguoiSua)}</div>`
+            :r.nguoiTao
+              ?`<div class="cevent-audit">✏️ Thêm bởi ${esc(r.nguoiTao)}</div>`
+              :'';
           return`<div class="cevent"><div class="cevent-time">${esc(r.thoigian)}</div><div class="cevent-title">${esc(r.noidung)}</div>${ac}</div>`;
         }).join(''):'<div style="font-size:11px;color:var(--muted);padding:4px 0;">Không có lịch</div>'}
       </div>
@@ -1227,7 +1314,6 @@ function buildDayChips(){
   const el=document.getElementById('dayChips');if(!el)return;
   const days=wkDays(wOff);
   const today=todayVN();
-  // Đếm sự kiện theo ngày (dùng _wkCache không filtered)
   const cntMap={};
   if(_wkCache)_wkCache.forEach(r=>{if(r.ngay)cntMap[r.ngay]=(cntMap[r.ngay]||0)+1;});
   let html=`<button class="day-chip${_dayFilter===null?' on':''}" data-day="all">Tất cả</button>`;
@@ -1443,7 +1529,6 @@ function autoThu(){
 }
 function closeLich(){
   document.getElementById('lichOv').classList.remove('open');
-  // Áp dụng update đang pending nếu có
   applyPendingIfAny();
 }
 
@@ -1481,7 +1566,8 @@ async function saveLich(){
   try{
     const d=await apiFetch(payload);
     if(d.success){
-      // Cập nhật local data ngay
+      // Dùng nowLocal() để lấy timestamp GMT+7 với giây
+      const localNow=nowLocal();
       if(edId){
         const idx=allD.findIndex(r=>r.id===edId);
         if(idx!==-1){
@@ -1489,7 +1575,8 @@ async function saveLich(){
             ngay:payload.ngay,thu:payload.thu,thoigian:payload.thoigian,
             noidung:payload.noidung,diadiem:payload.diadiem,
             chutri:payload.chutri,thanhphan:payload.thanhphan,
-            nguoiSua:d.nguoiSua||cu,thoiGianSua:d.thoiGianSua||nowLocal(),
+            nguoiSua:d.nguoiSua||cu,
+            thoiGianSua:d.thoiGianSua||localNow,
             updatedAt:d.updatedAt||Date.now(),
           }));
         }
@@ -1500,8 +1587,10 @@ async function saveLich(){
           thoigian:payload.thoigian,noidung:payload.noidung,
           diadiem:payload.diadiem,chutri:payload.chutri,
           thanhphan:payload.thanhphan,
-          nguoiTao:cu,thoiGianTao:d.thoiGianTao||nowLocal(),
-          nguoiSua:'',thoiGianSua:'',updatedAt:d.updatedAt||Date.now(),
+          nguoiTao:cu,
+          thoiGianTao:d.thoiGianTao||localNow,
+          nguoiSua:'',thoiGianSua:'',
+          updatedAt:d.updatedAt||Date.now(),
         }));
         setTimeout(()=>{_newIds=new Set();render()},3000);
       }
@@ -1515,7 +1604,7 @@ async function saveLich(){
       toast({
         type:'ok',
         title:edId?'✓ Đã cập nhật lịch':'✓ Đã thêm lịch mới',
-        msg:edId?`Chỉnh sửa bởi ${cu}`:`Tạo bởi ${cu}`,
+        msg:edId?`Sửa bởi ${cu}`:`Thêm bởi ${cu}`,
         duration:3500
       });
     }else{
@@ -1547,7 +1636,6 @@ function openDel(id){
 function closeDel(){
   document.getElementById('delOv').classList.remove('open');
   _pendingDelId=null;
-  // Áp dụng update đang pending nếu có
   applyPendingIfAny();
 }
 async function confirmDel(){
@@ -1706,7 +1794,6 @@ function setSyncState(state,label){
   const txt=document.getElementById('syncTxt');
   if(dot)dot.className='sync-dot '+state;
   if(txt)txt.textContent=label;
-  // Offline banner
   if(state==='err')setOfflineBanner(true);
   else if(state==='ok')setOfflineBanner(false);
 }
@@ -1756,8 +1843,6 @@ function dismissUpdate(){
   _pendingData=null;
   const ub=document.getElementById('updBanner');if(ub)ub.classList.remove('show');
 }
-
-// Áp dụng dữ liệu pending khi form đóng
 function applyPendingIfAny(){
   if(_pendingData&&!isAnyFormOpen()){
     const diff=diffData(_pendingData);
@@ -1848,6 +1933,11 @@ _dmStyle.textContent=[
   '[data-theme="dark"] .del-preview{background:#1a2d40!important;border-color:#253447!important}',
   '[data-theme="dark"] .usr-tabs{background:#1a2d40!important}',
   '[data-theme="dark"] .usr-tab.on{background:#253447!important;color:#4a8ec2!important}',
+  /* Dark mode audit colors */
+  '[data-theme="dark"] .audit-line .a-label{color:#5a7a9a!important}',
+  '[data-theme="dark"] .audit-line .a-name{color:#4a8ec2!important}',
+  '[data-theme="dark"] .audit-line .a-time{color:#4a6080!important}',
+  '[data-theme="dark"] .audit-line .a-sep{color:#2e4060!important}',
 ].join('\n');
 document.head.appendChild(_dmStyle);
 
