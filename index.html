@@ -189,34 +189,35 @@ body{
 .fab:active{background:var(--p-light);transform:scale(.97) translateZ(0)}
 
 /* ── AUDIT STYLES ────────────────────────────────────────
-   Mobile: compact (10–11px)
-   Desktop (≥769px): slightly larger, more breathing room
+   Mobile: 12–13px cho dễ đọc
+   Desktop (≥769px): 11–12px (compact hơn vì bảng chật)
    ────────────────────────────────────────────────────── */
 .audit{
-  display:flex;flex-direction:column;gap:3px;
-  margin-top:5px;
+  display:flex;flex-direction:column;gap:4px;
+  margin-top:6px;
 }
 .audit-line{
-  display:inline-flex;align-items:center;gap:4px;
-  font-size:10.5px;color:var(--muted);line-height:1.35;
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;color:var(--muted);line-height:1.4;
   flex-wrap:wrap;
 }
 .audit-line .a-label{
-  font-size:10px;font-weight:600;
+  font-size:11.5px;font-weight:600;
   color:#6b7a90;
   letter-spacing:.2px;
   white-space:nowrap;
 }
 .audit-line .a-name{
   color:var(--p);font-weight:600;
+  font-size:12px;
   white-space:nowrap;
 }
 .audit-line .a-sep{
-  color:#b0bac9;font-size:9px;
+  color:#b0bac9;font-size:10px;
   margin:0 1px;
 }
 .audit-line .a-time{
-  color:#8a96aa;font-size:10px;
+  color:#8a96aa;font-size:12.5px;
   font-variant-numeric:tabular-nums;
   white-space:nowrap;
 }
@@ -641,12 +642,12 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   .pill{font-size:13px;padding:3px 11px}
   .td-noidung{font-size:15px}
 
-  /* ── Audit — Desktop sizing ── */
+  /* ── Audit — Desktop sizing (bảng chật, giữ compact hơn mobile) ── */
   .audit{gap:4px;margin-top:6px}
   .audit-line{font-size:12px;gap:5px}
   .audit-line .a-label{font-size:11px}
   .audit-line .a-name{font-size:12px}
-  .audit-line .a-time{font-size:11px}
+  .audit-line .a-time{font-size:11.5px}
 
   .bottom-bar{padding:10px 40px calc(10px + var(--safe-bot));min-height:62px}
   .sync-txt{font-size:14px}
