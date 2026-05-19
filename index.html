@@ -188,10 +188,6 @@ body{
 }
 .fab:active{background:var(--p-light);transform:scale(.97) translateZ(0)}
 
-/* ── AUDIT STYLES ────────────────────────────────────────
-   Mobile: 12–13px cho dễ đọc
-   Desktop (≥769px): 11–12px (compact hơn vì bảng chật)
-   ────────────────────────────────────────────────────── */
 .audit{
   display:flex;flex-direction:column;gap:4px;
   margin-top:6px;
@@ -299,10 +295,11 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .mcard-datebox-m{font-size:9.5px;opacity:.8;margin-top:2px}
 .mcard-hdr-mid{flex:1;min-width:0}
 .mcard-thu{font-size:12.5px;font-weight:700;color:var(--p-light);margin-bottom:4px}
+/* ── THAY ĐỔI: tăng font-size thời gian trên mobile card ── */
 .mcard-time-pill{
   display:inline-flex;align-items:center;
   background:var(--p-pale);color:var(--p);
-  border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500;
+  border-radius:6px;padding:3px 10px;font-size:13px;font-weight:600;
 }
 .mcard-time-pill.all{background:#fef3c7;color:#92400e}
 .mcard-hdr-acts{display:flex;gap:5px;flex-shrink:0}
@@ -642,7 +639,6 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   .pill{font-size:13px;padding:3px 11px}
   .td-noidung{font-size:15px}
 
-  /* ── Audit — Desktop sizing (bảng chật, giữ compact hơn mobile) ── */
   .audit{gap:4px;margin-top:6px}
   .audit-line{font-size:12px;gap:5px}
   .audit-line .a-label{font-size:11px}
@@ -1050,14 +1046,8 @@ function updHdr(){
 // ════════════════════════════════════════════════════════
 //  DATA HELPERS
 // ════════════════════════════════════════════════════════
-
-/**
- * nowLocal() — Trả về chuỗi thời gian GMT+7 (Giờ Đông Dương)
- * Format: HH:MM:SS DD/MM/YYYY
- * Ví dụ: 09:05:32 18/05/2025
- */
 function nowLocal(){
-  const vn=nowVN(); // đã cộng +7h vào UTC
+  const vn=nowVN();
   const p=n=>String(n).padStart(2,'0');
   return`${p(vn.getUTCHours())}:${p(vn.getUTCMinutes())}:${p(vn.getUTCSeconds())} ${p(vn.getUTCDate())}/${p(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()}`;
 }
@@ -1118,11 +1108,6 @@ function showLoading(){
 // ════════════════════════════════════════════════════════
 //  AUDIT
 // ════════════════════════════════════════════════════════
-/**
- * auditHtml() — Render thông tin người tạo/sửa
- * Hiển thị: ✏️ Thêm bởi [Tên] · HH:MM:SS DD/MM/YYYY
- *           🔄 Sửa bởi  [Tên] · HH:MM:SS DD/MM/YYYY
- */
 function auditHtml(r){
   const lines=[];
   if(r.nguoiTao){
@@ -1223,7 +1208,6 @@ function renderT(){
   cl.innerHTML=sorted.map(r=>{
     const parts=r.ngay?r.ngay.split('-'):[];
     const dd=parts[2]||'';const mm=parts[1]||'';
-    // Audit mobile — cũng dùng cùng format label rõ ràng
     const auditMobile=[];
     if(r.nguoiTao){
       auditMobile.push(
@@ -1567,7 +1551,6 @@ async function saveLich(){
   try{
     const d=await apiFetch(payload);
     if(d.success){
-      // Dùng nowLocal() để lấy timestamp GMT+7 với giây
       const localNow=nowLocal();
       if(edId){
         const idx=allD.findIndex(r=>r.id===edId);
@@ -1934,7 +1917,6 @@ _dmStyle.textContent=[
   '[data-theme="dark"] .del-preview{background:#1a2d40!important;border-color:#253447!important}',
   '[data-theme="dark"] .usr-tabs{background:#1a2d40!important}',
   '[data-theme="dark"] .usr-tab.on{background:#253447!important;color:#4a8ec2!important}',
-  /* Dark mode audit colors */
   '[data-theme="dark"] .audit-line .a-label{color:#5a7a9a!important}',
   '[data-theme="dark"] .audit-line .a-name{color:#4a8ec2!important}',
   '[data-theme="dark"] .audit-line .a-time{color:#4a6080!important}',
