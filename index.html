@@ -825,11 +825,11 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
       <label class="fl">Thời gian</label>
       <input class="fi" type="text" id="fTg" placeholder="VD: 9:00 - 11:00 hoặc Cả ngày" maxlength="50" oninput="syncTgChips()">
       <div class="qchips" id="tgChips">
-        <button type="button" class="qchip" onclick="setTg('Cả ngày')">Cả ngày</button>
-        <button type="button" class="qchip" onclick="setTg('08:00 - 12:00')">08:00–12:00</button>
-        <button type="button" class="qchip" onclick="setTg('09:00 - 10:00')">09:00–10:00</button>
-        <button type="button" class="qchip" onclick="setTg('13:00 - 17:00')">13:00–17:00</button>
-        <button type="button" class="qchip" onclick="setTg('14:00 - 16:00')">14:00–16:00</button>
+        <button type="button" class="qchip" onclick="setTg('Cả ngày')" data-tg="Cả ngày">Cả ngày</button>
+          <button type="button" class="qchip" onclick="setTg('08:00 - 12:00')" data-tg="08:00 - 12:00">08:00–12:00</button>
+          <button type="button" class="qchip" onclick="setTg('09:00 - 10:00')" data-tg="09:00 - 10:00">09:00–10:00</button>
+          <button type="button" class="qchip" onclick="setTg('13:00 - 17:00')" data-tg="13:00 - 17:00">13:00–17:00</button>
+          <button type="button" class="qchip" onclick="setTg('14:00 - 16:00')" data-tg="14:00 - 16:00">14:00–16:00</button>
       </div>
     </div>
     <div class="fg"><label class="fl">Nội dung công việc</label><input class="fi" type="text" id="fNd" placeholder="Mô tả nội dung công việc" maxlength="200"></div>
@@ -949,10 +949,13 @@ function updateStickyTop(){
   const tb=document.getElementById('weekTabbar');
   if(hdr&&tb)tb.style.top=hdr.offsetHeight+'px';
 }
+// Debounce resize để tránh gọi liên tục (performance)
+let _resizeTid=null;
+function _debouncedStickyTop(){clearTimeout(_resizeTid);_resizeTid=setTimeout(updateStickyTop,80);}
 window.addEventListener('load',updateStickyTop);
-window.addEventListener('resize',updateStickyTop);
+window.addEventListener('resize',_debouncedStickyTop,{passive:true});
 if(window.ResizeObserver){
-  new ResizeObserver(updateStickyTop).observe(document.getElementById('mainHdr'));
+  new ResizeObserver(_debouncedStickyTop).observe(document.getElementById('mainHdr'));
 }
 
 // ════════════════════════════════════════════════════════
@@ -1083,7 +1086,7 @@ function getWkData(){
 //  LOAD
 // ════════════════════════════════════════════════════════
 async function load(force=false){
-  if(!force&&allD.length&&(Date.now()-cacheTime)<CACHE_TTL){render();return}
+  if(!force&&allD.length&&(Date.now()-cacheTime)<CACHE_TTL){renderAndRebuildChips();return}
   if(isLoading)return;
   isLoading=true;showLoading();
   try{
@@ -1096,7 +1099,7 @@ async function load(force=false){
     toast({type:'err',title:'Không tải được dữ liệu',msg:'Kiểm tra kết nối và thử lại.'});
   }
   finally{isLoading=false}
-  render();
+  renderAndRebuildChips();
 }
 function showLoading(){
   const tb=document.getElementById('tbody');
@@ -1142,6 +1145,12 @@ function auditHtml(r){
 function render(){
   if(cv==='table')renderT();
   else renderC();
+  // buildDayChips chỉ cần gọi khi tuần/filter thay đổi, không phải mỗi lần render view
+}
+
+// Gọi buildDayChips riêng khi dữ liệu tuần thực sự thay đổi
+function renderAndRebuildChips(){
+  render();
   buildDayChips();
 }
 
@@ -1160,7 +1169,7 @@ function chW(d){
   wOff=d===0?0:wOff+d;
   invalidateWkCache();
   updHdr();
-  render();
+  renderAndRebuildChips();
 }
 
 function renderT(){
@@ -1208,29 +1217,12 @@ function renderT(){
   cl.innerHTML=sorted.map(r=>{
     const parts=r.ngay?r.ngay.split('-'):[];
     const dd=parts[2]||'';const mm=parts[1]||'';
-    const auditMobile=[];
-    if(r.nguoiTao){
-      auditMobile.push(
-        `<span class="audit-line">`+
-        `<span class="a-label">✏️ Thêm bởi</span>`+
-        `<span class="a-name">${esc(r.nguoiTao)}</span>`+
-        (r.thoiGianTao?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianTao)}</span>`:'')+
-        `</span>`
-      );
-    }
-    if(r.nguoiSua){
-      auditMobile.push(
-        `<span class="audit-line">`+
-        `<span class="a-label">🔄 Sửa bởi</span>`+
-        `<span class="a-name">${esc(r.nguoiSua)}</span>`+
-        (r.thoiGianSua?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianSua)}</span>`:'')+
-        `</span>`
-      );
-    }
     const metaRows=[];
     if(r.diadiem)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">📍 Địa điểm:</span><span class="mcard-row-val">${esc(r.diadiem)}</span></div>`);
     if(r.chutri)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👤 Chủ trì:</span><span class="mcard-row-val">${esc(r.chutri)}</span></div>`);
     if(r.thanhphan)metaRows.push(`<div class="mcard-row"><span class="mcard-row-lbl">👥 T.phần:</span><span class="mcard-row-val">${esc(r.thanhphan)}</span></div>`);
+    // Tái sử dụng auditHtml() thay vì build inline (tránh duplicate code)
+    const auditStr=auditHtml(r);
     return`<div class="mcard${_newIds.has(r.id)?' row-new':''}">
       <div class="mcard-hdr">
         <div class="mcard-datebox">
@@ -1249,7 +1241,7 @@ function renderT(){
       <div class="mcard-body">
         <div class="mcard-title">${esc(r.noidung)}</div>
         ${metaRows.length?`<div class="mcard-meta">${metaRows.join('')}</div>`:''}
-        ${auditMobile.length?`<div class="mcard-audit audit">${auditMobile.join('')}</div>`:''}
+        ${auditStr?`<div class="mcard-audit">${auditStr}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1266,9 +1258,12 @@ function renderC(){
   if(!g)return;
   const today=todayVN();
   const days=wkDays(wOff);
+  // Dùng wkCache đã filter sẵn thay vì scan allD lại từ đầu
+  const wkMap=new Map();
+  getWkData().forEach(r=>{if(!wkMap.has(r.ngay))wkMap.set(r.ngay,[]);wkMap.get(r.ngay).push(r);});
   function dayHtml(day){
     const ds=fmt(day);
-    const dd=allD.filter(r=>r.ngay===ds).sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
+    const dd=(wkMap.get(ds)||[]).sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
     return`<div class="cal-day">
       <div class="cal-hdr${ds===today?' today':''}">
         <div class="cal-thu">${esc(THU[day.getUTCDay()])}</div>
@@ -1576,7 +1571,7 @@ async function saveLich(){
           nguoiSua:'',thoiGianSua:'',
           updatedAt:d.updatedAt||Date.now(),
         }));
-        setTimeout(()=>{_newIds=new Set();render()},3000);
+        setTimeout(()=>{_newIds=new Set();document.querySelectorAll('.row-new').forEach(el=>el.classList.remove('row-new'));},3000);
       }
       invalidateWkCache();
       _lastHash=hashData(allD);
@@ -1794,8 +1789,14 @@ function diffData(newArr){
 }
 function applyNewData(newArr,diff){
   _newIds=new Set(diff.addedIds);
-  allD=newArr;cacheTime=Date.now();invalidateWkCache();render();
-  if(_newIds.size)setTimeout(()=>{_newIds=new Set();render()},3000);
+  allD=newArr;cacheTime=Date.now();invalidateWkCache();renderAndRebuildChips();
+  // Xóa highlight sau 3s mà không cần render() lại toàn bộ — chỉ remove class
+  if(_newIds.size){
+    setTimeout(()=>{
+      _newIds=new Set();
+      document.querySelectorAll('.row-new').forEach(el=>el.classList.remove('row-new'));
+    },3000);
+  }
   const parts=[];
   if(diff.added)parts.push(`+${diff.added} mới`);
   if(diff.updated)parts.push(`${diff.updated} cập nhật`);
@@ -1893,35 +1894,29 @@ function toggleDark(){
   else{_darkMode=null;localStorage.removeItem('darkMode');applyDark();return;}
   localStorage.setItem('darkMode',_darkMode);applyDark();
 }
-setInterval(()=>{if(!_darkMode)applyDark()},60000);
+// Kiểm tra dark mode mỗi phút (chỉ khi không có preference cố định)
+const _darkCheckInterval=setInterval(()=>{if(!_darkMode)applyDark()},60000);
 const _dmStyle=document.createElement('style');
-_dmStyle.textContent=[
-  '[data-theme="dark"]{',
-  '  --p:#4a8ec2!important;--p-light:#5fa0d4!important;--p-pale:#1a2d40!important;',
-  '  --acc:#f06470!important;--suc:#3bbf84!important;--warn:#fbbf24!important;--bg:#0f1923!important;',
-  '  --card:#172130!important;--txt:#e8edf4!important;--muted:#7a8fa8!important;',
-  '  --bdr:#253447!important;--bdr2:#2e4060!important;',
-  '}',
-  '[data-theme="dark"] .mcard-datebox{color:#fff!important}',
-  '[data-theme="dark"] .mcard-title{color:#7ab8e8!important}',
-  '[data-theme="dark"] .mcard-hdr{background:#0f1923!important}',
-  '[data-theme="dark"] .hdr,[data-theme="dark"] .week-tabbar{background:#0d2035!important}',
-  '[data-theme="dark"] .bottom-bar{background:#172130!important;border-top-color:#253447!important}',
-  '[data-theme="dark"] .t-title{color:#e8edf4!important}',
-  '[data-theme="dark"] tbody tr:nth-child(even){background:#131f2e!important}',
-  '[data-theme="dark"] .fi{background:#1a2d40!important;color:#e8edf4!important;border-color:#253447!important}',
-  '[data-theme="dark"] .fi:focus{background:#1e3450!important;border-color:#4a8ec2!important}',
-  '[data-theme="dark"] .sheet{background:#172130!important}',
-  '[data-theme="dark"] .xcls{background:#253447!important;color:#7a8fa8!important}',
-  '[data-theme="dark"] .mbtn.cancel{background:#253447!important;color:#7a8fa8!important}',
-  '[data-theme="dark"] .del-preview{background:#1a2d40!important;border-color:#253447!important}',
-  '[data-theme="dark"] .usr-tabs{background:#1a2d40!important}',
-  '[data-theme="dark"] .usr-tab.on{background:#253447!important;color:#4a8ec2!important}',
-  '[data-theme="dark"] .audit-line .a-label{color:#5a7a9a!important}',
-  '[data-theme="dark"] .audit-line .a-name{color:#4a8ec2!important}',
-  '[data-theme="dark"] .audit-line .a-time{color:#4a6080!important}',
-  '[data-theme="dark"] .audit-line .a-sep{color:#2e4060!important}',
-].join('\n');
+_dmStyle.textContent=`[data-theme="dark"]{--p:#4a8ec2!important;--p-light:#5fa0d4!important;--p-pale:#1a2d40!important;--acc:#f06470!important;--suc:#3bbf84!important;--warn:#fbbf24!important;--bg:#0f1923!important;--card:#172130!important;--txt:#e8edf4!important;--muted:#7a8fa8!important;--bdr:#253447!important;--bdr2:#2e4060!important;}
+[data-theme="dark"] .mcard-datebox{color:#fff!important}
+[data-theme="dark"] .mcard-title{color:#7ab8e8!important}
+[data-theme="dark"] .mcard-hdr{background:#0f1923!important}
+[data-theme="dark"] .hdr,[data-theme="dark"] .week-tabbar{background:#0d2035!important}
+[data-theme="dark"] .bottom-bar{background:#172130!important;border-top-color:#253447!important}
+[data-theme="dark"] .t-title{color:#e8edf4!important}
+[data-theme="dark"] tbody tr:nth-child(even){background:#131f2e!important}
+[data-theme="dark"] .fi{background:#1a2d40!important;color:#e8edf4!important;border-color:#253447!important}
+[data-theme="dark"] .fi:focus{background:#1e3450!important;border-color:#4a8ec2!important}
+[data-theme="dark"] .sheet{background:#172130!important}
+[data-theme="dark"] .xcls{background:#253447!important;color:#7a8fa8!important}
+[data-theme="dark"] .mbtn.cancel{background:#253447!important;color:#7a8fa8!important}
+[data-theme="dark"] .del-preview{background:#1a2d40!important;border-color:#253447!important}
+[data-theme="dark"] .usr-tabs{background:#1a2d40!important}
+[data-theme="dark"] .usr-tab.on{background:#253447!important;color:#4a8ec2!important}
+[data-theme="dark"] .audit-line .a-label{color:#5a7a9a!important}
+[data-theme="dark"] .audit-line .a-name{color:#4a8ec2!important}
+[data-theme="dark"] .audit-line .a-time{color:#4a6080!important}
+[data-theme="dark"] .audit-line .a-sep{color:#2e4060!important}`;
 document.head.appendChild(_dmStyle);
 
 // ════════════════════════════════════════════════════════
@@ -2011,8 +2006,7 @@ function syncTgChips(){
   const el=getFormEl('fTg');
   const v=el?el.value:'';
   document.querySelectorAll('#tgChips .qchip').forEach(c=>{
-    const m=c.getAttribute('onclick').match(/setTg\('(.+?)'\)/);
-    c.classList.toggle('on',!!m&&m[1]===v);
+    c.classList.toggle('on',c.dataset.tg===v);
   });
 }
 
@@ -2029,7 +2023,6 @@ if(!navigator.onLine)setOfflineBanner(true);
   _lastHash=hashData(allD);
   setSyncState('ok',fmtSyncTime());
   schedulePoll();
-  buildDayChips();
 })();
 </script>
 </body>
