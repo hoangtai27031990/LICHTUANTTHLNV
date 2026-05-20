@@ -1111,6 +1111,12 @@ function showLoading(){
 // ════════════════════════════════════════════════════════
 //  AUDIT
 // ════════════════════════════════════════════════════════
+// Chuỗi thoiGian dạng "HH:MM:SS DD/MM/YYYY" — chỉ lấy phần ngày
+function auditDate(s){
+  if(!s)return'';
+  const m=s.match(/(\d{2}\/\d{2}\/\d{4})$/);
+  return m?m[1]:s;
+}
 function auditHtml(r){
   const lines=[];
   if(r.nguoiTao){
@@ -1119,7 +1125,7 @@ function auditHtml(r){
       `<span class="a-label">✏️ Thêm bởi</span>`+
       `<span class="a-name">${esc(r.nguoiTao)}</span>`+
       (r.thoiGianTao
-        ?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianTao)}</span>`
+        ?`<span class="a-sep">·</span><span class="a-time">${esc(auditDate(r.thoiGianTao))}</span>`
         :'')+
       `</span>`
     );
@@ -1130,7 +1136,7 @@ function auditHtml(r){
       `<span class="a-label">🔄 Sửa bởi</span>`+
       `<span class="a-name">${esc(r.nguoiSua)}</span>`+
       (r.thoiGianSua
-        ?`<span class="a-sep">·</span><span class="a-time">${esc(r.thoiGianSua)}</span>`
+        ?`<span class="a-sep">·</span><span class="a-time">${esc(auditDate(r.thoiGianSua))}</span>`
         :'')+
       `</span>`
     );
