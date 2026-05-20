@@ -355,6 +355,75 @@ tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top}
 .cevent-time{font-size:10px;color:var(--muted);margin-bottom:1px}
 .cevent-title{font-size:11.5px;font-weight:500;color:var(--txt);line-height:1.3}
 .cevent-audit{font-size:10px;color:#8a96aa;margin-top:3px}
+
+/* ── MONTHLY CALENDAR ── */
+.mcal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.mcal-title{font-size:15px;font-weight:700;color:var(--txt)}
+.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mcal-dow{text-align:center;font-size:10px;font-weight:600;color:var(--muted);padding:4px 0;text-transform:uppercase;letter-spacing:.3px}
+.mcal-cell{
+  aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;padding:5px 3px 3px;
+  cursor:pointer;touch-action:manipulation;position:relative;
+  border:1px solid transparent;transition:background .12s,border-color .12s;
+  min-height:38px;
+}
+.mcal-cell:active{background:var(--p-pale)}
+.mcal-cell.empty{cursor:default;pointer-events:none}
+.mcal-cell.today{background:var(--acc);color:#fff}
+.mcal-cell.today .mcal-d{color:#fff}
+.mcal-cell.has-event{border-color:var(--bdr)}
+.mcal-cell.selected{background:var(--p);border-color:var(--p)}
+.mcal-cell.selected .mcal-d{color:#fff}
+.mcal-d{font-size:13px;font-weight:600;color:var(--txt);line-height:1}
+.mcal-dots{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;justify-content:center}
+.mcal-dot{width:5px;height:5px;border-radius:50%;background:var(--p);flex-shrink:0}
+.mcal-cell.today .mcal-dot{background:#fff}
+.mcal-cell.selected .mcal-dot{background:rgba(255,255,255,.8)}
+.mcal-cnt{font-size:9px;color:var(--p);font-weight:700;margin-top:2px;line-height:1}
+.mcal-cell.today .mcal-cnt,.mcal-cell.selected .mcal-cnt{color:#fff}
+
+/* Day detail sheet */
+.dday-hdr{
+  display:flex;align-items:center;gap:12px;
+  background:var(--p);color:#fff;border-radius:12px;
+  padding:12px 14px;margin-bottom:14px;
+}
+.dday-datebox{
+  display:flex;flex-direction:column;align-items:center;
+  background:rgba(255,255,255,.15);border-radius:9px;
+  padding:6px 10px;min-width:48px;text-align:center;flex-shrink:0;
+}
+.dday-d{font-size:24px;font-weight:700;line-height:1}
+.dday-m{font-size:10px;opacity:.8;margin-top:2px}
+.dday-info{flex:1}
+.dday-thu{font-size:13px;font-weight:600;opacity:.9}
+.dday-cnt{font-size:11px;opacity:.7;margin-top:2px}
+.dday-events{display:flex;flex-direction:column;gap:10px}
+.dday-event{
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:10px;padding:11px 13px;
+  border-left:3px solid var(--p);
+}
+.dday-event-time{
+  font-size:11px;font-weight:600;color:var(--p);margin-bottom:4px;
+}
+.dday-event-title{font-size:14px;font-weight:600;color:var(--txt);line-height:1.4;margin-bottom:6px}
+.dday-event-meta{display:flex;flex-direction:column;gap:4px}
+.dday-event-row{display:flex;gap:6px;font-size:12px;color:var(--muted)}
+.dday-event-lbl{min-width:66px;flex-shrink:0;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px}
+.dday-event-val{color:var(--txt);flex:1;word-break:break-word}
+.dday-event-audit{margin-top:6px;padding-top:6px;border-top:1px solid var(--bdr)}
+.dday-empty{text-align:center;padding:32px 0;color:var(--muted);font-size:13px}
+.dday-acts{display:flex;gap:6px;margin-top:10px}
+.dday-act{
+  flex:1;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;
+  min-height:36px;touch-action:manipulation;-webkit-appearance:none;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+}
+.dday-act.edit{background:var(--p-pale);color:var(--p)}
+.dday-act.del{background:#feecec;color:var(--acc)}
 .ov{
   position:fixed;inset:0;
   background:rgba(10,20,40,.5);
@@ -652,6 +721,11 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   .cal-dt{font-size:22px}
   .cevent-time{font-size:12px}
   .cevent-title{font-size:14px}
+  .mcal-d{font-size:15px}
+  .mcal-cell{min-height:52px;padding:7px 4px 4px}
+  .mcal-title{font-size:17px}
+  .dday-event-title{font-size:15px}
+  .dday-event-row{font-size:13px}
 }
 @media(max-width:400px){
   .logo-sub{font-size:9px;opacity:.65}
@@ -915,6 +989,15 @@ input[type="date"].fi{-webkit-min-logical-width:calc(100% - 32px)}
   </div>
 </div>
 
+<!-- DAY DETAIL SHEET -->
+<div class="ov" id="ddayOv" onclick="bgClose(event,closeDday)">
+  <div class="sheet" style="max-width:540px;">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span id="ddayTitle">Chi tiết ngày</span><button class="xcls" onclick="closeDday()">✕</button></div>
+    <div id="ddayContent"></div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════════════════════
 //  CONFIG
@@ -975,6 +1058,7 @@ let _pollTimer=null;
 let _pollFailCnt=0;
 let _wkCache=null,_wkOff=null,_wkVer=0,_allDVer=0;
 let _offlineSince=null;
+let _calMon=null; // {y, m} tháng đang xem trong tab Lịch
 
 // ════════════════════════════════════════════════════════
 //  SECURITY
@@ -1111,11 +1195,12 @@ function showLoading(){
 // ════════════════════════════════════════════════════════
 //  AUDIT
 // ════════════════════════════════════════════════════════
-// Chuỗi thoiGian dạng "HH:MM:SS DD/MM/YYYY" — chỉ lấy phần ngày
+// Chuỗi thoiGian dạng "HH:MM:SS DD/MM/YYYY" -> đổi thành "DD-MM-YYYY HH:MM:SS"
 function auditDate(s){
   if(!s)return'';
-  const m=s.match(/(\d{2}\/\d{2}\/\d{4})$/);
-  return m?m[1]:s;
+  const m=s.match(/^(\d{2}:\d{2}:\d{2})\s+(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(m)return`${m[2]}-${m[3]}-${m[4]} ${m[1]}`;
+  return s;
 }
 function auditHtml(r){
   const lines=[];
@@ -1263,34 +1348,109 @@ function renderC(){
   const g=document.getElementById('cgrid');
   if(!g)return;
   const today=todayVN();
-  const days=wkDays(wOff);
-  // Dùng wkCache đã filter sẵn thay vì scan allD lại từ đầu
-  const wkMap=new Map();
-  getWkData().forEach(r=>{if(!wkMap.has(r.ngay))wkMap.set(r.ngay,[]);wkMap.get(r.ngay).push(r);});
-  function dayHtml(day){
-    const ds=fmt(day);
-    const dd=(wkMap.get(ds)||[]).sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
-    return`<div class="cal-day">
-      <div class="cal-hdr${ds===today?' today':''}">
-        <div class="cal-thu">${esc(THU[day.getUTCDay()])}</div>
-        <div class="cal-dt">${day.getUTCDate()}/${day.getUTCMonth()+1}</div>
-      </div>
-      <div class="cal-body">
-        ${dd.length?dd.map(r=>{
-          const ac=r.nguoiSua
-            ?`<div class="cevent-audit">🔄 Sửa bởi ${esc(r.nguoiSua)}</div>`
-            :r.nguoiTao
-              ?`<div class="cevent-audit">✏️ Thêm bởi ${esc(r.nguoiTao)}</div>`
-              :'';
-          return`<div class="cevent"><div class="cevent-time">${esc(r.thoigian)}</div><div class="cevent-title">${esc(r.noidung)}</div>${ac}</div>`;
-        }).join(''):'<div style="font-size:11px;color:var(--muted);padding:4px 0;">Không có lịch</div>'}
-      </div>
+  const vn=nowVN();
+  // Khởi tạo tháng hiện tại nếu chưa có
+  if(!_calMon)_calMon={y:vn.getUTCFullYear(),m:vn.getUTCMonth()};
+  const {y,m}=_calMon;
+  const monthNames=['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
+                    'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+  // Build map ngày -> số lịch từ allD
+  const evMap=new Map();
+  allD.forEach(r=>{
+    if(!r.ngay)return;
+    const[ry,rm]=r.ngay.split('-').map(Number);
+    if(ry===y&&rm-1===m){
+      if(!evMap.has(r.ngay))evMap.set(r.ngay,[]);
+      evMap.get(r.ngay).push(r);
+    }
+  });
+  // Số ngày trong tháng, ngày đầu là thứ mấy
+  const firstDow=(new Date(Date.UTC(y,m,1))).getUTCDay();// 0=CN
+  const daysInMonth=new Date(Date.UTC(y,m+1,0)).getUTCDate();
+  const startCol=firstDow===0?6:firstDow-1;// Thứ 2 = cột 0
+  const DOW_LABELS=['T2','T3','T4','T5','T6','T7','CN'];
+  let html=`<div class="mcal-nav">
+    <button class="navbtn" onclick="calMon(-1)" title="Tháng trước">◀</button>
+    <span class="mcal-title">${monthNames[m]} ${y}</span>
+    <button class="navbtn" onclick="calMon(1)" title="Tháng sau">▶</button>
+  </div>
+  <div class="mcal-grid">`;
+  DOW_LABELS.forEach(d=>{html+=`<div class="mcal-dow">${d}</div>`;});
+  // Ô trống đầu tháng
+  for(let i=0;i<startCol;i++)html+=`<div class="mcal-cell empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evs=evMap.get(ds)||[];
+    const isToday=ds===today;
+    const cnt=evs.length;
+    const dots=Math.min(cnt,3);
+    html+=`<div class="mcal-cell${isToday?' today':''}${cnt>0?' has-event':''}" data-ds="${ds}">
+      <span class="mcal-d">${d}</span>
+      ${cnt>0?`<div class="mcal-dots">${'<span class="mcal-dot"></span>'.repeat(dots)}</div>`:''}
+      ${cnt>0?`<span class="mcal-cnt">${cnt}</span>`:''}
     </div>`;
   }
-  const row1=days.slice(0,4).map(dayHtml).join('');
-  const row2=days.slice(4,7).map(dayHtml).join('');
-  g.innerHTML=`<div class="cal-row row-top">${row1}</div><div class="cal-row row-bot">${row2}</div>`;
+  html+=`</div>`;
+  g.innerHTML=html;
+  g.onclick=e=>{
+    const cell=e.target.closest('.mcal-cell[data-ds]');
+    if(cell)openDday(cell.dataset.ds);
+  };
 }
+function calMon(dir){
+  if(!_calMon){const vn=nowVN();_calMon={y:vn.getUTCFullYear(),m:vn.getUTCMonth()};}
+  _calMon.m+=dir;
+  if(_calMon.m>11){_calMon.m=0;_calMon.y++;}
+  if(_calMon.m<0){_calMon.m=11;_calMon.y--;}
+  renderC();
+}
+
+// ════════════════════════════════════════════════════════
+//  DAY DETAIL SHEET
+// ════════════════════════════════════════════════════════
+function openDday(ds){
+  const THU_VI=['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+  const[y,mo,d]=ds.split('-');
+  const dow=new Date(Date.UTC(+y,+mo-1,+d)).getUTCDay();
+  const evs=allD.filter(r=>r.ngay===ds).sort((a,b)=>(a.thoigian||'').localeCompare(b.thoigian||''));
+  document.getElementById('ddayTitle').textContent=`📅 ${THU_VI[dow]}, ${d}/${mo}/${y}`;
+  const hdr=`<div class="dday-hdr">
+    <div class="dday-datebox">
+      <div class="dday-d">${d}</div>
+      <div class="dday-m">Th${mo}</div>
+    </div>
+    <div class="dday-info">
+      <div class="dday-thu">${THU_VI[dow]}</div>
+      <div class="dday-cnt">${evs.length?evs.length+' lịch công tác':'Không có lịch'}</div>
+    </div>
+  </div>`;
+  let body='';
+  if(!evs.length){
+    body=`<div class="dday-empty">📭 Không có lịch công tác trong ngày này</div>`;
+  }else{
+    body=`<div class="dday-events">${evs.map(r=>{
+      const meta=[];
+      if(r.diadiem)meta.push(`<div class="dday-event-row"><span class="dday-event-lbl">📍 Địa điểm</span><span class="dday-event-val">${esc(r.diadiem)}</span></div>`);
+      if(r.chutri)meta.push(`<div class="dday-event-row"><span class="dday-event-lbl">👤 Chủ trì</span><span class="dday-event-val">${esc(r.chutri)}</span></div>`);
+      if(r.thanhphan)meta.push(`<div class="dday-event-row"><span class="dday-event-lbl">👥 T.phần</span><span class="dday-event-val">${esc(r.thanhphan)}</span></div>`);
+      const auditStr=auditHtml(r);
+      const acts=cu?`<div class="dday-acts">
+        <button class="dday-act edit" onclick="closeDday();openEdit('${esc(r.id)}')">✏️ Sửa</button>
+        <button class="dday-act del" onclick="closeDday();openDel('${esc(r.id)}')">🗑 Xóa</button>
+      </div>`:'';
+      return`<div class="dday-event">
+        <div class="dday-event-time">🕐 ${esc(r.thoigian)||'—'}</div>
+        <div class="dday-event-title">${esc(r.noidung)}</div>
+        ${meta.length?`<div class="dday-event-meta">${meta.join('')}</div>`:''}
+        ${auditStr?`<div class="dday-event-audit">${auditStr}</div>`:''}
+        ${acts}
+      </div>`;
+    }).join('')}</div>`;
+  }
+  document.getElementById('ddayContent').innerHTML=hdr+body;
+  document.getElementById('ddayOv').classList.add('open');
+}
+function closeDday(){document.getElementById('ddayOv').classList.remove('open');}
 
 // ════════════════════════════════════════════════════════
 //  DAY FILTER CHIPS
@@ -1811,7 +1971,8 @@ function applyNewData(newArr,diff){
 }
 function isAnyFormOpen(){
   return document.getElementById('lichOv').classList.contains('open')||
-         document.getElementById('delOv').classList.contains('open');
+         document.getElementById('delOv').classList.contains('open')||
+         document.getElementById('ddayOv').classList.contains('open');
 }
 function showUpdateBanner(diff,newArr){
   _pendingData=newArr;
@@ -1922,7 +2083,11 @@ _dmStyle.textContent=`[data-theme="dark"]{--p:#4a8ec2!important;--p-light:#5fa0d
 [data-theme="dark"] .audit-line .a-label{color:#5a7a9a!important}
 [data-theme="dark"] .audit-line .a-name{color:#4a8ec2!important}
 [data-theme="dark"] .audit-line .a-time{color:#4a6080!important}
-[data-theme="dark"] .audit-line .a-sep{color:#2e4060!important}`;
+[data-theme="dark"] .audit-line .a-sep{color:#2e4060!important}
+[data-theme="dark"] .mcal-cell.has-event{border-color:#253447!important}
+[data-theme="dark"] .mcal-d{color:#e8edf4!important}
+[data-theme="dark"] .dday-event{background:#172130!important;border-color:#253447!important}
+[data-theme="dark"] .dday-event-val{color:#e8edf4!important}`;
 document.head.appendChild(_dmStyle);
 
 // ════════════════════════════════════════════════════════
